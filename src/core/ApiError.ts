@@ -6,7 +6,7 @@ import {
   InternalErrorResponse,
   NotFoundResponse,
   BadRequestResponse,
-  ForbiddenResponse,
+  ForbiddenResponse
 } from "./ApiResponse";
 
 enum ErrorType {
@@ -19,7 +19,7 @@ enum ErrorType {
   NO_ENTRY = "NoEntryError",
   NO_DATA = "NoDataError",
   BAD_REQUEST = "BadRequestError",
-  FORBIDDEN = "ForbiddenError",
+  FORBIDDEN = "ForbiddenError"
 }
 
 export abstract class ApiError extends Error {

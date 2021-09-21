@@ -28,8 +28,8 @@ const options = {
     json: true,
     maxSize: "20m",
     colorize: true,
-    maxFiles: "14d",
-  },
+    maxFiles: "14d"
+  }
 };
 
 export default createLogger({
@@ -39,9 +39,9 @@ export default createLogger({
       format: format.combine(
         format.errors({ stack: true }),
         format.prettyPrint()
-      ),
-    }),
+      )
+    })
   ],
   exceptionHandlers: [new DailyRotateFile(options.file)],
-  exitOnError: false, // do not exit on handled exceptions
+  exitOnError: false // do not exit on handled exceptions
 });
