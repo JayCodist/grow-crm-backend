@@ -1,13 +1,13 @@
-import express from 'express';
-import { SuccessResponse } from '../../core/ApiResponse';
+import express from "express";
+import { SuccessResponse } from "../../core/ApiResponse";
 
 const router = express.Router();
 
 /*-------------------------------------------------------------------------*/
 // Below all APIs are public APIs protected by api-key
-router.use('/', (req, res) => {
-    return new SuccessResponse("Done!", {name: "Ukaegbu Justice"}).send(res);
-});
+router.use("/", (req, res) =>
+  new SuccessResponse("Done!", { name: "Ukaegbu Justice" }).send(res)
+);
 /*-------------------------------------------------------------------------*/
 
 // router.use('/signup', signup);
