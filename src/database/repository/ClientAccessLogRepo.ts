@@ -2,13 +2,8 @@ import { Types } from "mongoose";
 import ClientAccessLog, {
   ClientAccessLogModel
 } from "../model/ClientAccessLog";
-// import User, { UserModel } from "../model/User";
-// import Role, { RoleModel } from "../model/Role";
-// import { InternalError } from "../../core/ApiError";
-import { PartialLoose } from "../../types";
+import { PartialLoose } from "../../helpers/type-helpers";
 import { InternalError } from "../../core/ApiError";
-// import KeystoreRepo from "./KeystoreRepo";
-// import Keystore from "../model/Keystore";
 
 type SortLogic = PartialLoose<ClientAccessLog, "asc" | "desc">;
 
