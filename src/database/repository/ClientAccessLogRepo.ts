@@ -1,9 +1,12 @@
 import { Types } from "mongoose";
+import dayjs from "dayjs";
 import ClientAccessLog, {
   ClientAccessLogModel
 } from "../model/ClientAccessLog";
 import { PartialLoose } from "../../helpers/type-helpers";
 import { InternalError } from "../../core/ApiError";
+import { getSearchArray } from "../../helpers/seach-helpers";
+import { createdAtDateFormat } from "../../helpers/constants";
 
 type SortLogic = PartialLoose<ClientAccessLog, "asc" | "desc">;
 
@@ -56,7 +59,6 @@ export default class ClientAccessLogRepo {
                 });
               }
             });
-            // resolve()
           }
         });
     });
@@ -76,8 +78,17 @@ export default class ClientAccessLogRepo {
   }
 
   public static async create(
-    data: ClientAccessLog
+    input: ClientAccessLog
   ): Promise<{ clientAccessLog: ClientAccessLog }> {
+    const data: ClientAccessLog = {
+      ...input,
+      createdAt: dayjs().format(),
+
+      _adminSearch: getSearchArray(input.admin),
+      _clientSearch: getSearchArray(input.client),
+      _createdAtSearch: getSearchArray(dayjs().format(createdAtDateFormat)),
+      _orderIDSearch: getSearchArray(input.orderID)
+    };
     const clientAccessLog = await ClientAccessLogModel.create(data);
     return { clientAccessLog };
   }

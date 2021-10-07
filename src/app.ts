@@ -6,7 +6,7 @@ import "./database"; // initialize database
 import { NotFoundError, ApiError, InternalError } from "./core/ApiError";
 import routesV1 from "./routes/v1";
 
-process.on("uncaughtException", (e) => {
+process.on("uncaughtException", e => {
   Logger.error(e);
 });
 

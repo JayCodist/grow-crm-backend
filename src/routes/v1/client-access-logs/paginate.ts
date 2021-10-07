@@ -1,4 +1,5 @@
 import express from "express";
+import { ApiError, InternalError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
 import ClientAccessLogRepo from "../../../database/repository/ClientAccessLogRepo";
 import validator from "../../../helpers/validator";
@@ -10,13 +11,28 @@ clientAccessLogList.get(
   "/",
   validator(validation.pagination, "query"),
   async (req, res) => {
-    const { pageNumber, pageSize, sortField, sortType } = req.query;
-    const data = await ClientAccessLogRepo.getPaginatedLogs({
-      sortLogic: { [(sortField as string) || "orderID"]: sortType || "asc" },
-      pageSize: Number(pageSize) || 10,
-      pageNumber: Number(pageNumber) || 1
-    });
-    new SuccessResponse("success", data).send(res);
+    try {
+      const {
+        pageNumber,
+        pageSize,
+        sortField,
+        sortType,
+        // searchField,
+        searchValue
+      } = req.query;
+      const data = await ClientAccessLogRepo.getPaginatedLogs({
+        sortLogic: { [(sortField as string) || "orderID"]: sortType || "asc" },
+        pageSize: Number(pageSize) || 10,
+        pageNumber: Number(pageNumber) || 1,
+        filter: searchValue ? { $text: { $search: searchValue } } : undefined
+      });
+      new SuccessResponse("success", data).send(res);
+    } catch (error) {
+      ApiError.handle(
+        new InternalError("Failed to fetch. Please contact your administrator"),
+        res
+      );
+    }
   }
 );
 

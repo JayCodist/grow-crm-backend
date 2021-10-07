@@ -17,7 +17,7 @@ const validator = (schema: Joi.ObjectSchema, source: ValidationSource) => {
 
       const { details } = error;
       const message = details
-        .map((i) => i.message.replace(/['"]+/g, ""))
+        .map(i => i.message.replace(/['"]+/g, ""))
         .join(",");
       Logger.error(message);
 

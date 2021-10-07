@@ -1,4 +1,5 @@
 import express from "express";
+import clientAccessLogCreate from "./client-access-logs/create";
 import clientAccessLogList from "./client-access-logs/paginate";
 
 const router = express.Router();
@@ -12,6 +13,7 @@ router.use("/", async (req, res, next) => {
 /*-------------------------------------------------------------------------*/
 
 router.use("/client-access-logs/paginate", clientAccessLogList);
+router.use("/client-access-logs/create", clientAccessLogCreate);
 
 // router.use('/blogs', blogList);
 // router.use('/blog', blogDetail);
