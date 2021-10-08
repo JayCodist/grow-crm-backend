@@ -7,7 +7,7 @@ import ClientAccessLog, {
 } from "../model/ClientAccessLog";
 import { PartialLoose } from "../../helpers/type-helpers";
 import { InternalError } from "../../core/ApiError";
-import { getSearchArray } from "../../helpers/seach-helpers";
+import { getSearchArray } from "../../helpers/search-helpers";
 import { createdAtDateFormat } from "../../helpers/constants";
 
 type SortLogic = PartialLoose<ClientAccessLog, "asc" | "desc">;
