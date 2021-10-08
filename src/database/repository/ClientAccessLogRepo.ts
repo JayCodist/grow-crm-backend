@@ -1,7 +1,9 @@
 import { Types } from "mongoose";
 import dayjs from "dayjs";
 import ClientAccessLog, {
-  ClientAccessLogModel
+  ClientAccessLogCreate,
+  ClientAccessLogModel,
+  clientAccessLogProjection
 } from "../model/ClientAccessLog";
 import { PartialLoose } from "../../helpers/type-helpers";
 import { InternalError } from "../../core/ApiError";
@@ -40,7 +42,8 @@ export default class ClientAccessLogRepo {
         .skip((pageNumber - 1) * pageSize)
         .limit(pageSize)
         .lean<ClientAccessLog[]>()
-        .exec((err, clientAccessLogs) => {
+        .select(clientAccessLogProjection.join(" "))
+        .exec((err: Error | null, clientAccessLogs: ClientAccessLog[]) => {
           if (err) {
             reject(new InternalError(err.message));
           } else {
@@ -65,22 +68,13 @@ export default class ClientAccessLogRepo {
   }
 
   public static findById(id: Types.ObjectId): Promise<ClientAccessLog | null> {
-    return (
-      ClientAccessLogModel.findOne({ _id: id })
-        // .select("+email +password +roles")
-        .populate({
-          path: "roles",
-          match: { status: true }
-        })
-        .lean<ClientAccessLog>()
-        .exec()
-    );
+    return ClientAccessLogModel.findOne({ _id: id })
+      .lean<ClientAccessLog>()
+      .exec();
   }
 
-  public static async create(
-    input: ClientAccessLog
-  ): Promise<{ clientAccessLog: ClientAccessLog }> {
-    const data: ClientAccessLog = {
+  public static async create(input: ClientAccessLog): Promise<ClientAccessLog> {
+    const data: ClientAccessLogCreate = {
       ...input,
       createdAt: dayjs().format(),
 
@@ -89,8 +83,8 @@ export default class ClientAccessLogRepo {
       _createdAtSearch: getSearchArray(dayjs().format(createdAtDateFormat)),
       _orderIDSearch: getSearchArray(input.orderID)
     };
-    const clientAccessLog = await ClientAccessLogModel.create(data);
-    return { clientAccessLog };
+    const { _id, createdAt } = await ClientAccessLogModel.create(data);
+    return { ...input, id: _id, createdAt };
   }
 
   // public static findByEmail(email: string): Promise<User | null> {

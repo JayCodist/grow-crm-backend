@@ -25,7 +25,7 @@ mongoose
   .then(() => {
     Logger.info("Mongoose connection done");
   })
-  .catch((e) => {
+  .catch(e => {
     Logger.info("Mongoose connection error");
     Logger.error(e);
   });
@@ -37,7 +37,7 @@ mongoose.connection.on("connected", () => {
 });
 
 // If the connection throws an error
-mongoose.connection.on("error", (err) => {
+mongoose.connection.on("error", err => {
   Logger.error(`Mongoose default connection error: ${err}`);
 });
 

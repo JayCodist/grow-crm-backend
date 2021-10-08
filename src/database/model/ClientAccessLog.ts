@@ -1,45 +1,59 @@
 import { Schema, model, Document } from "mongoose";
+import Logger from "../../core/Logger";
 
 export const DOCUMENT_NAME = "ClientAccessLog";
 export const COLLECTION_NAME = "clientAccessLog";
 
+export const clientAccessLogProjection = [
+  "admin",
+  "createdAt",
+  "orderID",
+  "client"
+];
+
 export default interface ClientAccessLog {
+  id: string;
   admin: string;
-  _adminSearch: string[];
-  createdAt?: string;
-  _createdAtSearch?: string[];
+  createdAt: string;
   orderID: string;
-  _orderIDSearch: string[];
   client: string;
+}
+
+export interface ClientAccessLogCreate extends Omit<ClientAccessLog, "id"> {
+  _orderIDSearch: string[];
+  _adminSearch: string[];
+  _createdAtSearch: string[];
   _clientSearch: string[];
 }
 
-interface ClientAccessLogDocument extends Document, ClientAccessLog {}
+interface ClientAccessLogDocument extends Document, ClientAccessLogCreate {}
 
 const schema = new Schema(
   {
     admin: String,
-    _adminSearch: [String],
+    _adminSearch: { type: [String], index: true },
     client: String,
-    _clientSearch: [String],
+    _clientSearch: { type: [String], index: true },
     orderID: String,
-    _orderIDSearch: [String],
+    _orderIDSearch: { type: [String], index: true },
     createdAt: String,
-    _createdAtSearch: [String]
+    _createdAtSearch: { type: [String], index: true }
   },
-  {
-    versionKey: false
-  }
-);
-// .index({
-//   "admin.firstName": "text",
-//   client: "text",
-//   orderID: "text",
-//   createdAtSearch: "text"
-// });
+  { skipVersioning: true }
+).index({
+  createdAt: 1
+});
 
 export const ClientAccessLogModel = model<ClientAccessLogDocument>(
   DOCUMENT_NAME,
   schema,
   COLLECTION_NAME
 );
+
+ClientAccessLogModel.on("index", err => {
+  if (err) {
+    Logger.error({ message: "ClientAccessLog index error: ", err });
+  } else {
+    Logger.info("ClientAccessLog indexing complete");
+  }
+});
