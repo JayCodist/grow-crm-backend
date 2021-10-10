@@ -7,3 +7,14 @@ instance_class: F1
 automatic_scaling:
   max_instances: 4
   min_instances: 0
+
+env_variables:
+  NODE_ENV: "environment"
+  CORS_URL: "*"
+  ACCESS_TOKEN_VALIDITY_DAYS: 30
+  REFRESH_TOKEN_VALIDITY_DAYS: 120
+  TOKEN_ISSUER: "https://grow-crm.web.app"
+  TOKEN_AUDIENCE: "https://grow-crm.web.app"
+  DB_NAME: ${{ secrets.DB_NAME }}
+  DB_USER: ${{ secrets.DB_USER }}
+  DB_USER_PWD: ${{ secrets.DB_USER_PWD }}
