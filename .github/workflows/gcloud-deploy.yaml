@@ -11,6 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: yarn install
+      - name: Perform build
+        run: yarn build
       - uses: google-github-actions/deploy-appengine@main
         with:
           credentials: ${{ secrets.gcp_credentials }}
