@@ -2,7 +2,7 @@
   "name": "grow-crm-backend",
   "version": "1.0.0",
   "description": "Express|MongoDB backend for Grow CRM",
-  "main": "index.js",
+  "main": "./build/server.js",
   "scripts": {
     "start": "npm run build && npm run serve",
     "serve": "node -r dotenv/config build/server.js",
