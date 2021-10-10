@@ -32,7 +32,7 @@ const options = {
   }
 };
 
-export default createLogger({
+const devLog = createLogger({
   transports: [
     new transports.Console({
       level: logLevel,
@@ -45,3 +45,12 @@ export default createLogger({
   exceptionHandlers: [new DailyRotateFile(options.file)],
   exitOnError: false // do not exit on handled exceptions
 });
+
+const prodLog = {
+  info: console.log,
+  debug: console.log,
+  error: console.error,
+  warn: console.warn
+};
+
+export default environment === "development" ? devLog : prodLog;

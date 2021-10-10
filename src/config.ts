@@ -1,5 +1,7 @@
+type Environment = "production" | "development";
+
 // Mapper for environment variables
-export const environment = process.env.NODE_ENV;
+export const environment: Environment = process.env.NODE_ENV as Environment;
 export const port = process.env.PORT || "8080";
 
 export const db = {
