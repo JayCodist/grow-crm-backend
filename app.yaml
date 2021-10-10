@@ -9,7 +9,6 @@ automatic_scaling:
   min_instances: 0
 
 env_variables:
-  NODE_ENV: "environment"
   CORS_URL: "*"
   ACCESS_TOKEN_VALIDITY_DAYS: 30
   REFRESH_TOKEN_VALIDITY_DAYS: 120
@@ -18,5 +17,6 @@ env_variables:
   DB_NAME: ${{ secrets.DB_NAME }}
   DB_USER: ${{ secrets.DB_USER }}
   DB_USER_PWD: ${{ secrets.DB_USER_PWD }}
+  DB_HOST: ${{ secrets.DB_HOST }}
 
 entrypoint: "node build/server.js"
