@@ -18,3 +18,5 @@ env_variables:
   DB_NAME: ${{ secrets.DB_NAME }}
   DB_USER: ${{ secrets.DB_USER }}
   DB_USER_PWD: ${{ secrets.DB_USER_PWD }}
+
+entrypoint: "node build/server.js"

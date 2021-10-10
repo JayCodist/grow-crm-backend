@@ -15,3 +15,9 @@
 
 # Node.js dependencies:
 node_modules/
+
+# Build output
+build
+
+# Logs
+logs
