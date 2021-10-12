@@ -1,0 +1,15 @@
+steps:
+- name: node:12.13.0
+  entrypoint: yarn
+  args: ["install"]
+- name: node:12.13.0
+  entrypoint: yarn
+  args: ["create-env"]
+  env:
+    - "DB_NAME=${_DB_NAME}"
+    - "DB_USER=${_DB_USER}"
+    - "DB_USER_PWD=${_DB_USER_PWD}"
+    - "DB_HOST=${_DB_HOST}"
+- name: "gcr.io/cloud-builders/gcloud"
+  args: ["app", "deploy"]
+timeout: "1600s"
