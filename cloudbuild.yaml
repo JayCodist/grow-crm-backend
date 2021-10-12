@@ -14,5 +14,5 @@ steps:
     - "DB_USER_PWD=${_DB_USER_PWD}"
     - "DB_HOST=${_DB_HOST}"
 - name: "gcr.io/cloud-builders/gcloud"
-  args: ["app", "deploy"]
+  args: ["app", "deploy", "--quiet", "app.yaml", "--project", "regal-operations-defy", "--version", "service-default", "--no-promote"]
 timeout: "1600s"
