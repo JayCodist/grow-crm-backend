@@ -4,6 +4,9 @@ steps:
   args: ["install"]
 - name: node:12.13.0
   entrypoint: yarn
+  args: ["build"]
+- name: node:12.13.0
+  entrypoint: yarn
   args: ["create-env"]
   env:
     - "DB_NAME=${_DB_NAME}"
