@@ -3,18 +3,23 @@ import formidable from "formidable";
 
 export const handleFormDataParsing = () => {
   return (req: Request, res: Response, next: NextFunction) => {
-    if (Object.keys(req.body).length === 0) {
-      const form = formidable();
-      form.parse(req, (err, fields, files) => {
-        if (!err) {
-          req.body = {
-            ...fields,
-            ...files
-          };
+    try {
+      if (Object.keys(req.body).length === 0) {
+        const form = formidable();
+        form.parse(req, (err, fields, files) => {
+          if (!err) {
+            req.body = {
+              ...fields,
+              ...files
+            };
+            next();
+          }
           next();
-        }
-      });
-    } else {
+        });
+      } else {
+        next();
+      }
+    } catch (error) {
       next();
     }
   };

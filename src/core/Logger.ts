@@ -46,13 +46,13 @@
 //   exitOnError: false // do not exit on handled exceptions
 // });
 
-const prodLog = {
+const Logger = {
   info: console.log,
   debug: console.log,
   error: console.error,
   warn: console.warn
 };
 
-export default prodLog;
+export default Logger;
 
 // export default environment === "development" ? devLog : prodLog;
