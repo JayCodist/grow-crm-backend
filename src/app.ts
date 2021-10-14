@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import Logger from "./core/Logger";
-import { corsUrl, environment } from "./config";
+import { environment } from "./config";
 import "./database"; // initialize database
 import { NotFoundError, ApiError, InternalError } from "./core/ApiError";
 import routesV1 from "./routes/v1";
@@ -16,7 +16,7 @@ app.use(
   express.urlencoded({ limit: "10mb", extended: true, parameterLimit: 50000 })
 );
 app.use(express.json({ limit: "10mb" }));
-app.use(cors({ origin: corsUrl, optionsSuccessStatus: 200 }));
+app.use(cors());
 
 // Routes
 app.use("/v1", routesV1);
