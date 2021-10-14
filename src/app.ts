@@ -16,7 +16,7 @@ app.use(
   express.urlencoded({ limit: "10mb", extended: true, parameterLimit: 50000 })
 );
 app.use(express.json({ limit: "10mb" }));
-app.use(cors());
+app.use(cors({ credentials: true, origin: true }));
 
 // Routes
 app.use("/v1", routesV1);
