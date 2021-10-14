@@ -33,7 +33,7 @@ export default class ClientAccessLogRepo {
     pageSize = defaultPageAttr.pageSize,
     sortLogic = defaultSortLogic
   }: PaginatedFetchParams): Promise<{
-    clientAccessLogs: ClientAccessLog[];
+    data: ClientAccessLog[];
     count: number;
   }> {
     return new Promise((resolve, reject) => {
@@ -57,7 +57,7 @@ export default class ClientAccessLogRepo {
                 reject(new InternalError(countErr.message));
               } else {
                 resolve({
-                  clientAccessLogs,
+                  data: clientAccessLogs,
                   count
                 });
               }
