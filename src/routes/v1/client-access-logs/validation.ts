@@ -4,9 +4,9 @@ const validation = {
   pagination: Joi.object().keys({
     pageNumber: Joi.number().integer().min(1),
     pageSize: Joi.number().integer().min(1),
-    sortField: Joi.string(),
-    searchField: Joi.string(),
-    searchValue: Joi.string(),
+    sortField: Joi.string().allow(""),
+    searchField: Joi.string().allow(""),
+    searchValue: Joi.string().allow(""),
     sortType: Joi.string().valid("asc", "desc")
   }),
   create: Joi.object().keys({

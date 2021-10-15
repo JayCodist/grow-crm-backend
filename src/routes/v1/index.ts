@@ -15,10 +15,4 @@ router.use("/", async (req, res, next) => {
 router.use("/client-access-logs/paginate", clientAccessLogList);
 router.use("/client-access-logs/create", clientAccessLogCreate);
 
-// router.use('/blogs', blogList);
-// router.use('/blog', blogDetail);
-// router.use('/writer/blog', writer);
-// router.use('/editor/blog', editor);
-// router.use('/profile', user);
-
 export default router;
