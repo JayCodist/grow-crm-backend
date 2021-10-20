@@ -9,7 +9,6 @@ import { PartialLoose } from "../../helpers/type-helpers";
 import { InternalError } from "../../core/ApiError";
 import { getSearchArray } from "../../helpers/search-helpers";
 import { createdAtDateFormat } from "../../helpers/constants";
-import Logger from "../../core/Logger";
 
 type SortLogic = PartialLoose<ClientAccessLog, "asc" | "desc">;
 
@@ -37,7 +36,6 @@ export default class ClientAccessLogRepo {
     data: ClientAccessLog[];
     count: number;
   }> {
-    Logger.debug({ sortLogic });
     return new Promise((resolve, reject) => {
       ClientAccessLogModel.find(filter)
         .sort(sortLogic)
