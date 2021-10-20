@@ -24,11 +24,14 @@ clientAccessLogList.get(
       } = req.query;
 
       const data = await ClientAccessLogRepo.getPaginatedLogs({
-        sortLogic: {
-          [sortField as string]: sortType
-        },
-        pageSize: Number(pageSize) || 10,
-        pageNumber: Number(pageNumber) || 1,
+        sortLogic:
+          sortField && sortType
+            ? {
+                [sortField as string]: sortType
+              }
+            : undefined,
+        pageSize: Number(pageSize) || undefined,
+        pageNumber: Number(pageNumber) || undefined,
         filter:
           searchValue && searchField
             ? {
