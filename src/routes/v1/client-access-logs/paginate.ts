@@ -25,7 +25,7 @@ clientAccessLogList.get(
 
       const data = await ClientAccessLogRepo.getPaginatedLogs({
         sortLogic: {
-          [(sortField as string) || "createdAt"]: sortType || "asc"
+          [sortField as string]: sortType
         },
         pageSize: Number(pageSize) || 10,
         pageNumber: Number(pageNumber) || 1,
