@@ -1,1 +1,1 @@
-export const createdAtDateFormat = "dddd, D MMM YYYY. hh:mm:ssA";
+export const createdAtDateFormat = "dddd, D MMM YYYY hh:mm:ss A";
