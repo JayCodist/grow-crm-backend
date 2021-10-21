@@ -8,7 +8,8 @@ export const clientAccessLogProjection = [
   "admin",
   "createdAt",
   "orderID",
-  "client"
+  "client",
+  "meta"
 ];
 
 export default interface ClientAccessLog {
@@ -17,6 +18,7 @@ export default interface ClientAccessLog {
   createdAt: string;
   orderID: string;
   client: string;
+  meta: string;
 }
 
 export interface ClientAccessLogCreate extends Omit<ClientAccessLog, "id"> {
@@ -24,6 +26,7 @@ export interface ClientAccessLogCreate extends Omit<ClientAccessLog, "id"> {
   _adminSearch: string[];
   _createdAtSearch: string[];
   _clientSearch: string[];
+  _metaSearch: string[];
 }
 
 interface ClientAccessLogDocument extends Document, ClientAccessLogCreate {}
@@ -37,7 +40,9 @@ const schema = new Schema(
     orderID: String,
     _orderIDSearch: { type: [String], index: true },
     createdAt: String,
-    _createdAtSearch: { type: [String], index: true }
+    _createdAtSearch: { type: [String], index: true },
+    meta: String,
+    _metaSearch: { type: [String], index: true }
   },
   { skipVersioning: true }
 ).index({

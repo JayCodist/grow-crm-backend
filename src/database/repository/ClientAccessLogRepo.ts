@@ -81,59 +81,10 @@ export default class ClientAccessLogRepo {
       _adminSearch: getSearchArray(input.admin),
       _clientSearch: getSearchArray(input.client),
       _createdAtSearch: getSearchArray(dayjs().format(createdAtDateFormat)),
-      _orderIDSearch: getSearchArray(input.orderID)
+      _orderIDSearch: getSearchArray(input.orderID),
+      _metaSearch: getSearchArray(input.meta)
     };
     const { _id, createdAt } = await ClientAccessLogModel.create(data);
     return { ...input, id: _id, createdAt };
   }
-
-  // public static findByEmail(email: string): Promise<User | null> {
-  //   return UserModel.findOne({ email, status: true })
-  //     .select("+email +password +roles")
-  //     .populate({
-  //       path: "roles",
-  //       match: { status: true },
-  //       select: { code: 1 }
-  //     })
-  //     .lean<User>()
-  //     .exec();
-  // }
-  // public static findProfileById(id: Types.ObjectId): Promise<User | null> {
-  //   return UserModel.findOne({ _id: id, status: true })
-  //     .select("+roles")
-  //     .populate({
-  //       path: "roles",
-  //       match: { status: true },
-  //       select: { code: 1 }
-  //     })
-  //     .lean<User>()
-  //     .exec();
-  // }
-  // public static findPublicProfileById(
-  //   id: Types.ObjectId
-  // ): Promise<User | null> {
-  //   return UserModel.findOne({ _id: id, status: true }).lean<User>().exec();
-  // }
-  // public static async update(
-  //   user: User,
-  //   accessTokenKey: string,
-  //   refreshTokenKey: string
-  // ): Promise<{ user: User; keystore: Keystore }> {
-  //   user.updatedAt = new Date();
-  //   await UserModel.updateOne({ _id: user._id }, { $set: { ...user } })
-  //     .lean()
-  //     .exec();
-  //   const keystore = await KeystoreRepo.create(
-  //     user._id,
-  //     accessTokenKey,
-  //     refreshTokenKey
-  //   );
-  //   return { user, keystore };
-  // }
-  // public static updateInfo(user: User): Promise<any> {
-  //   user.updatedAt = new Date();
-  //   return UserModel.updateOne({ _id: user._id }, { $set: { ...user } })
-  //     .lean()
-  //     .exec();
-  // }
 }
