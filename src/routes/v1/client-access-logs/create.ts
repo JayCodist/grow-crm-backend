@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { ApiError, InternalError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
 import ClientAccessLogRepo from "../../../database/repository/ClientAccessLogRepo";
@@ -12,9 +12,13 @@ clientAccessLogCreate.post(
   "/",
   handleFormDataParsing(),
   validator(validation.create, "body"),
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     try {
-      const response = await ClientAccessLogRepo.create(req.body);
+      const ipAddress = req.ip;
+      const response = await ClientAccessLogRepo.create({
+        ...req.body,
+        meta: `IP: ${ipAddress} - ${req.body.meta}`
+      });
       new SuccessResponse("success", response).send(res);
     } catch (error) {
       ApiError.handle(
