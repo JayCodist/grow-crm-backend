@@ -17,7 +17,7 @@ clientAccessLogCreate.post(
       const ipAddress = req.ip;
       const response = await ClientAccessLogRepo.create({
         ...req.body,
-        meta: `IP: ${ipAddress} - ${req.body.meta}`
+        meta: `IP: ${ipAddress.replace(/[^\d.]/g, "")} - ${req.body.meta}`
       });
       new SuccessResponse("success", response).send(res);
     } catch (error) {
