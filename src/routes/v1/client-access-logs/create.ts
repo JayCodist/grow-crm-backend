@@ -14,10 +14,11 @@ clientAccessLogCreate.post(
   validator(validation.create, "body"),
   async (req: Request, res: Response) => {
     try {
-      // const rawIPAddress = req.ip.replace(/[^\d.]/g, "");
-      // const ipAddress = rawIPAddress === "1" ? "localhost" : rawIPAddress;
-      const ipAddress =
+      const rawIPAddress =
         req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+      const ipAddress = rawIPAddress
+        ? rawIPAddress.toString().split(",")[0]
+        : "N/A";
       const response = await ClientAccessLogRepo.create({
         ...req.body,
         meta: `IP: ${ipAddress} - ${req.body.meta}`
