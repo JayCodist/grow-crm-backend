@@ -18,6 +18,8 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 app.use(cors({ credentials: true, origin: true }));
 
+app.set("trust proxy", false);
+
 // Routes
 app.use("/v1", routesV1);
 
