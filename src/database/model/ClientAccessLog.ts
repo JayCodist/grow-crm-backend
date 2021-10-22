@@ -9,7 +9,8 @@ export const clientAccessLogProjection = [
   "createdAt",
   "orderID",
   "client",
-  "meta"
+  "meta",
+  "clientID"
 ];
 
 export default interface ClientAccessLog {
@@ -17,6 +18,7 @@ export default interface ClientAccessLog {
   admin: string;
   createdAt: string;
   orderID: string;
+  clientID: string;
   client: string;
   meta: string;
 }
@@ -35,6 +37,7 @@ const schema = new Schema(
   {
     admin: String,
     _adminSearch: { type: [String], index: true },
+    clientID: String,
     client: String,
     _clientSearch: { type: [String], index: true },
     orderID: String,

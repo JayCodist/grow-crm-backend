@@ -13,7 +13,8 @@ const validation = {
     admin: Joi.string().min(3).max(50).required(),
     client: Joi.string().min(3).max(100).required(),
     orderID: Joi.string().min(2).max(20).required(),
-    meta: Joi.string().min(10).max(200).required()
+    meta: Joi.string().min(10).max(200).required(),
+    clientID: Joi.string().min(3).max(50).required()
   })
 };
 
