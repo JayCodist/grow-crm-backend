@@ -12,10 +12,11 @@ mobileVersionCheck.get(
   validator(validation.mobileVersionCheck, "query"),
   async (req, res) => {
     try {
-      const { version, os } = req.query as unknown as {
+      const { version: _version, os } = req.query as unknown as {
         version: number;
         os: "ios" | "android";
       };
+      const version = Number(_version) || 0;
       const handler =
         os === "android"
           ? MobileVersionCheckRepo.checkAndroidVersion
