@@ -1,8 +1,8 @@
 import { Schema, model, Document } from "mongoose";
 import Logger from "../../core/Logger";
 
-export const DOCUMENT_NAME = "ClientAccessLog";
-export const COLLECTION_NAME = "clientAccessLog";
+const DOCUMENT_NAME = "ClientAccessLog";
+const COLLECTION_NAME = "clientAccessLog";
 
 export const clientAccessLogProjection = [
   "admin",
