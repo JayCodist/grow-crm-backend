@@ -10,7 +10,7 @@ const dbURI =
     ? `mongodb+srv://${db.user}:${encodeURIComponent(db.password)}@${
         db.host
       }${dbPortStr}/${db.name}`
-    : `mongodb://${db.host}${dbPortStr}/${db.name}`;
+    : `mongodb://localhost:27017/grow_crm_db_dev`;
 const options: ConnectOptions = {
   autoIndex: true,
   maxPoolSize: 10, // Maintain up to 10 socket connections
