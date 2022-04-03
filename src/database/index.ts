@@ -1,14 +1,16 @@
 import mongoose, { ConnectOptions } from "mongoose";
 import Logger from "../core/Logger";
-import { db } from "../config";
+import { db, environment } from "../config";
 
 const dbPortStr = db.port ? `:${db.port}` : "";
 
 // Build the connection string
-const dbURI = `mongodb+srv://${db.user}:${encodeURIComponent(db.password)}@${
-  db.host
-}${dbPortStr}/${db.name}`;
-
+const dbURI =
+  environment === "production"
+    ? `mongodb+srv://${db.user}:${encodeURIComponent(db.password)}@${
+        db.host
+      }${dbPortStr}/${db.name}`
+    : `mongodb://${db.host}${dbPortStr}/${db.name}`;
 const options: ConnectOptions = {
   autoIndex: true,
   maxPoolSize: 10, // Maintain up to 10 socket connections
