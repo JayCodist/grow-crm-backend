@@ -1,5 +1,4 @@
 import Joi from "@hapi/joi";
-import { join } from "path";
 
 const validation = {
   create: Joi.object().keys({
