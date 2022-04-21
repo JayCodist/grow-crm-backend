@@ -79,17 +79,17 @@ export default class ContactsRepo {
     return { ...input, phones, createdAt };
   }
 
-  public static async update(req: Request) {
-    const contact = await ContactModel.findByIdAndUpdate(
-      req.params.id,
-      req.body
-    );
+  public static async update(updateParams: PartialLoose<Contact>) {
+    const { id, ...update } = updateParams;
+    const contact = await ContactModel.findByIdAndUpdate(id, update, {
+      new: true
+    });
 
     return contact;
   }
 
-  public static async delete(req: Request) {
-    const contact = await ContactModel.findByIdAndDelete(req.params.id);
+  public static async delete(id: string) {
+    const contact = await ContactModel.findByIdAndDelete(id);
 
     return contact;
   }

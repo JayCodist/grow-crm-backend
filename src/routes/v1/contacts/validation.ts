@@ -12,7 +12,7 @@ const validation = {
     gender: Joi.string().required(),
     city: Joi.string().required(),
     email: Joi.string().email().required(),
-    phone: Joi.string().allow(""),
+    phone: Joi.string().required(),
     phoneAlt: Joi.string().allow(""),
     phoneAlt2: Joi.string().allow(""),
     state: Joi.string().required(),
@@ -21,7 +21,7 @@ const validation = {
   }),
   paginate: Joi.object().keys({
     pageNumber: Joi.number().integer().min(1),
-    pageSize: Joi.number().integer().min(1),
+    pageSize: Joi.number().integer().min(0),
     sortField: Joi.string().allow(""),
     searchField: Joi.string().allow(""),
     searchValue: Joi.string().allow(""),

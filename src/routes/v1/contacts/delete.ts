@@ -15,7 +15,7 @@ deleteContact.delete(
   validator(validation.delete, "params"),
   async (req, res) => {
     try {
-      const response = await ContactsRepo.delete(req);
+      const response = await ContactsRepo.delete(req.params.id);
       if (!response) {
         new BadRequestResponse("Contact not found").send(res);
       }
