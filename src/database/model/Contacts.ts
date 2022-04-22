@@ -6,7 +6,6 @@ const COLLECTION_NAME = "contacts";
 
 export const contactProjection = [
   "key",
-  "objectId",
   "createdAt",
   "name",
   "phone",
@@ -26,7 +25,6 @@ export const contactProjection = [
 ];
 
 export default interface Contact {
-  objectId: string;
   id: string;
   key: string;
   name: string;
@@ -61,7 +59,6 @@ interface ContactDocument extends Document, ContactCreate {}
 
 const schema = new Schema(
   {
-    objectId: String,
     _id: String,
     key: String,
     name: String,
