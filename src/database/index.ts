@@ -5,12 +5,15 @@ import { db, environment } from "../config";
 const dbPortStr = db.port ? `:${db.port}` : "";
 
 // Build the connection string
-const dbURI =
-  environment === "production"
-    ? `mongodb+srv://${db.user}:${encodeURIComponent(db.password)}@${
-        db.host
-      }${dbPortStr}/${db.name}`
-    : `mongodb://localhost:27017/grow_crm_db_dev`;
+const dbURIMap = {
+  production: `mongodb+srv://${db.user}:${encodeURIComponent(db.password)}@${
+    db.host
+  }${dbPortStr}/${db.name}`,
+  development: "mongodb://localhost:27017/grow_crm_db_dev",
+  test: "mongodb://localhost:27017/grow_crm_db_test"
+};
+const dbURI = dbURIMap[environment];
+
 const options: ConnectOptions = {
   autoIndex: true,
   maxPoolSize: 10, // Maintain up to 10 socket connections
