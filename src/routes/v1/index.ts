@@ -22,9 +22,9 @@ router.use("/client-access-logs/create", clientAccessLogCreate);
 
 router.use("/config", configRoutes);
 
-router.use("/contact", createContact);
-router.use("/contact", contactLoglist);
-router.use("/contact", updateContact);
-router.use("/contact", deleteContact);
+router.use("/contacts", createContact);
+router.use("/contacts", contactLoglist);
+router.use("/contacts", updateContact);
+router.use("/contacts", deleteContact);
 
 export default router;

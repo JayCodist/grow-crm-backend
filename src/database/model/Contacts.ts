@@ -26,7 +26,6 @@ export const contactProjection = [
 
 export default interface Contact {
   id: string;
-  key: string;
   name: string;
   firstName: string;
   lastName: string;

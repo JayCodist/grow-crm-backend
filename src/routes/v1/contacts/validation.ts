@@ -6,17 +6,19 @@ const validation = {
     name: Joi.string().required(),
     firstName: Joi.string().required().allow(""),
     lastName: Joi.string().required().allow(""),
-    address: Joi.array().items(Joi.string()),
-    phones: Joi.array().items(Joi.string()),
+    address: Joi.array().items(Joi.string()).required(),
+    phones: Joi.array().items(Joi.string()).required(),
     category: Joi.array().items(Joi.string()),
-    gender: Joi.string().required(),
-    city: Joi.string().required(),
-    email: Joi.string().email().required(),
+    gender: Joi.string().default(""),
+    city: Joi.string().default(""),
+    email: Joi.string().email().default(""),
     phone: Joi.string().required(),
-    phoneAlt: Joi.string().allow(""),
-    phoneAlt2: Joi.string().allow(""),
-    state: Joi.string().required(),
-    dob: Joi.date().allow(""),
+    phoneAlt: Joi.string().default(""),
+    phoneAlt2: Joi.string().default(""),
+    state: Joi.string().default(""),
+    dob: Joi.string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .allow(""),
     timeStamp: Joi.date().timestamp()
   }),
   paginate: Joi.object().keys({
