@@ -26,7 +26,7 @@ const sampleContact: any = {
   state: "",
   dob: "",
   email: "",
-  timeStamp: new Date().valueOf()
+  timestamp: new Date().valueOf()
 };
 
 const endpoint = "/v1/contacts";
@@ -161,7 +161,7 @@ describe("Contacts", () => {
   //           expect(data.state).to.be.a("string");
   //           expect(data.dob).to.be.a("string");
   //           expect(data.email).to.be.a("string");
-  //           expect(data.timeStamp).to.be.a("string");
+  //           expect(data.timestamp).to.be.a("string");
   //           expect(data.gender).to.be.a("string");
   //           done();
   //         });
