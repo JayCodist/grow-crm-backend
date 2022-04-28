@@ -25,7 +25,7 @@ const sampleContact: any = {
   state: "",
   dob: "",
   email: "",
-  timestamp: new Date().valueOf()
+  timeStamp: new Date().valueOf()
 };
 
 const endpoint = "/v1/contacts";
@@ -42,7 +42,7 @@ describe("Contacts", () => {
   /*
    * Test the /GET route
    */
-  describe("/GET", () => {
+  describe("/GET/:id", () => {
     it("it should GET empty array of Contacts", done => {
       request(server)
         .get(`${endpoint}/paginate`)
@@ -54,6 +54,106 @@ describe("Contacts", () => {
           expect(data.length).to.equal(0);
           done();
         });
+    });
+  });
+
+  /*
+   * Test the /POST route
+   */
+  describe("/POST", () => {
+    it("it should POST a new Contact", done => {
+      request(server)
+        .post(`${endpoint}/create`)
+        .send(sampleContact)
+        .end((_, res) => {
+          const { status, body } = res;
+          const { data } = body;
+          expect(status).to.equal(200);
+          expect(data).to.be.an("object");
+          expect(data.id).to.be.a("string");
+          expect(data.name).to.be.a("string");
+          expect(data.firstName).to.be.a("string");
+          expect(data.lastName).to.be.a("string");
+          expect(data.phone).to.be.a("string");
+          expect(data.phoneAlt).to.be.a("string");
+          expect(data.phoneAlt2).to.be.a("string");
+          expect(data.phones).to.be.an("array");
+          expect(data.address).to.be.an("array");
+          expect(data.category).to.be.an("array");
+          expect(data.city).to.be.a("string");
+          expect(data.state).to.be.a("string");
+          expect(data.dob).to.be.a("string");
+          expect(data.email).to.be.a("string");
+          expect(data.timeStamp).to.be.a("number");
+          expect(data.gender).to.be.a("string");
+          done();
+        });
+    });
+  });
+
+  /*
+   * Test /PUT route
+   */
+
+  describe("/PUT/:id", () => {
+    it("it should UPDATE a contact by the given id", done => {
+      const contact = new Contact({
+        ...sampleContact,
+        _id: sampleContact.id
+      });
+      contact.save(() => {
+        request(server)
+          .put(`${endpoint}/update/${sampleContact.id}`)
+          .send({ phone: "08029667843", lastName: "Taiwo" })
+          .end((_, res) => {
+            const { status, body } = res;
+            const { data } = body;
+            expect(status).to.equal(200);
+            expect(data).to.be.an("object");
+            expect(data._id).to.be.a("string");
+            expect(data.name).to.be.a("string");
+            expect(data.firstName).to.be.a("string");
+            expect(data.lastName).to.be.a("string").eql("Taiwo");
+            expect(data.phone).to.be.a("string").eql("08029667843");
+            expect(data.phoneAlt).to.be.a("string");
+            expect(data.phoneAlt2).to.be.a("string");
+            expect(data.phones).to.be.an("array");
+            expect(data.address).to.be.an("array");
+            expect(data.category).to.be.an("array");
+            expect(data.city).to.be.a("string");
+            expect(data.state).to.be.a("string");
+            expect(data.dob).to.be.a("string");
+            expect(data.email).to.be.a("string");
+            expect(data.timeStamp).to.be.a("string");
+            expect(data.gender).to.be.a("string");
+            done();
+          });
+      });
+    });
+  });
+
+  /*
+   * Test /DELETE route
+   */
+
+  describe("/DELETE/:id", () => {
+    it("it should DELETE a contact by the given id", done => {
+      const contact = new Contact({
+        ...sampleContact,
+        _id: sampleContact.id
+      });
+      contact.save(() => {
+        request(server)
+          .delete(`${endpoint}/delete/${sampleContact.id}`)
+          .send(sampleContact)
+          .end((_, res) => {
+            const { status, body } = res;
+            expect(status).to.equal(200);
+            expect(body).to.not.have.property("data");
+
+            done();
+          });
+      });
     });
   });
 });
