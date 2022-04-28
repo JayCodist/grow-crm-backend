@@ -31,7 +31,7 @@ const sampleContact: any = {
 const endpoint = "/v1/contacts";
 
 describe("Contacts", () => {
-  let id: string;
+  // let id: string;
   before(done => {
     Contact.deleteMany({}, () => done());
   });
@@ -42,7 +42,7 @@ describe("Contacts", () => {
   /*
    * Test the /GET route
    */
-  describe("/GET/:id", () => {
+  describe("/GET", () => {
     it("it should GET empty array of Contacts", done => {
       request(server)
         .get(`${endpoint}/paginate`)
@@ -70,22 +70,12 @@ describe("Contacts", () => {
           const { data } = body;
           expect(status).to.equal(200);
           expect(data).to.be.an("object");
-          expect(data.id).to.be.a("string");
-          expect(data.name).to.be.a("string");
-          expect(data.firstName).to.be.a("string");
-          expect(data.lastName).to.be.a("string");
-          expect(data.phone).to.be.a("string");
-          expect(data.phoneAlt).to.be.a("string");
-          expect(data.phoneAlt2).to.be.a("string");
-          expect(data.phones).to.be.an("array");
-          expect(data.address).to.be.an("array");
-          expect(data.category).to.be.an("array");
-          expect(data.city).to.be.a("string");
-          expect(data.state).to.be.a("string");
-          expect(data.dob).to.be.a("string");
-          expect(data.email).to.be.a("string");
-          expect(data.timeStamp).to.be.a("number");
-          expect(data.gender).to.be.a("string");
+          expect(data.id).to.equal(sampleContact.id);
+          // request(server)
+          //   .get(`${endpoint}/paginate`)
+          //   .end((_, res) => {
+
+          //   })
           done();
         });
     });

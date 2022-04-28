@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-type Environment = "production" | "development";
+export type Environment = "production" | "development" | "test";
 
 // Mapper for environment variables
 export const environment: Environment =
