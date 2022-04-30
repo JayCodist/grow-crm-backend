@@ -48,6 +48,9 @@ const validation = {
   }),
   delete: Joi.object().keys({
     id: Joi.string().required()
+  }),
+  record: Joi.object().keys({
+    id: Joi.string().required()
   })
 };
 
