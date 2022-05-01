@@ -132,42 +132,38 @@ describe("Contacts", () => {
   //  * Test /PUT route
   //  */
 
-  // describe("/PUT/:id", () => {
-  //   it("it should UPDATE a contact by the given id", done => {
-  //     const contact = new Contact({
-  //       ...sampleContact,
-  //       _id: sampleContact.id
-  //     });
-  //     contact.save(() => {
-  //       request(server)
-  //         .put(`${endpoint}/update/${sampleContact.id}`)
-  //         .send({ phone: "08029667843", lastName: "Taiwo" })
-  //         .end((_, res) => {
-  //           const { status, body } = res;
-  //           const { data } = body;
-  //           expect(status).to.equal(200);
-  //           expect(data).to.be.an("object");
-  //           expect(data._id).to.be.a("string");
-  //           expect(data.name).to.be.a("string");
-  //           expect(data.firstName).to.be.a("string");
-  //           expect(data.lastName).to.be.a("string").eql("Taiwo");
-  //           expect(data.phone).to.be.a("string").eql("08029667843");
-  //           expect(data.phoneAlt).to.be.a("string");
-  //           expect(data.phoneAlt2).to.be.a("string");
-  //           expect(data.phones).to.be.an("array");
-  //           expect(data.address).to.be.an("array");
-  //           expect(data.category).to.be.an("array");
-  //           expect(data.city).to.be.a("string");
-  //           expect(data.state).to.be.a("string");
-  //           expect(data.dob).to.be.a("string");
-  //           expect(data.email).to.be.a("string");
-  //           expect(data.timestamp).to.be.a("string");
-  //           expect(data.gender).to.be.a("string");
-  //           done();
-  //         });
-  //     });
-  //   });
-  // });
+  describe("/PUT/:id", () => {
+    it("it should fail to put with wrong payload", async () => {
+      const response = await request(server)
+        .put(`${endpoint}/update/${sampleContact.id}`)
+        .send({ phones: "08029667843" });
+
+      const { status, body } = response;
+      const { message } = body;
+
+      expect(status).to.equal(400);
+      expect(/phones\smust\sbe\san\sarray/i.test(message)).to.equal(true);
+    });
+
+    it("it should update a contact by the given id", async () => {
+      const response = await request(server)
+        .put(`${endpoint}/update/${sampleContact.id}`)
+        .send({ phone: "08029667843", lastName: "Taiwo" });
+
+      const { status, body } = response;
+      const { data } = body;
+
+      expect(status).to.equal(200);
+      expect(data).to.be.an("object");
+      expect(data.phone).to.equal("08029667843");
+      expect(data.lastName).to.equal("Taiwo");
+
+      const { data: responseData } = await performFetchTest();
+      const updatedContact = responseData.data[0];
+      expect(updatedContact.phone).to.equal("08029667843");
+      expect(updatedContact.lastName).to.equal("Taiwo");
+    });
+  });
 
   // /*
   //  * Test /DELETE route
