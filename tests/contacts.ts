@@ -132,7 +132,7 @@ describe("Contacts", () => {
   //  * Test /PUT route
   //  */
 
-  describe("/PUT/:id", () => {
+  describe("/PUT", () => {
     it("it should fail to put with wrong payload", async () => {
       const response = await request(server)
         .put(`${endpoint}/update/${sampleContact.id}`)
@@ -169,24 +169,22 @@ describe("Contacts", () => {
   //  * Test /DELETE route
   //  */
 
-  // describe("/DELETE/:id", () => {
-  //   it("it should DELETE a contact by the given id", done => {
-  //     const contact = new Contact({
-  //       ...sampleContact,
-  //       _id: sampleContact.id
-  //     });
-  //     contact.save(() => {
-  //       request(server)
-  //         .delete(`${endpoint}/delete/${sampleContact.id}`)
-  //         .send(sampleContact)
-  //         .end((_, res) => {
-  //           const { status, body } = res;
-  //           expect(status).to.equal(200);
-  //           expect(body).to.not.have.property("data");
+  describe("/DELETE", () => {
+    it("it should delete a contact by the given id", async () => {
+      const response = await request(server).delete(
+        `${endpoint}/delete/${sampleContact.id}`
+      );
 
-  //           done();
-  //         });
-  //     });
-  //   });
-  // });
+      const { status, body } = response;
+
+      expect(status).to.equal(200);
+      expect(body).to.not.have.property("data");
+    });
+    it("it should get empty array of contacts", async () => {
+      const { data: response } = await performFetchTest();
+      const { data, count } = response;
+      expect(data.length).to.equal(0);
+      expect(count).to.equal(0);
+    });
+  });
 });
