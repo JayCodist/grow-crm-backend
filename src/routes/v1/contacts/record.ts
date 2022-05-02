@@ -8,7 +8,7 @@ import validation from "./validation";
 const getRecord = express.Router();
 
 getRecord.get(
-  "/get/:id",
+  "/record/:id",
   validator(validation.record, "params"),
   async (req, res) => {
     try {

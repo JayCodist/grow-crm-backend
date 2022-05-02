@@ -61,6 +61,22 @@ const performFetchTest: (
   return body;
 };
 
+const performRecordTest: (
+  id: string,
+  isFailureCase?: boolean
+) => Promise<ApiResponse> = async (id, isFailureCase) => {
+  const response = await request(server).get(`${endpoint}/record/${id}`);
+  const { status, body } = response;
+  expect(status).to.equal(isFailureCase ? 400 : 200);
+  if (isFailureCase) {
+    expect(body.data).to.equal(undefined);
+  } else {
+    const { data } = body;
+    expect(data).to.be.an("object");
+  }
+  return body;
+};
+
 describe("Contacts", () => {
   // let id: string;
   before(done => {
@@ -73,7 +89,7 @@ describe("Contacts", () => {
   /*
    * Test the /GET route
    */
-  describe("/GET", () => {
+  describe("/GET", async () => {
     it("it should fail to get empty array of contacts with wrong params", async () => {
       const shouldFail = true;
       const { message } = await performFetchTest(
@@ -88,6 +104,12 @@ describe("Contacts", () => {
       const { data, count } = response;
       expect(data.length).to.equal(0);
       expect(count).to.equal(0);
+    });
+
+    it("it should reurn contact not found", async () => {
+      const response = await performRecordTest(sampleContact.id, true);
+      const { message } = response;
+      expect(/Contact\snot\sfound/i.test(message)).to.equal(true);
     });
   });
 
@@ -126,6 +148,12 @@ describe("Contacts", () => {
       expect(newContact.name).to.equal(sampleContact.name);
       expect(newContact.phone).to.equal(sampleContact.phone);
     });
+    it("it should get a contact record by the given id", async () => {
+      const response = await performRecordTest(sampleContact.id);
+      const { data } = response;
+      expect(data).to.be.an("object");
+      expect(data.id).to.equal(sampleContact._id);
+    });
   });
 
   // /*
@@ -163,6 +191,12 @@ describe("Contacts", () => {
       expect(updatedContact.phone).to.equal("08029667843");
       expect(updatedContact.lastName).to.equal("Taiwo");
     });
+    it("it should get a updated contact record by the given id", async () => {
+      const response = await performRecordTest(sampleContact.id);
+      const { data } = response;
+      expect(data.phone).to.equal("08029667843");
+      expect(data.lastName).to.equal("Taiwo");
+    });
   });
 
   // /*
@@ -178,13 +212,18 @@ describe("Contacts", () => {
       const { status, body } = response;
 
       expect(status).to.equal(200);
-      expect(body).to.not.have.property("data");
+      expect(body.data).to.equal(undefined);
     });
     it("it should get empty array of contacts", async () => {
       const { data: response } = await performFetchTest();
       const { data, count } = response;
       expect(data.length).to.equal(0);
       expect(count).to.equal(0);
+    });
+    it("it should reurn contact not found", async () => {
+      const response = await performRecordTest(sampleContact.id, true);
+      const { message } = response;
+      expect(/Contact\snot\sfound/i.test(message)).to.equal(true);
     });
   });
 });
