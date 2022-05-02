@@ -191,7 +191,7 @@ describe("Contacts", () => {
       expect(updatedContact.phone).to.equal("08029667843");
       expect(updatedContact.lastName).to.equal("Taiwo");
     });
-    it("it should get a updated contact record by the given id", async () => {
+    it("it should get an updated contact record by the given id", async () => {
       const response = await performRecordTest(sampleContact.id);
       const { data } = response;
       expect(data.phone).to.equal("08029667843");
@@ -220,7 +220,7 @@ describe("Contacts", () => {
       expect(data.length).to.equal(0);
       expect(count).to.equal(0);
     });
-    it("it should reurn contact not found", async () => {
+    it("it should return contact not found", async () => {
       const response = await performRecordTest(sampleContact.id, true);
       const { message } = response;
       expect(/Contact\snot\sfound/i.test(message)).to.equal(true);
