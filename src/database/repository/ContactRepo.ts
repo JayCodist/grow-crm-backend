@@ -92,4 +92,8 @@ export default class ContactsRepo {
 
     return contact;
   }
+
+  public static findById(id: string): Promise<Contact | null> {
+    return ContactModel.findOne({ _id: id }).lean<Contact>().exec();
+  }
 }

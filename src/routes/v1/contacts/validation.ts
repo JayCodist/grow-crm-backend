@@ -19,7 +19,7 @@ const validation = {
     dob: Joi.string()
       .regex(/^\d{4}-\d{2}-\d{2}$/)
       .allow(""),
-    timeStamp: Joi.date().timestamp()
+    timestamp: Joi.date().timestamp()
   }),
   paginate: Joi.object().keys({
     pageNumber: Joi.number().integer().min(1),
@@ -47,6 +47,9 @@ const validation = {
     dob: Joi.date().allow("")
   }),
   delete: Joi.object().keys({
+    id: Joi.string().required()
+  }),
+  record: Joi.object().keys({
     id: Joi.string().required()
   })
 };

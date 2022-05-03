@@ -19,7 +19,7 @@ export const contactProjection = [
   "firstName",
   "lastName",
   "gender",
-  "timeStamp",
+  "timestamp",
   "category",
   "phones"
 ];
@@ -40,7 +40,7 @@ export default interface Contact {
   phoneAlt2: string;
   state: string;
   dob: string;
-  timeStamp: string;
+  timestamp: string;
   createdAt: string;
 }
 
@@ -80,7 +80,7 @@ const schema = new Schema(
     phoneAlt2: String,
     state: String,
     dob: String,
-    timeStamp: String
+    timestamp: String
   },
   { _id: false }
 ).index({
