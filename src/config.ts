@@ -25,3 +25,5 @@ export const tokenInfo = {
 };
 
 export const logDirectory = "./logs";
+
+export const wCAuthString = `&consumer_key=${process.env.WC_CONSUMER_KEY}&consumer_secret=${process.env.WC_CONSUMER_SECRET}`;

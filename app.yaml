@@ -1,7 +1,7 @@
 # app.yaml
 
 # service: exercises
-runtime: nodejs12
+runtime: nodejs16
 
 instance_class: F1
 automatic_scaling:
@@ -15,4 +15,4 @@ env_variables:
   TOKEN_ISSUER: "https://grow-crm.web.app"
   TOKEN_AUDIENCE: "https://grow-crm.web.app"
 
-entrypoint: "node build/server.js"
+entrypoint: "node build/src/server.js"
