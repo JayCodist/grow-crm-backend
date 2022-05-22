@@ -1,16 +1,22 @@
 import mongoose, { ConnectOptions } from "mongoose";
 import Logger from "../core/Logger";
-import { db, environment } from "../config";
+import { db, Environment, environment as _environment } from "../config";
 
 const dbPortStr = db.port ? `:${db.port}` : "";
 
 // Build the connection string
-const dbURI =
-  environment === "production"
-    ? `mongodb+srv://${db.user}:${encodeURIComponent(db.password)}@${
-        db.host
-      }${dbPortStr}/${db.name}`
-    : `mongodb://localhost:27017/grow_crm_db_dev`;
+const environment = ((_environment as string) || "development")
+  .toLowerCase()
+  .trim() as Environment;
+const dbURIMap: Record<Environment, string> = {
+  production: `mongodb+srv://${db.user}:${encodeURIComponent(db.password)}@${
+    db.host
+  }${dbPortStr}/${db.name}`,
+  development: "mongodb://localhost:27017/grow_crm_db_dev",
+  test: "mongodb://localhost:27017/grow_crm_db_test"
+};
+const dbURI = dbURIMap[environment];
+
 const options: ConnectOptions = {
   autoIndex: true,
   maxPoolSize: 10, // Maintain up to 10 socket connections
@@ -19,7 +25,7 @@ const options: ConnectOptions = {
   socketTimeoutMS: 45000 // Close sockets after 45 seconds of inactivity
 };
 
-Logger.debug(dbURI);
+Logger.debug({ environment, dbURI });
 
 // Create the database connection
 mongoose

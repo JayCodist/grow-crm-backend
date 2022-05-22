@@ -9,8 +9,10 @@ enum ResponseStatus {
   INTERNAL_ERROR = 500
 }
 
-abstract class ApiResponse {
-  constructor(private status: ResponseStatus, private message: string) {}
+export abstract class ApiResponse {
+  public data?: any;
+
+  constructor(public status: ResponseStatus, public message: string) {}
 
   protected prepare<T extends ApiResponse>(
     res: Response,
@@ -24,13 +26,14 @@ abstract class ApiResponse {
   }
 }
 
-export class SuccessResponse<T> extends ApiResponse {
-  constructor(message: string, private data: T) {
+export class SuccessResponse extends ApiResponse {
+  constructor(message: string, _data: any) {
     super(ResponseStatus.SUCCESS, message);
+    this.data = _data;
   }
 
   send(res: Response): Response {
-    return super.prepare<SuccessResponse<T>>(res, this);
+    return super.prepare<SuccessResponse>(res, this);
   }
 }
 

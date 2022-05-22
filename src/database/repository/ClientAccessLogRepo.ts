@@ -9,6 +9,7 @@ import { PartialLoose } from "../../helpers/type-helpers";
 import { InternalError } from "../../core/ApiError";
 import { getSearchArray } from "../../helpers/search-helpers";
 import { createdAtDateFormat } from "../../helpers/constants";
+import { formatResponseRecord } from "../../helpers/formatters";
 
 type SortLogic = PartialLoose<ClientAccessLog, "asc" | "desc">;
 
@@ -57,7 +58,7 @@ export default class ClientAccessLogRepo {
                 reject(new InternalError(countErr.message));
               } else {
                 resolve({
-                  data: clientAccessLogs,
+                  data: clientAccessLogs.map(formatResponseRecord),
                   count
                 });
               }
