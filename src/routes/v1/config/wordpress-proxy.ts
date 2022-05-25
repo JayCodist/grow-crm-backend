@@ -29,7 +29,9 @@ getWPProduct.get(
         `${backendUrlMap[business]}/products?slug=${slug}${wCAuthString}`
       );
       const json = await response.json();
-      Logger.debug(response, json);
+      if (/^(4|5)/.test(String(response.status))) {
+        throw json;
+      }
       const product = json[0] || null;
       new SuccessResponse("success", product).send(res);
     } catch (e) {
