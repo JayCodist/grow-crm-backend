@@ -61,59 +61,69 @@ export abstract class ApiError extends Error {
 export class AuthFailureError extends ApiError {
   constructor(message = "Invalid Credentials") {
     super(ErrorType.UNAUTHORIZED, message);
+    Object.setPrototypeOf(this, AuthFailureError.prototype);
   }
 }
 
 export class InternalError extends ApiError {
   constructor(message = "Internal error") {
     super(ErrorType.INTERNAL, message);
+    Object.setPrototypeOf(this, InternalError.prototype);
   }
 }
 
 export class BadRequestError extends ApiError {
   constructor(message = "Bad Request") {
     super(ErrorType.BAD_REQUEST, message);
+    Object.setPrototypeOf(this, BadRequestError.prototype);
   }
 }
 
 export class NotFoundError extends ApiError {
   constructor(message = "Not Found") {
     super(ErrorType.NOT_FOUND, message);
+    Object.setPrototypeOf(this, NotFoundError.prototype);
   }
 }
 
 export class ForbiddenError extends ApiError {
   constructor(message = "Permission denied") {
     super(ErrorType.FORBIDDEN, message);
+    Object.setPrototypeOf(this, ForbiddenError.prototype);
   }
 }
 
 export class NoEntryError extends ApiError {
-  constructor(message = "Entry don't exists") {
+  constructor(message = "Entry does not exist") {
     super(ErrorType.NO_ENTRY, message);
+    Object.setPrototypeOf(this, NoEntryError.prototype);
   }
 }
 
 export class BadTokenError extends ApiError {
   constructor(message = "Token is not valid") {
     super(ErrorType.BAD_TOKEN, message);
+    Object.setPrototypeOf(this, BadTokenError.prototype);
   }
 }
 
 export class TokenExpiredError extends ApiError {
   constructor(message = "Token is expired") {
     super(ErrorType.TOKEN_EXPIRED, message);
+    Object.setPrototypeOf(this, TokenExpiredError.prototype);
   }
 }
 
 export class NoDataError extends ApiError {
   constructor(message = "No data available") {
     super(ErrorType.NO_DATA, message);
+    Object.setPrototypeOf(this, NoDataError.prototype);
   }
 }
 
 export class AccessTokenError extends ApiError {
   constructor(message = "Invalid access token") {
     super(ErrorType.ACCESS_TOKEN, message);
+    Object.setPrototypeOf(this, AccessTokenError.prototype);
   }
 }

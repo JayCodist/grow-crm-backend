@@ -30,11 +30,13 @@ app.use((req, res, next) => next(new NotFoundError()));
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof ApiError) {
+    Logger.debug("first");
     ApiError.handle(err, res);
   } else {
+    Logger.debug("last");
     if (environment === "development") {
       Logger.error(err);
-      res.status(500).send(err.message);
+      res.status(500).json({ message: err.message, status: 500, data: null });
       return;
     }
     ApiError.handle(new InternalError(), res);
