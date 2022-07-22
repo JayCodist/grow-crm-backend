@@ -4,7 +4,7 @@ import { wCAuthString } from "../../../config";
 import { ApiError, InternalError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
 import Logger from "../../../core/Logger";
-import { ProductWP } from "../../../database/model/Product";
+import { ProductWP } from "../../../database/model/ProductWP";
 import validator from "../../../helpers/validator";
 import validation from "./validation";
 

@@ -27,22 +27,21 @@ interface ProductVariant {
 type DesignOption = "wrappedBouquet" | "inVase" | "inLargeVase" | "box";
 
 export interface ProductWP {
-  id: number;
+  key: number;
   name: string;
+  subtitle: string;
+  temporaryNote: string;
   slug: string;
+  category: string;
   type: "simple" | "variable";
   featured: boolean;
   sku: string;
   price: number;
-  salePrice: number;
   images: ProductImage[];
   variants: ProductVariant[];
   addonsGroups: AddonGroup[];
-  productDescription: string;
-  title: string;
-  sizes?: string[];
-  designOptions?: DesignOption[];
-  note?: string;
-  description?: string;
-  details: string;
+  description: string;
+  longDescription: string;
+  designOptions: DesignOption[];
+  tags: string[];
 }
