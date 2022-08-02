@@ -21,7 +21,6 @@ export const productWPProjection = [
   "variants",
   "addonsGroups",
   "designOptions",
-  "_nameSearch",
   "type"
 ];
 
@@ -71,8 +70,13 @@ export interface ProductWP {
   longDescription: string;
   designOptions: DesignOption[];
   tags: string[];
+}
+
+export interface ProductWPCreate extends Omit<ProductWP, ""> {
   _nameSearch: string[];
 }
+
+interface ProductWPDocument extends ProductWPCreate {}
 
 const schema = new Schema({
   key: Number,
@@ -122,7 +126,7 @@ const schema = new Schema({
   timeStamp: String
 });
 
-export const ProductWPModel = model<ProductWP & Document>(
+export const ProductWPModel = model<ProductWPDocument & Document>(
   DOCUMENT_NAME,
   schema,
   COLLECTION_NAME
