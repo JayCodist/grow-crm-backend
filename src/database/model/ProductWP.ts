@@ -1,3 +1,29 @@
+import { model, Schema } from "mongoose";
+import Logger from "../../core/Logger";
+
+const DOCUMENT_NAME = "ProductWP";
+const COLLECTION_NAME = "productwp";
+
+export const productWPProjection = [
+  "key",
+  "temporaryNote",
+  "name",
+  "price",
+  "description",
+  "longDescription",
+  "images",
+  "slug",
+  "subtitle",
+  "category",
+  "sku",
+  "tags",
+  "featured",
+  "variants",
+  "addonsGroups",
+  "designOptions",
+  "type"
+];
+
 interface Addon {
   name: string;
   price: number;
@@ -45,3 +71,71 @@ export interface ProductWP {
   designOptions: DesignOption[];
   tags: string[];
 }
+
+export interface ProductWPCreate extends Omit<ProductWP, ""> {
+  _nameSearch: string[];
+}
+
+interface ProductWPDocument extends ProductWPCreate {}
+
+const schema = new Schema({
+  key: Number,
+  name: String,
+  _nameSearch: { type: [String], index: true },
+  subtitle: String,
+  temporaryNote: String,
+  slug: String,
+  category: String,
+  type: String,
+  featured: Boolean,
+  sku: String,
+  price: Number,
+  images: [
+    {
+      alt: String,
+      src: String,
+      id: Number
+    }
+  ],
+  variants: [
+    {
+      name: String,
+      price: Number,
+      class: String
+    }
+  ],
+  addonsGroups: [
+    {
+      name: String,
+      image: String,
+      description: String,
+      addons: [
+        {
+          name: String,
+          price: Number,
+          image: String
+        }
+      ],
+      slug: String
+    }
+  ],
+  description: String,
+  longDescription: String,
+  designOptions: [String],
+  tags: [String],
+  timeStamp: String
+});
+
+export const ProductWPModel = model<ProductWPDocument & Document>(
+  DOCUMENT_NAME,
+  schema,
+  COLLECTION_NAME
+);
+
+ProductWPModel.on("index", error => {
+  if (error) {
+    Logger.error(error);
+  } else {
+    Logger.info(`${DOCUMENT_NAME} index created!`);
+  }
+});

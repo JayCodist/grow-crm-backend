@@ -7,6 +7,7 @@ import deleteContact from "./contacts/delete";
 import contactLoglist from "./contacts/paginate";
 import getRecord from "./contacts/record";
 import updateContact from "./contacts/update";
+import productWP from "./product-wp/paginate";
 
 const router = express.Router();
 
@@ -28,5 +29,7 @@ router.use("/contacts", contactLoglist);
 router.use("/contacts", updateContact);
 router.use("/contacts", deleteContact);
 router.use("/contacts", getRecord);
+
+router.use("/product-wp", productWP);
 
 export default router;
