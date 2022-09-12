@@ -2,7 +2,7 @@ import { Schema, model, Document } from "mongoose";
 import Logger from "../../core/Logger";
 
 const DOCUMENT_NAME = "CategoryWP";
-const COLLECTION_NAME = "categoriesWP";
+const COLLECTION_NAME = "categoryWP";
 
 export const categoryWPProjection = ["key", "createdAt", "name"];
 
