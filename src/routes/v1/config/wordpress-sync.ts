@@ -205,8 +205,6 @@ doWordpressSync.post(
         wPTotalSyncs: currentSyncTotal + 1
       });
 
-      await AppConfigRepo.updateConfig({ wPSyncInProgress: true });
-
       new SuccessResponse("Successfully synchronized Wordpress", null).send(
         res
       );

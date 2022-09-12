@@ -2,7 +2,7 @@ import { Schema, model, Document } from "mongoose";
 import Logger from "../../core/Logger";
 
 const DOCUMENT_NAME = "Contacts";
-const COLLECTION_NAME = "contacts";
+const COLLECTION_NAME = "contact";
 
 export const contactProjection = [
   "id",

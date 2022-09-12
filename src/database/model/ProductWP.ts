@@ -2,7 +2,7 @@ import { Document, model, Schema } from "mongoose";
 import Logger from "../../core/Logger";
 
 const DOCUMENT_NAME = "ProductWP";
-const COLLECTION_NAME = "productwp";
+const COLLECTION_NAME = "productWP";
 
 export const productWPProjection = [
   "key",
