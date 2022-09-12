@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import { Document, model, Schema } from "mongoose";
 import Logger from "../../core/Logger";
 
 const DOCUMENT_NAME = "ProductWP";

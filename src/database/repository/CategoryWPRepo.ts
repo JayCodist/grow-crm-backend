@@ -58,10 +58,8 @@ export default class CategoryWPRepo {
   }
 
   public static async create(input: CategoryWP): Promise<CategoryWP> {
-    const { id } = input;
     const data: CategoryWPCreate = {
       ...input,
-      _id: id,
       createdAt: input.createdAt || dayjs().format(),
       _nameSearch: getSearchArray(input.name)
     };

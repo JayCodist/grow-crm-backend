@@ -26,35 +26,15 @@ const backendUrlMap: Record<WPBusiness, string> = {
 
 const doWordpressSync = express.Router();
 
-const fetchWPContent: (url: string) => Promise<[Response, any]> = async url => {
+const fetchWPContent: <T = any>(
+  url: string
+) => Promise<[Record<string, T[]>, Response]> = async url => {
   const response = await fetch(url);
   const json = await response.json();
   if (/^(4|5)/.test(String(response.status))) {
     throw json;
   }
-  return [response, json];
-};
-
-const WP_PAGE_SIZE = 30;
-
-const fetchPaginatedWPContent: (url: string) => Promise<any[]> = async url => {
-  const [response] = await fetchWPContent(`${url}&per_page=1`);
-  const total = Number(response.headers.get("x-wp-total")) || 1;
-  const promiseArr = Array(Math.ceil(total / 30))
-    .fill("")
-    .map((_, i) => {
-      return fetchWPContent(`${url}&per_page=${WP_PAGE_SIZE}&page=${i + 1}`);
-    });
-  const productBatches = (await Promise.all(promiseArr)).map(
-    response => response[1]
-  );
-  return productBatches.reduce(
-    (products, batch) => [
-      ...products,
-      ...batch.map(({ product }: any) => product)
-    ],
-    []
-  );
+  return [json, response];
 };
 
 const getDesignOptionMap: (rawProd: any) => DesignOptionsMap = (
@@ -135,12 +115,14 @@ doWordpressSync.post(
       const { business } = req.query as unknown as {
         business: "regalFlowers" | "floralHub";
       };
-      const categories = await fetchPaginatedWPContent(
-        `${backendUrlMap[business]}/products/categories?${wCAuthString}`
+      const [{ product_categories: categories }] = await fetchWPContent(
+        `${backendUrlMap[business]}/products/categories?${wCAuthString}&filter[limit]=10000`
       );
-      const productsRaw = await fetchPaginatedWPContent(
-        `${backendUrlMap[business]}/products?${wCAuthString}`
+
+      const [{ products: productsRaw }] = await fetchWPContent(
+        `${backendUrlMap[business]}/products?${wCAuthString}&filter[limit]=10000`
       );
+
       const products = productsRaw.map(rawProd => {
         const relatedVIPRef =
           Number(
@@ -191,10 +173,11 @@ doWordpressSync.post(
             )?.options?.[0] || "",
           relatedVIPRef,
           variants: getVariants(
-            rawProd,
+            rawProd.variations,
             relatedVIPRef
               ? productsRaw.find(prod => prod.id === relatedVIPRef)
-              : null
+                  ?.variations || []
+              : []
           ),
           addonsGroups: []
         };
@@ -228,6 +211,7 @@ doWordpressSync.post(
         res
       );
     } catch (e) {
+      await AppConfigRepo.updateConfig({ wPSyncInProgress: false });
       Logger.error("Failed to synchronize wordpress", e);
       ApiError.handle(
         new InternalError(

@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 import Logger from "../../core/Logger";
 
 const DOCUMENT_NAME = "CategoryWP";
@@ -13,7 +13,6 @@ export default interface CategoryWP {
 }
 
 export interface CategoryWPCreate extends Omit<CategoryWP, "id"> {
-  _id: string;
   _nameSearch: string[];
   createdAt: string;
 }
