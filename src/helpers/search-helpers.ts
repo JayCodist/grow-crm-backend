@@ -17,3 +17,9 @@ export const getSearchArray: (str: string) => string[] = _str => {
   });
   return Array.from(new Set(output));
 };
+
+export const waitOut = (milliseconds: number) => {
+  return new Promise(resolve => {
+    setTimeout(resolve, milliseconds);
+  });
+};

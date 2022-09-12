@@ -1,10 +1,11 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 import Logger from "../../core/Logger";
 
 const DOCUMENT_NAME = "Contacts";
-const COLLECTION_NAME = "contacts";
+const COLLECTION_NAME = "contact";
 
 export const contactProjection = [
+  "id",
   "key",
   "createdAt",
   "name",
@@ -54,8 +55,6 @@ export interface ContactCreate extends Omit<Contact, "id"> {
   _emailSearch: string[];
 }
 
-interface ContactDocument extends Document, ContactCreate {}
-
 const schema = new Schema(
   {
     _id: String,
@@ -87,7 +86,7 @@ const schema = new Schema(
   createdAt: 1
 });
 
-export const ContactModel = model<ContactDocument>(
+export const ContactModel = model<Document & ContactCreate>(
   DOCUMENT_NAME,
   schema,
   COLLECTION_NAME
