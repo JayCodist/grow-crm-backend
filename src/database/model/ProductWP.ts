@@ -41,24 +41,28 @@ interface AddonGroup {
 interface ProductImage {
   alt: string;
   src: string;
-  id: number;
 }
 
-interface ProductVariant {
+export interface ProductVariant {
   name: string;
   price: number;
+  sku: string;
   class: "regular" | "vip";
 }
 
-type DesignOption = "wrappedBouquet" | "inVase" | "inLargeVase" | "box";
+export type DesignOption = "wrappedBouquet" | "inVase" | "inLargeVase" | "box";
+
+export type DesignOptionsMap = Partial<
+  Record<DesignOption, "default" | "option">
+>;
 
 export interface ProductWP {
   key: number;
   name: string;
   subtitle: string;
-  temporaryNote: string;
+  temporaryNotes: string[];
   slug: string;
-  category: string;
+  occasions: string[];
   type: "simple" | "variable";
   featured: boolean;
   sku: string;
@@ -68,11 +72,14 @@ export interface ProductWP {
   addonsGroups: AddonGroup[];
   description: string;
   longDescription: string;
-  designOptions: DesignOption[];
+  designOptions: DesignOptionsMap;
   tags: string[];
+  budgetNote: string;
+  designNote: string;
+  relatedVIPRef: number | null;
 }
 
-export interface ProductWPCreate extends Omit<ProductWP, ""> {
+export interface ProductWPCreate extends ProductWP {
   _nameSearch: string[];
 }
 
@@ -83,9 +90,9 @@ const schema = new Schema({
   name: String,
   _nameSearch: { type: [String], index: true },
   subtitle: String,
-  temporaryNote: String,
+  temporaryNotes: [String],
   slug: String,
-  category: String,
+  occasions: { type: [String], index: true },
   type: String,
   featured: Boolean,
   sku: String,
@@ -93,15 +100,15 @@ const schema = new Schema({
   images: [
     {
       alt: String,
-      src: String,
-      id: Number
+      src: String
     }
   ],
   variants: [
     {
       name: String,
       price: Number,
-      class: String
+      class: String,
+      sku: String
     }
   ],
   addonsGroups: [
@@ -121,8 +128,13 @@ const schema = new Schema({
   ],
   description: String,
   longDescription: String,
-  designOptions: [String],
-  tags: [String],
+  designOptions: {
+    wrappedBouquet: String,
+    inVase: String,
+    inLargeVase: String,
+    box: String
+  },
+  tags: { type: [String], index: true },
   timeStamp: String
 });
 

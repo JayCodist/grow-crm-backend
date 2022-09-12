@@ -2,12 +2,14 @@
 
 import { InternalError } from "../../core/ApiError";
 import { formatResponseRecord } from "../../helpers/formatters";
+import { waitOut } from "../../helpers/search-helpers";
 import { PartialLoose } from "../../helpers/type-helpers";
 import {
   ProductWP,
   ProductWPModel,
   productWPProjection
 } from "../model/ProductWP";
+import AppConfigRepo from "./AppConfigRepo";
 
 export type tag = "regular" | "vip" | "bundled";
 
@@ -29,6 +31,22 @@ const defaultPageAttr = {
 };
 const defaultTags = ["regular", "vip", "bundled"] as tag[];
 
+/**
+ * Implements incremental backoff-retry if sync is ongoing
+ */
+const wPCollectionIsReady = async () => {
+  const config = await AppConfigRepo.getConfig();
+  if (config?.wPSyncInProgress) {
+    /**
+     * Wait till sync is complete
+     */
+    for (let waitTime = 1000; config?.wPSyncInProgress; waitTime += 1000) {
+      // eslint-disable-next-line no-await-in-loop
+      await waitOut(waitTime);
+    }
+  }
+};
+
 export default class ProductWPRepo {
   public static async getPaginatedProducts({
     filter = defaultFilter,
@@ -38,23 +56,25 @@ export default class ProductWPRepo {
     tags = defaultTags
   }: PaginatedFetchParams): Promise<{ data: ProductWP[]; count: number }> {
     return new Promise((resolve, reject) => {
-      ProductWPModel.find(filter)
-        .find({ tags: { $in: tags } })
-        .sort(sortLogic)
-        .skip((pageNumber - 1) * pageSize)
-        .limit(pageSize)
-        .lean<ProductWP[]>()
-        .select(productWPProjection.join(" "))
-        .exec((err: Error | null, products: ProductWP[]) => {
-          if (err) {
-            reject(new InternalError(err.message));
-          } else {
-            resolve({
-              data: products.map(formatResponseRecord),
-              count: products.length
-            });
-          }
-        });
+      wPCollectionIsReady().then(() =>
+        ProductWPModel.find(filter)
+          .find({ tags: { $in: tags } })
+          .sort(sortLogic)
+          .skip((pageNumber - 1) * pageSize)
+          .limit(pageSize)
+          .lean<ProductWP[]>()
+          .select(productWPProjection.join(" "))
+          .exec((err: Error | null, products: ProductWP[]) => {
+            if (err) {
+              reject(new InternalError(err.message));
+            } else {
+              resolve({
+                data: products.map(formatResponseRecord),
+                count: products.length
+              });
+            }
+          })
+      );
     });
   }
 }

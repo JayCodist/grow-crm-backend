@@ -5,6 +5,7 @@ const DOCUMENT_NAME = "Contacts";
 const COLLECTION_NAME = "contacts";
 
 export const contactProjection = [
+  "id",
   "key",
   "createdAt",
   "name",

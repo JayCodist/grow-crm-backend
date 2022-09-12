@@ -1,18 +1,27 @@
+import dayjs from "dayjs";
 import express from "express";
 import fetch, { Response } from "node-fetch";
 import { wCAuthString } from "../../../config";
 import { ApiError, InternalError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
 import Logger from "../../../core/Logger";
-import { ProductWP } from "../../../database/model/ProductWP";
+import { CategoryWPModel } from "../../../database/model/CategoryWP";
+import {
+  DesignOption,
+  DesignOptionsMap,
+  ProductVariant,
+  ProductWP,
+  ProductWPModel
+} from "../../../database/model/ProductWP";
+import AppConfigRepo from "../../../database/repository/AppConfigRepo";
 import validator from "../../../helpers/validator";
 import validation from "./validation";
 
 export type WPBusiness = "regalFlowers" | "floralHub";
 
 const backendUrlMap: Record<WPBusiness, string> = {
-  regalFlowers: "https://www.regalflowers.com.ng/wp-json/wc/v3",
-  floralHub: "https://www.floralhub.com.ng/wp-json/wc/v3"
+  regalFlowers: "https://www.regalflowers.com.ng/wc-api/v3",
+  floralHub: "https://www.floralhub.com.ng/wc-api/v3"
 };
 
 const doWordpressSync = express.Router();
@@ -28,23 +37,95 @@ const fetchWPContent: (url: string) => Promise<[Response, any]> = async url => {
 
 const WP_PAGE_SIZE = 30;
 
-const fetchPaginatedAPContent: (url: string) => Promise<ProductWP[]> =
-  async url => {
-    const [response] = await fetchWPContent(`${url}&per_page=1`);
-    const total = Number(response.headers.get("x-wp-total")) || 1;
-    const promiseArr = Array(Math.ceil(total / 30))
-      .fill("")
-      .map((_, i) => {
-        return fetchWPContent(`${url}&per_page=${WP_PAGE_SIZE}&page=${i + 1}`);
-      });
-    const productBatches = (await Promise.all(promiseArr)).map(
-      response => response[1]
-    );
-    return productBatches.reduce(
-      (products, batch) => [...products, ...batch],
-      []
-    );
+const fetchPaginatedWPContent: (url: string) => Promise<any[]> = async url => {
+  const [response] = await fetchWPContent(`${url}&per_page=1`);
+  const total = Number(response.headers.get("x-wp-total")) || 1;
+  const promiseArr = Array(Math.ceil(total / 30))
+    .fill("")
+    .map((_, i) => {
+      return fetchWPContent(`${url}&per_page=${WP_PAGE_SIZE}&page=${i + 1}`);
+    });
+  const productBatches = (await Promise.all(promiseArr)).map(
+    response => response[1]
+  );
+  return productBatches.reduce(
+    (products, batch) => [
+      ...products,
+      ...batch.map(({ product }: any) => product)
+    ],
+    []
+  );
+};
+
+const getDesignOptionMap: (rawProd: any) => DesignOptionsMap = (
+  rawProd: any
+) => {
+  const conversionMap: Record<string, DesignOption> = {
+    "Box Arrangement": "box",
+    "Wrapped Bouquet": "wrappedBouquet",
+    "In a Vase": "inVase",
+    "In Large Vase": "inLargeVase"
   };
+
+  const attributeOptions: string[] =
+    rawProd.attributes?.find(
+      (attribute: any) => attribute.name === "Select Design"
+    )?.options || [];
+
+  const defaultAttribute = attributeOptions
+    .find(option => option.includes("default"))
+    ?.replace(/default/i, "")
+    .trim();
+  const designOptionsMap = attributeOptions.reduce(
+    (map: Record<string, string>, option) =>
+      conversionMap[option]
+        ? ({
+            ...map,
+            [conversionMap[option]]:
+              option === defaultAttribute ? "default" : "option"
+          } as DesignOptionsMap)
+        : map,
+    {}
+  );
+  return designOptionsMap;
+};
+
+const getVariants: (
+  productVariations: any[],
+  vipVariations: any[]
+) => ProductVariant[] = (productVariations, vipVariations) => {
+  const regularVariants: ProductVariant[] = productVariations.map(variation => {
+    const variantName: string = variation.attributes?.find(
+      (attr: { name: string }) => attr?.name === "Select Size"
+    )?.option;
+    return {
+      class: "regular",
+      sku: variation.sku,
+      price: Number(variation.sale_price || variation.price) || 0,
+      name:
+        variantName
+          ?.replace(/-/g, " ")
+          .replace(/^./, char => char.toUpperCase()) || "N/A"
+    };
+  });
+
+  const vipVariants: ProductVariant[] = vipVariations.map(variation => {
+    const variantName: string = variation.attributes?.find(
+      (attr: { name: string }) => attr?.name === "Select Size"
+    )?.option;
+    return {
+      class: "vip",
+      sku: variation.sku,
+      price: Number(variation.sale_price || variation.price) || 0,
+      name:
+        variantName
+          ?.replace(/-/g, " ")
+          .replace(/^./, char => char.toUpperCase()) || "N/A"
+    };
+  });
+
+  return [...regularVariants, ...vipVariants];
+};
 
 doWordpressSync.post(
   "/",
@@ -54,16 +135,103 @@ doWordpressSync.post(
       const { business } = req.query as unknown as {
         business: "regalFlowers" | "floralHub";
       };
-      const products = await fetchPaginatedAPContent(
+      const categories = await fetchPaginatedWPContent(
+        `${backendUrlMap[business]}/products/categories?${wCAuthString}`
+      );
+      const productsRaw = await fetchPaginatedWPContent(
         `${backendUrlMap[business]}/products?${wCAuthString}`
       );
-      Logger.debug(products.length, products[0]);
-      new SuccessResponse("success", products).send(res);
+      const products = productsRaw.map(rawProd => {
+        const relatedVIPRef =
+          Number(
+            rawProd.attributes
+              ?.find((attribute: any) => attribute.name === "VIP Pricing IDS")
+              ?.options?.[0]?.replace(/\D/g, "")
+          ) || null;
+        const product: ProductWP = {
+          key: rawProd.id,
+          name: rawProd.title.split("-")[0].trim(),
+          subtitle:
+            rawProd.title
+              .split("-")[1]
+              // To remove trailing ellipsis
+              ?.replace(/\.\s*.\..*$/, "")
+              .trim() || "",
+          slug:
+            rawProd.permalink
+              ?.split("/product")
+              .pop()
+              ?.replaceAll("/", "")
+              .replace(/\?.*$/, "") || "",
+          sku: rawProd.sku,
+          price: Number(rawProd.sale_price || rawProd.price) || 0,
+          type: rawProd.type,
+          description: rawProd.longDescription,
+          longDescription: rawProd.shortDescription,
+          occasions: rawProd.categories,
+          tags: rawProd.tags,
+          images:
+            rawProd.images?.map((image: any) => ({
+              src: image.src,
+              alt: image.alt || image.title || ""
+            })) || [],
+          featured: rawProd.featured,
+          designOptions: getDesignOptionMap(rawProd),
+          temporaryNotes:
+            rawProd.attributes?.find(
+              (attribute: any) => attribute.name === "Info Product"
+            )?.options || [],
+          budgetNote:
+            rawProd.attributes?.find(
+              (attribute: any) => attribute.name === "Info Budget"
+            )?.options?.[0] || "",
+          designNote:
+            rawProd.attributes?.find(
+              (attribute: any) => attribute.name === "Info Design"
+            )?.options?.[0] || "",
+          relatedVIPRef,
+          variants: getVariants(
+            rawProd,
+            relatedVIPRef
+              ? productsRaw.find(prod => prod.id === relatedVIPRef)
+              : null
+          ),
+          addonsGroups: []
+        };
+        return product;
+      });
+      await AppConfigRepo.updateConfig({ wPSyncInProgress: true });
+      try {
+        await Promise.all([
+          ProductWPModel.collection.drop(),
+          CategoryWPModel.collection.drop()
+        ]);
+      } catch (err) {
+        console.error("Unable to drop collections: ", err);
+      }
+
+      await CategoryWPModel.insertMany(categories, { ordered: false });
+      await ProductWPModel.insertMany(products, { ordered: false });
+
+      const currentSyncTotal =
+        (await AppConfigRepo.getConfig())?.wPTotalSyncs || 0;
+
+      await AppConfigRepo.updateConfig({
+        wPSyncInProgress: false,
+        lastWPSyncDate: dayjs().format(),
+        wPTotalSyncs: currentSyncTotal + 1
+      });
+
+      await AppConfigRepo.updateConfig({ wPSyncInProgress: true });
+
+      new SuccessResponse("Successfully synchronized Wordpress", null).send(
+        res
+      );
     } catch (e) {
-      Logger.error("Failed to fetch product", e);
+      Logger.error("Failed to synchronize wordpress", e);
       ApiError.handle(
         new InternalError(
-          "Failed to fetch product. Please contact your administrator"
+          "Failed to synchronize wordpress. Please contact your administrator"
         ),
         res
       );
