@@ -1,4 +1,5 @@
 import express from "express";
+import categoryWP from "./category-wp/paginate";
 import clientAccessLogCreate from "./client-access-logs/create";
 import clientAccessLogList from "./client-access-logs/paginate";
 import configRoutes from "./config";
@@ -31,5 +32,7 @@ router.use("/contacts", deleteContact);
 router.use("/contacts", getRecord);
 
 router.use("/product-wp", productWP);
+
+router.use("/category-wp", categoryWP);
 
 export default router;

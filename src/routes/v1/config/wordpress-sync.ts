@@ -10,10 +10,11 @@ import {
   DesignOption,
   DesignOptionsMap,
   ProductVariant,
-  ProductWP,
+  ProductWPCreate,
   ProductWPModel
 } from "../../../database/model/ProductWP";
 import AppConfigRepo from "../../../database/repository/AppConfigRepo";
+import { getSearchArray } from "../../../helpers/search-helpers";
 import validator from "../../../helpers/validator";
 import validation from "./validation";
 
@@ -130,9 +131,12 @@ doWordpressSync.post(
               ?.find((attribute: any) => attribute.name === "VIP Pricing IDS")
               ?.options?.[0]?.replace(/\D/g, "")
           ) || null;
-        const product: ProductWP = {
+        const product: ProductWPCreate = {
           key: rawProd.id,
           name: rawProd.title.split("-")[0].trim(),
+          _nameSearch: getSearchArray(
+            rawProd.title?.replace(/\.\s*.\..*$/, "").trim() || ""
+          ),
           subtitle:
             rawProd.title
               .split("-")[1]
@@ -150,7 +154,7 @@ doWordpressSync.post(
           type: rawProd.type,
           description: rawProd.longDescription,
           longDescription: rawProd.shortDescription,
-          occasions: rawProd.categories,
+          categories: rawProd.categories,
           tags: rawProd.tags,
           images:
             rawProd.images?.map((image: any) => ({
@@ -193,7 +197,13 @@ doWordpressSync.post(
         console.error("Unable to drop collections: ", err);
       }
 
-      await CategoryWPModel.insertMany(categories, { ordered: false });
+      await CategoryWPModel.insertMany(
+        categories.map(category => ({
+          ...category,
+          _nameSearch: getSearchArray(category.name)
+        })),
+        { ordered: false }
+      );
       await ProductWPModel.insertMany(products, { ordered: false });
 
       const currentSyncTotal =
