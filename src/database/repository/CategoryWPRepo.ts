@@ -8,7 +8,10 @@ import { PartialLoose } from "../../helpers/type-helpers";
 import { PaginatedFetchParams } from "./ClientAccessLogRepo";
 import { InternalError } from "../../core/ApiError";
 import { formatResponseRecord } from "../../helpers/formatters";
-import { getSearchArray } from "../../helpers/search-helpers";
+import {
+  getSearchArray,
+  wPCollectionIsReady
+} from "../../helpers/search-helpers";
 
 type SortLogic = PartialLoose<CategoryWP, "asc" | "desc">;
 const defaultSortLogic: SortLogic = { createdAt: "asc" };
@@ -27,33 +30,35 @@ export default class CategoryWPRepo {
     sortLogic = defaultSortLogic
   }: PaginatedFetchParams): Promise<{ data: CategoryWP[]; count: number }> {
     return new Promise((resolve, reject) => {
-      CategoryWPModel.find(filter)
-        .sort(sortLogic)
-        .skip((pageNumber - 1) * pageSize)
-        .limit(pageSize)
-        .lean<CategoryWP[]>()
-        .select(categoryWPProjection.join(" "))
-        .exec((err: Error | null, categoryWPs: CategoryWP[]) => {
-          if (err) {
-            reject(new InternalError(err.message));
-          } else {
-            const filterQuery = CategoryWPModel.find(filter);
-            const countQuery =
-              filter === defaultFilter
-                ? filterQuery.estimatedDocumentCount()
-                : CategoryWPModel.countDocuments(filter);
-            countQuery.exec((countErr, count) => {
-              if (countErr) {
-                reject(new InternalError(countErr.message));
-              } else {
-                resolve({
-                  data: categoryWPs.map(formatResponseRecord),
-                  count
-                });
-              }
-            });
-          }
-        });
+      wPCollectionIsReady().then(() =>
+        CategoryWPModel.find(filter)
+          .sort(sortLogic)
+          .skip((pageNumber - 1) * pageSize)
+          .limit(pageSize)
+          .lean<CategoryWP[]>()
+          .select(categoryWPProjection.join(" "))
+          .exec((err: Error | null, categoryWPs: CategoryWP[]) => {
+            if (err) {
+              reject(new InternalError(err.message));
+            } else {
+              const filterQuery = CategoryWPModel.find(filter);
+              const countQuery =
+                filter === defaultFilter
+                  ? filterQuery.estimatedDocumentCount()
+                  : CategoryWPModel.countDocuments(filter);
+              countQuery.exec((countErr, count) => {
+                if (countErr) {
+                  reject(new InternalError(countErr.message));
+                } else {
+                  resolve({
+                    data: categoryWPs.map(formatResponseRecord),
+                    count
+                  });
+                }
+              });
+            }
+          })
+      );
     });
   }
 

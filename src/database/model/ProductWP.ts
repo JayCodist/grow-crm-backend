@@ -14,7 +14,7 @@ export const productWPProjection = [
   "images",
   "slug",
   "subtitle",
-  "category",
+  "categories",
   "sku",
   "tags",
   "featured",
@@ -62,7 +62,7 @@ export interface ProductWP {
   subtitle: string;
   temporaryNotes: string[];
   slug: string;
-  occasions: string[];
+  categories: string[];
   type: "simple" | "variable";
   featured: boolean;
   sku: string;
@@ -92,7 +92,7 @@ const schema = new Schema({
   subtitle: String,
   temporaryNotes: [String],
   slug: String,
-  occasions: { type: [String], index: true },
+  categories: { type: [String], index: true },
   type: String,
   featured: Boolean,
   sku: String,

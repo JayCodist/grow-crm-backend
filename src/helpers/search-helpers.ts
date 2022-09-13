@@ -1,3 +1,5 @@
+import AppConfigRepo from "../database/repository/AppConfigRepo";
+
 export const getSearchArray: (str: string) => string[] = _str => {
   const str = _str.toLowerCase();
   const output: string[] = [];
@@ -22,4 +24,20 @@ export const waitOut = (milliseconds: number) => {
   return new Promise(resolve => {
     setTimeout(resolve, milliseconds);
   });
+};
+
+/**
+ * Implements incremental backoff-retry if sync is ongoing
+ */
+export const wPCollectionIsReady = async () => {
+  const config = await AppConfigRepo.getConfig();
+  if (config?.wPSyncInProgress) {
+    /**
+     * Wait till sync is complete
+     */
+    for (let waitTime = 1000; config?.wPSyncInProgress; waitTime += 1000) {
+      // eslint-disable-next-line no-await-in-loop
+      await waitOut(waitTime);
+    }
+  }
 };

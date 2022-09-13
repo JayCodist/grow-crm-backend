@@ -5,11 +5,9 @@ const validation = {
     pageNumber: Joi.number().integer().min(1),
     pageSize: Joi.number().integer().min(0),
     sortField: Joi.string().allow(""),
-    searchField: Joi.string().allow(""),
-    searchValue: Joi.string().allow(""),
-    sortType: Joi.string().valid("asc", "desc"),
-    // tagField: Joi.string().allow(""),
-    tagValue: Joi.string().allow("regular", "vip", "bundled")
+    categories: Joi.string().allow(""),
+    tags: Joi.string().allow(""),
+    sortType: Joi.string().valid("asc", "desc")
   }),
   create: Joi.object().keys({
     name: Joi.string().required(),
