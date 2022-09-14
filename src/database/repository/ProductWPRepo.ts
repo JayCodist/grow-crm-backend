@@ -65,4 +65,8 @@ export default class ProductWPRepo {
       );
     });
   }
+
+  public static findBySlug(slug: string): Promise<ProductWP | null> {
+    return ProductWPModel.findOne({ slug }).lean<ProductWP>().exec();
+  }
 }
