@@ -9,7 +9,7 @@ import contactLoglist from "./contacts/paginate";
 import getRecord from "./contacts/record";
 import updateContact from "./contacts/update";
 import productWP from "./product-wp/paginate";
-import productWPSulg from "./product-wp/product-slug";
+import productWPSlug from "./product-wp/product-slug";
 
 const router = express.Router();
 
@@ -33,7 +33,7 @@ router.use("/contacts", deleteContact);
 router.use("/contacts", getRecord);
 
 router.use("/product-wp", productWP);
-router.use("/product-wp", productWPSulg);
+router.use("/product-wp", productWPSlug);
 
 router.use("/category-wp", categoryWP);
 

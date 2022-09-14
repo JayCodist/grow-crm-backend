@@ -5,9 +5,9 @@ import ProductWPRepo from "../../../database/repository/ProductWPRepo";
 import validator from "../../../helpers/validator";
 import validation from "./validation";
 
-const productWPSulg = express.Router();
+const productWPSlug = express.Router();
 
-productWPSulg.get(
+productWPSlug.get(
   "/:slug",
   validator(validation.slug, "params"),
   async (req, res) => {
@@ -24,4 +24,4 @@ productWPSulg.get(
   }
 );
 
-export default productWPSulg;
+export default productWPSlug;
