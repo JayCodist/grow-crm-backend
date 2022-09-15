@@ -8,6 +8,7 @@ import deleteContact from "./contacts/delete";
 import contactLoglist from "./contacts/paginate";
 import getRecord from "./contacts/record";
 import updateContact from "./contacts/update";
+import allProductWp from "./product-wp/all";
 import productWP from "./product-wp/paginate";
 import productWPSlug from "./product-wp/product-slug";
 
@@ -32,6 +33,7 @@ router.use("/contacts", updateContact);
 router.use("/contacts", deleteContact);
 router.use("/contacts", getRecord);
 
+router.use("/product-wp", allProductWp);
 router.use("/product-wp", productWP);
 router.use("/product-wp", productWPSlug);
 
