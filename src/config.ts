@@ -15,15 +15,6 @@ export const db = {
   password: process.env.DB_USER_PWD || ""
 };
 
-export const corsUrl = "*";
-
-export const tokenInfo = {
-  accessTokenValidityDays: 30,
-  refreshTokenValidityDays: 120,
-  issuer: "https://grow-crm.web.app",
-  audience: "https://grow-crm.web.app"
-};
-
 export const logDirectory = "./logs";
 
 export const wCAuthString = `consumer_key=${process.env.WC_CONSUMER_KEY}&consumer_secret=${process.env.WC_CONSUMER_SECRET}`;

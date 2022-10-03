@@ -8,3 +8,5 @@ logs
 coverage
 
 *.env
+
+service-account*.json
