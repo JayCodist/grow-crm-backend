@@ -54,6 +54,9 @@ const validation = {
     designOptions: Joi.array().items(Joi.string()),
     tags: Joi.array().items(Joi.string()),
     timeStamp: Joi.string().allow("")
+  }),
+  slug: Joi.object().keys({
+    slug: Joi.string().required()
   })
 };
 
