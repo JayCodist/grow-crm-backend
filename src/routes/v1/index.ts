@@ -9,31 +9,26 @@ import deleteContact from "./contacts/delete";
 import contactLoglist from "./contacts/paginate";
 import getRecord from "./contacts/record";
 import updateContact from "./contacts/update";
+import orderID from "./order-firebase/order-id";
 import allProductWp from "./product-wp/all";
 import productWP from "./product-wp/paginate";
 import productWPSlug from "./product-wp/product-slug";
 
 const router = express.Router();
 
-// TODO: remove this when seen
-const { firestore } = firebaseAdmin;
-firestore()
-  .collection("channels")
-  .get()
-  .then(snap => {
-    console.log(snap.docs.length);
-  });
-
 /*-------------------------------------------------------------------------*/
 // Below all APIs are public APIs protected by api-key
-router.use("/", async (req, res) => {
-  // Implement security later
-  res.json({
-    app: "Regal Flowers",
-    version: "V1",
-    author: "jaycodist@gmail.com"
-  });
-});
+// router.use("/", async (req, res) => {
+//   // Implement security later
+//   res.json({
+//     app: "Regal Flowers",
+//     version: "V1",
+//     author: "jaycodist@gmail.com"
+//   });
+// });
+
+router.use("/order-firebase", orderID);
+
 /*-------------------------------------------------------------------------*/
 
 router.use("/client-access-logs/paginate", clientAccessLogList);
