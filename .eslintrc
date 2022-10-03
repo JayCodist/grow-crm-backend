@@ -31,6 +31,7 @@
         "arrow-body-style": "off",
         "import/prefer-default-export": "off",
         "no-underscore-dangle": "off",
-        "no-console": "off"
+        "no-console": "off",
+        "import/no-dynamic-require": "off"
     }
 }
