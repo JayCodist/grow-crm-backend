@@ -26,13 +26,17 @@ firestore()
 
 /*-------------------------------------------------------------------------*/
 // Below all APIs are public APIs protected by api-key
-router.use("/", async (req, res) => {
-  // Implement security later
+router.get("/", async (req, res) => {
   res.json({
     app: "Regal Flowers",
     version: "V1",
     author: "jaycodist@gmail.com"
   });
+});
+
+router.use("/", async (req, res, next) => {
+  // Implement security later
+  next();
 });
 /*-------------------------------------------------------------------------*/
 
