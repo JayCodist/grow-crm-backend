@@ -1,5 +1,4 @@
 import express from "express";
-import categoryWP from "./category-wp/paginate";
 import clientAccessLogCreate from "./client-access-logs/create";
 import clientAccessLogList from "./client-access-logs/paginate";
 import configRoutes from "./config";
@@ -8,10 +7,11 @@ import deleteContact from "./contacts/delete";
 import contactLoglist from "./contacts/paginate";
 import getRecord from "./contacts/record";
 import updateContact from "./contacts/update";
-import orderID from "./firebase/order-id";
-import allProductWp from "./product-wp/all";
-import productWP from "./product-wp/paginate";
-import productWPSlug from "./product-wp/product-slug";
+import orderID from "./firebase/order/order-id";
+import categoryWP from "./wordpress/category-wp/paginate";
+import allProductWp from "./wordpress/product-wp/all";
+import productWP from "./wordpress/product-wp/paginate";
+import productWPSlug from "./wordpress/product-wp/product-slug";
 
 const router = express.Router();
 
@@ -41,10 +41,10 @@ router.use("/contacts", updateContact);
 router.use("/contacts", deleteContact);
 router.use("/contacts", getRecord);
 
-router.use("/product-wp", allProductWp);
-router.use("/product-wp", productWP);
-router.use("/product-wp", productWPSlug);
+router.use("/wordpress/product", allProductWp);
+router.use("/wordpress/product", productWP);
+router.use("/wordpress/product", productWPSlug);
 
-router.use("/category-wp", categoryWP);
+router.use("wordpress/category-", categoryWP);
 
 export default router;

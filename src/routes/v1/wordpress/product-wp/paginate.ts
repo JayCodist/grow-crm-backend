@@ -1,8 +1,8 @@
 import express from "express";
-import { ApiError, InternalError } from "../../../core/ApiError";
-import { SuccessResponse } from "../../../core/ApiResponse";
-import ProductWPRepo from "../../../database/repository/ProductWPRepo";
-import validator from "../../../helpers/validator";
+import { ApiError, InternalError } from "../../../../core/ApiError";
+import { SuccessResponse } from "../../../../core/ApiResponse";
+import ProductWPRepo from "../../../../database/repository/ProductWPRepo";
+import validator from "../../../../helpers/validator";
 import validation from "./validation";
 
 const productWP = express.Router();
