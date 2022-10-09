@@ -1,5 +1,4 @@
 import express from "express";
-import firebaseAdmin from "../../helpers/firebase-admin";
 import categoryWP from "./category-wp/paginate";
 import clientAccessLogCreate from "./client-access-logs/create";
 import clientAccessLogList from "./client-access-logs/paginate";
@@ -9,7 +8,7 @@ import deleteContact from "./contacts/delete";
 import contactLoglist from "./contacts/paginate";
 import getRecord from "./contacts/record";
 import updateContact from "./contacts/update";
-import orderID from "./order-firebase/order-id";
+import orderID from "./firebase/order-id";
 import allProductWp from "./product-wp/all";
 import productWP from "./product-wp/paginate";
 import productWPSlug from "./product-wp/product-slug";
@@ -27,7 +26,7 @@ const router = express.Router();
 //   });
 // });
 
-router.use("/order-firebase", orderID);
+router.use("/firebase/order", orderID);
 
 /*-------------------------------------------------------------------------*/
 

@@ -1,6 +1,6 @@
 import express from "express";
 import { ApiError, InternalError } from "../../../core/ApiError";
-import { BadRequestResponse, SuccessResponse } from "../../../core/ApiResponse";
+import { NotFoundResponse, SuccessResponse } from "../../../core/ApiResponse";
 import firebaseAdmin from "../../../helpers/firebase-admin";
 
 const ordertID = express.Router();
@@ -12,20 +12,16 @@ ordertID.get("/:id", async (req, res) => {
     const response = await firestore()
       .collection("orders")
       .doc(req.params.id)
-      .get()
-      .then(doc => {
-        if (!doc.exists) {
-          return "No such document!";
-        }
-        return doc.data();
-      });
+      .get();
 
-    if (!response) {
-      new BadRequestResponse("Product not found").send(res);
+    const data = response.data();
+
+    if (!data) {
+      return new NotFoundResponse("Order not found").send(res);
     }
-    new SuccessResponse("success", response).send(res);
+    return new SuccessResponse("success", data).send(res);
   } catch (error) {
-    ApiError.handle(new InternalError("Unable to fetch product"), res);
+    return ApiError.handle(new InternalError("Unable to fetch product"), res);
   }
 });
 
