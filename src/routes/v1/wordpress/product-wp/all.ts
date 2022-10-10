@@ -1,7 +1,7 @@
 import express from "express";
-import { ApiError, InternalError } from "../../../core/ApiError";
-import { SuccessResponse } from "../../../core/ApiResponse";
-import ProductWPRepo from "../../../database/repository/ProductWPRepo";
+import { ApiError, InternalError } from "../../../../core/ApiError";
+import { SuccessResponse } from "../../../../core/ApiResponse";
+import ProductWPRepo from "../../../../database/repository/ProductWPRepo";
 
 const allProductWp = express.Router();
 
