@@ -67,7 +67,10 @@ export default class ProductWPRepo {
   }
 
   public static findBySlug(slug: string): Promise<ProductWP | null> {
-    return ProductWPModel.findOne({ slug }).lean<ProductWP>().exec();
+    return ProductWPModel.findOne({ slug })
+      .select(productWPProjection.join(" "))
+      .lean<ProductWP>()
+      .exec();
   }
 
   public static async getAllProducts(): Promise<{
