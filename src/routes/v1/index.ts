@@ -8,7 +8,6 @@ import contactLoglist from "./contacts/paginate";
 import getRecord from "./contacts/record";
 import updateContact from "./contacts/update";
 import orderID from "./firebase/order/order-id";
-import paymentStatus from "./firebase/payment/payment-status";
 import categoryWP from "./wordpress/category-wp/paginate";
 import allProductWp from "./wordpress/product-wp/all";
 import productWP from "./wordpress/product-wp/paginate";
@@ -28,7 +27,6 @@ const router = express.Router();
 // });
 
 router.use("/firebase/order", orderID);
-router.use("/firebase/payment", paymentStatus);
 
 /*-------------------------------------------------------------------------*/
 

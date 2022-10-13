@@ -24,7 +24,7 @@ ordertID.get("/:id", async (req, res) => {
     }
     return new SuccessResponse("success", data).send(res);
   } catch (error) {
-    return ApiError.handle(new InternalError("Unable to fetch order"), res);
+    return ApiError.handle(new InternalError("Unable to fetch product"), res);
   }
 });
 
