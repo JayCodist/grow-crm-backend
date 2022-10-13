@@ -19,12 +19,20 @@ ordertID.get("/:id", async (req, res) => {
 
     const data = response.data();
 
+    const order = {
+      paymentStatus: data?.paymentStatus,
+      amount: data?.amount,
+      orderID: data?.orderID,
+      deliveryStatus: data?.deliveryStatus,
+      orderItems: data?.orderProducts
+    };
+
     if (!data) {
       return new NotFoundResponse("Order not found").send(res);
     }
-    return new SuccessResponse("success", data).send(res);
+    return new SuccessResponse("success", order).send(res);
   } catch (error) {
-    return ApiError.handle(new InternalError("Unable to fetch product"), res);
+    return ApiError.handle(new InternalError("Unable to fetch order"), res);
   }
 });
 
