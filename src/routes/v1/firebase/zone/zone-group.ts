@@ -13,9 +13,7 @@ zoneGroup.get("/groups", async (req, res) => {
   try {
     const { firestore } = firebaseAdmin;
 
-    const response = await await await firestore()
-      .collection("zoneGroups")
-      .get();
+    const response = await firestore().collection("zoneGroups").get();
 
     const zoneGroups = response.docs.map(doc => doc.data().name);
 
