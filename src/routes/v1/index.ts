@@ -7,7 +7,9 @@ import deleteContact from "./contacts/delete";
 import contactLoglist from "./contacts/paginate";
 import getRecord from "./contacts/record";
 import updateContact from "./contacts/update";
+import createOrder from "./firebase/order/create";
 import orderID from "./firebase/order/order-id";
+import updateOrder from "./firebase/order/update";
 import zoneGroup from "./firebase/zone/zone-group";
 import categoryWP from "./wordpress/category-wp/paginate";
 import allProductWp from "./wordpress/product-wp/all";
@@ -28,6 +30,9 @@ const router = express.Router();
 // });
 
 router.use("/firebase/order", orderID);
+router.use("/firebase/order", createOrder);
+router.use("/firebase/order", updateOrder);
+
 router.use("/firebase/zone", zoneGroup);
 
 /*-------------------------------------------------------------------------*/
