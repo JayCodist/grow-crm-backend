@@ -47,6 +47,6 @@ router.use("/wordpress/product", allProductWp);
 router.use("/wordpress/product", productWP);
 router.use("/wordpress/product", productWPSlug);
 
-router.use("wordpress/category-", categoryWP);
+router.use("/wordpress/category", categoryWP);
 
 export default router;

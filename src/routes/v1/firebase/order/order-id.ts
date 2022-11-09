@@ -12,25 +12,27 @@ ordertID.get("/:id", async (req, res) => {
   try {
     const { firestore } = firebaseAdmin;
 
-    const response = await firestore()
-      .collection("orders")
-      .doc(req.params.id)
-      .get();
+    const response = await Promise.all([
+      firestore().collection("orders").doc(req.params.id).get(),
+      firestore().collection("business").get()
+    ]);
 
-    const data = response.data();
+    const order = response[0].data();
+    const business = response[1].docs.map(doc => doc.data());
 
-    const order = {
-      paymentStatus: data?.paymentStatus,
-      amount: data?.amount,
-      orderID: data?.orderID,
-      deliveryStatus: data?.deliveryStatus,
-      orderItems: data?.orderProducts
+    const businessLetter = business.find(
+      bus => bus.name === order?.business
+    )?.letter;
+
+    const data = {
+      ...order,
+      fullOrderId: `${businessLetter}${order?.deliveryZone}${order?.orderID}`
     };
 
-    if (!data) {
+    if (!order) {
       return new NotFoundResponse("Order not found").send(res);
     }
-    return new SuccessResponse("success", order).send(res);
+    return new SuccessResponse("success", data).send(res);
   } catch (error) {
     return ApiError.handle(new InternalError("Unable to fetch order"), res);
   }
