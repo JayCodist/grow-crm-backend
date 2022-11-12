@@ -9,6 +9,7 @@ import getRecord from "./contacts/record";
 import updateContact from "./contacts/update";
 import orderID from "./firebase/order/order-id";
 import zoneGroup from "./firebase/zone/zone-group";
+import paymentRoutes from "./payments";
 import categoryWP from "./wordpress/category-wp/paginate";
 import allProductWp from "./wordpress/product-wp/all";
 import productWP from "./wordpress/product-wp/paginate";
@@ -47,6 +48,8 @@ router.use("/wordpress/product", allProductWp);
 router.use("/wordpress/product", productWP);
 router.use("/wordpress/product", productWPSlug);
 
-router.use("wordpress/category-", categoryWP);
+router.use("wordpress/category", categoryWP);
+
+router.use("/payments", paymentRoutes);
 
 export default router;
