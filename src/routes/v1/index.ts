@@ -11,7 +11,8 @@ import createOrder from "./firebase/order/create";
 import orderID from "./firebase/order/order-id";
 import updateOrder from "./firebase/order/update";
 import zoneGroup from "./firebase/zone/zone-group";
-import paymentRoutes from "./payments";
+import regalFlowersRoutes from "./regal-flowers";
+import paymentRoutes from "./regal-flowers/payments";
 import categoryWP from "./wordpress/category-wp/paginate";
 import allProductWp from "./wordpress/product-wp/all";
 import productWP from "./wordpress/product-wp/paginate";
@@ -56,5 +57,7 @@ router.use("/wordpress/product", productWPSlug);
 router.use("/wordpress/category", categoryWP);
 
 router.use("/payments", paymentRoutes);
+
+router.use("/regal", regalFlowersRoutes);
 
 export default router;
