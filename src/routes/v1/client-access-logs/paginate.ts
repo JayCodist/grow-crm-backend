@@ -1,5 +1,5 @@
 import express from "express";
-import { ApiError, InternalError } from "../../../core/ApiError";
+import { ApiError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
 import ClientAccessLogRepo from "../../../database/repository/ClientAccessLogRepo";
 import validator from "../../../helpers/validator";
@@ -42,10 +42,7 @@ clientAccessLogList.get(
       });
       new SuccessResponse("success", data).send(res);
     } catch (error) {
-      ApiError.handle(
-        new InternalError("Failed to fetch. Please contact your administrator"),
-        res
-      );
+      ApiError.handle(error as Error, res);
     }
   }
 );
