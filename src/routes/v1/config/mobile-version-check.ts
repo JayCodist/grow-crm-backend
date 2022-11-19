@@ -1,5 +1,5 @@
 import express from "express";
-import { ApiError, InternalError } from "../../../core/ApiError";
+import { ApiError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
 import MobileVersionCheckRepo from "../../../database/repository/MobileVersionCheckRepo";
 import validator from "../../../helpers/validator";
@@ -24,12 +24,7 @@ mobileVersionCheck.get(
       const isValid = await handler(version);
       new SuccessResponse("success", isValid).send(res);
     } catch (e) {
-      ApiError.handle(
-        new InternalError(
-          "Failed to validate version. Please contact your administrator"
-        ),
-        res
-      );
+      ApiError.handle(e as Error, res);
     }
   }
 );

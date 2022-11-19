@@ -1,5 +1,5 @@
 import express from "express";
-import { ApiError, InternalError } from "../../../../core/ApiError";
+import { ApiError } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
 import ProductWPRepo from "../../../../database/repository/ProductWPRepo";
 
@@ -11,7 +11,7 @@ allProductWp.get("/all", async (req, res) => {
 
     new SuccessResponse("success", response).send(res);
   } catch (error) {
-    ApiError.handle(new InternalError("Failed to fetch products."), res);
+    ApiError.handle(error as Error, res);
   }
 });
 

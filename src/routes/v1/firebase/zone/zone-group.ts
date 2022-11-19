@@ -1,9 +1,5 @@
 import express from "express";
-import {
-  ApiError,
-  BadRequestError,
-  InternalError
-} from "../../../../core/ApiError";
+import { ApiError, BadRequestError } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
 import firebaseAdmin from "../../../../helpers/firebase-admin";
 
@@ -22,10 +18,7 @@ zoneGroup.get("/groups", async (req, res) => {
     }
     return new SuccessResponse("success", zoneGroups).send(res);
   } catch (error) {
-    return ApiError.handle(
-      new InternalError("Unable to fetch zone groups"),
-      res
-    );
+    return ApiError.handle(error as Error, res);
   }
 });
 

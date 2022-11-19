@@ -13,7 +13,7 @@
     "create-env": "printenv > .env",
     "build-ts": "tsc",
     "clean": "rimraf ./build",
-    "watch-node": "nodemon -r dotenv/config build/src/server.js",
+    "watch-node": "nodemon -r dotenv/config build/src/server.js --delay 1",
     "watch-ts": "tsc -w && copyfiles service-account.json build"
   },
   "keywords": [],
@@ -21,6 +21,7 @@
   "license": "ISC",
   "dependencies": {
     "@hapi/joi": "^17.1.1",
+    "bcrypt": "^5.1.0",
     "core-js": "^3.25.1",
     "cors": "^2.8.5",
     "dayjs": "^1.10.7",
@@ -28,12 +29,14 @@
     "express": "^4.17.1",
     "firebase-admin": "^11.0.1",
     "formidable": "^1.2.2",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.0.7",
     "node-fetch": "^2.6.7",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.5"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
     "@types/formidable": "^1.2.4",
