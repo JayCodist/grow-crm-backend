@@ -2,9 +2,9 @@ import express from "express";
 import mobileVersionCheck from "./mobile-version-check";
 import doWordpressSync from "./wordpress-sync";
 
-const router = express.Router();
+const configRoutes = express.Router();
 
-router.use("/mobile-version-check", mobileVersionCheck);
-router.use("/wordpress-sync", doWordpressSync);
+configRoutes.use("/mobile-version-check", mobileVersionCheck);
+configRoutes.use("/wordpress-sync", doWordpressSync);
 
-export default router;
+export default configRoutes;

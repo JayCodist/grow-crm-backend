@@ -2,9 +2,8 @@ import dayjs from "dayjs";
 import express from "express";
 import fetch, { Response } from "node-fetch";
 import { wCAuthString } from "../../../config";
-import { ApiError, InternalError } from "../../../core/ApiError";
+import { ApiError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
-import Logger from "../../../core/Logger";
 import { CategoryWPModel } from "../../../database/model/CategoryWP";
 import {
   DesignOption,
@@ -220,13 +219,7 @@ doWordpressSync.post(
       );
     } catch (e) {
       await AppConfigRepo.updateConfig({ wPSyncInProgress: false });
-      Logger.error("Failed to synchronize wordpress", e);
-      ApiError.handle(
-        new InternalError(
-          "Failed to synchronize wordpress. Please contact your administrator"
-        ),
-        res
-      );
+      ApiError.handle(e as Error, res);
     }
   }
 );

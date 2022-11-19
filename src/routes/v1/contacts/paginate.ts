@@ -1,5 +1,5 @@
 import express from "express";
-import { ApiError, InternalError } from "../../../core/ApiError";
+import { ApiError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
 import ContactsRepo from "../../../database/repository/ContactRepo";
 import validator from "../../../helpers/validator";
@@ -43,7 +43,7 @@ contactLoglist.get(
 
       new SuccessResponse("success", data).send(res);
     } catch (error) {
-      ApiError.handle(new InternalError("Failed to fetch contacts."), res);
+      ApiError.handle(error as Error, res);
     }
   }
 );

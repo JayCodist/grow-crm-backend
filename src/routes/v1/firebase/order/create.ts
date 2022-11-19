@@ -1,5 +1,5 @@
 import express from "express";
-import { ApiError, InternalError } from "../../../../core/ApiError";
+import { ApiError } from "../../../../core/ApiError";
 import {
   NotFoundResponse,
   SuccessResponse
@@ -30,7 +30,7 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
 
     return new SuccessResponse("success", createdOrderResponse).send(res);
   } catch (error) {
-    return ApiError.handle(new InternalError("Unable to fetch order"), res);
+    return ApiError.handle(error as Error, res);
   }
 });
 

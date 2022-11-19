@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { ApiError, InternalError } from "../../../core/ApiError";
+import { ApiError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
 import ClientAccessLogRepo from "../../../database/repository/ClientAccessLogRepo";
 import { handleFormDataParsing } from "../../../helpers/request-modifiers";
@@ -25,12 +25,7 @@ clientAccessLogCreate.post(
       });
       new SuccessResponse("success", response).send(res);
     } catch (error) {
-      ApiError.handle(
-        new InternalError(
-          "Unable to create client-access log. Please contact your administrator"
-        ),
-        res
-      );
+      ApiError.handle(error as Error, res);
     }
   }
 );
