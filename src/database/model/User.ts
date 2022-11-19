@@ -40,22 +40,18 @@ export interface LoginResponse extends Omit<User, "password"> {
 
 export type UserCreate = Partial<User> & { email: string; password: string };
 
-const schema = new Schema(
-  {
-    _id: String,
-    name: String,
-    addresses: [String],
-    gender: String,
-    city: String,
-    email: String,
-    phone: String,
-    phoneAlt: String,
-    state: String,
-    dob: String,
-    password: String
-  },
-  { _id: false }
-).index({
+const schema = new Schema({
+  name: String,
+  addresses: [String],
+  gender: String,
+  city: String,
+  email: String,
+  phone: String,
+  phoneAlt: String,
+  state: String,
+  dob: String,
+  password: String
+}).index({
   createdAt: 1
 });
 

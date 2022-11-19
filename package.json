@@ -13,7 +13,7 @@
     "create-env": "printenv > .env",
     "build-ts": "tsc",
     "clean": "rimraf ./build",
-    "watch-node": "nodemon -r dotenv/config build/src/server.js",
+    "watch-node": "nodemon -r dotenv/config build/src/server.js --delay 1",
     "watch-ts": "tsc -w && copyfiles service-account.json build"
   },
   "keywords": [],
