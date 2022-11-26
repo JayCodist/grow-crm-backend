@@ -8,7 +8,7 @@ const getOTPCode = () => {
 };
 
 export default class OTPRecordRepo {
-  public static async createOTPRecord(email: string): Promise<OTPRecord> {
+  public static async createOTPRecord(email: string): Promise<string> {
     const createdAt = dayjs().format();
     const existingOTPRecord = await OTPRecordModel.findOne({ email });
     const code = getOTPCode();
@@ -20,10 +20,10 @@ export default class OTPRecordRepo {
           new: true
         }
       );
-      return existingOTPRecord;
+    } else {
+      await OTPRecordModel.create({ email, code, createdAt });
     }
-    const { _id } = await OTPRecordModel.create({ email, code, createdAt });
-    return { email, code, createdAt, id: _id };
+    return code;
   }
 
   public static async delete(id: string) {

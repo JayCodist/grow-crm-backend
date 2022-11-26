@@ -12,7 +12,7 @@ export const sendEmailToAddress: (
   emailSubject: string
 ) => Promise<void> = async (emailAddresses, message, emailSubject) => {
   try {
-    const response = await mailjet.post("send", { version: "v3.1" }).request({
+    await mailjet.post("send", { version: "v3.1" }).request({
       Messages: [
         {
           From: {
@@ -32,7 +32,6 @@ export const sendEmailToAddress: (
         }
       ]
     });
-    console.log(response.body);
   } catch (err) {
     throw new InternalError(
       (err as any).ErrorMessage || (err as Error).message

@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { AuthFailureError } from "../../core/ApiError";
+import { hashPassword } from "../../helpers/formatters";
 import User, { LoginResponse, UserCreate } from "../model/User";
 import UsersRepo from "./UserRepo";
 
@@ -19,7 +20,7 @@ const getLoginResponse: (user: Partial<User>) => LoginResponse = ({
 
 export default class AuthRepo {
   public static async signup(userData: UserCreate) {
-    const password = await this.hashPassword(userData.password as string);
+    const password = await hashPassword(userData.password as string);
     const user = await UsersRepo.createUser({ ...userData, password });
     return getLoginResponse(user);
   }
@@ -37,11 +38,5 @@ export default class AuthRepo {
       throw new AuthFailureError("Credentials entered are not valid");
     }
     return getLoginResponse(user);
-  }
-
-  public static async hashPassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt(11);
-    const hashedPassword = await bcrypt.hash(password as string, salt);
-    return hashedPassword;
   }
 }

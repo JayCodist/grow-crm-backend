@@ -1,7 +1,8 @@
 import dayjs from "dayjs";
-import User, { LoginResponse, UserCreate, UserModel } from "../model/User";
+import User, { UserCreate, UserModel } from "../model/User";
 import { PartialLoose } from "../../helpers/type-helpers";
 import { BadRequestError } from "../../core/ApiError";
+import { hashPassword } from "../../helpers/formatters";
 
 export default class UsersRepo {
   public static async createUser(input: UserCreate): Promise<User> {
@@ -27,19 +28,28 @@ export default class UsersRepo {
     return { ...data, id: _id } as User;
   }
 
-  public static async update(updateParams: PartialLoose<LoginResponse>) {
+  public static async update(
+    updateParams: PartialLoose<User> & { id: string }
+  ) {
     const { id, ...update } = updateParams;
-    const user = await UserModel.findByIdAndUpdate(id, update, {
-      new: true
-    });
+    const passwordProps = update.password
+      ? { password: await hashPassword(update.password) }
+      : {};
+    const user = await UserModel.findByIdAndUpdate(
+      id,
+      { ...update, ...passwordProps },
+      {
+        new: true
+      }
+    );
 
     return user;
   }
 
   public static async delete(id: string) {
-    const user = await UserModel.findByIdAndDelete(id);
+    const response = await UserModel.findByIdAndDelete(id);
 
-    return user;
+    return response;
   }
 
   public static findById(id: string): Promise<User | null> {
