@@ -16,6 +16,13 @@ const validation = {
   login: Joi.object().keys({
     email: Joi.string().required(),
     password: Joi.string().required()
+  }),
+  requestOTP: Joi.object().keys({
+    email: Joi.string().required()
+  }),
+  validateOTP: Joi.object().keys({
+    email: Joi.string().required(),
+    code: Joi.string().required()
   })
 };
 
