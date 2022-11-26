@@ -14,7 +14,11 @@ export interface OTPRecord {
 const schema = new Schema({
   code: String,
   email: String,
-  createdAt: String
+  createdAt: String,
+  expireAt: {
+    type: Date,
+    default: Date.now() + 10 * 60 * 1000 // expires in 10 minutes
+  }
 }).index({
   createdAt: 1
 });
