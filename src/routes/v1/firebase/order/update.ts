@@ -1,5 +1,5 @@
 import express from "express";
-import { ApiError, InternalError } from "../../../../core/ApiError";
+import { ApiError } from "../../../../core/ApiError";
 import {
   NotFoundResponse,
   SuccessResponse
