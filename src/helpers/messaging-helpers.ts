@@ -1,7 +1,7 @@
 import Mailjet from "node-mailjet";
 import { InternalError } from "../core/ApiError";
 
-const mailjet = Mailjet.apiConnect(
+const mailjet = Mailjet.connect(
   process.env.MAILJET_API_KEY as string,
   process.env.MAILJET_SECRET_KEY as string
 );
@@ -12,7 +12,7 @@ export const sendEmailToAddress: (
   emailSubject: string
 ) => Promise<void> = async (emailAddresses, message, emailSubject) => {
   try {
-    await mailjet.post("send", { version: "v3.1" }).request({
+    const response = await mailjet.post("send", { version: "v3.1" }).request({
       Messages: [
         {
           From: {
@@ -32,6 +32,7 @@ export const sendEmailToAddress: (
         }
       ]
     });
+    console.log(response.body);
   } catch (err) {
     throw new InternalError(
       (err as any).ErrorMessage || (err as Error).message

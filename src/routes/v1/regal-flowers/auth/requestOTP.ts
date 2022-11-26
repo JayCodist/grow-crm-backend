@@ -1,7 +1,8 @@
 import express from "express";
-import { ApiError } from "../../../../core/ApiError";
+import { ApiError, AuthFailureError } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
 import OTPRecordRepo from "../../../../database/repository/OTPRecordRepo";
+import UsersRepo from "../../../../database/repository/UserRepo";
 import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
 import { handleFormDataParsing } from "../../../../helpers/request-modifiers";
 import validator from "../../../../helpers/validator";
@@ -16,10 +17,14 @@ requestOTP.use(
   async (req, res) => {
     try {
       const { email } = req.body;
+      const user = await UsersRepo.findByEmail(email);
+      if (!user) {
+        throw new AuthFailureError("Email does not belong to existing user");
+      }
       const OTPRecord = await OTPRecordRepo.createOTPRecord(email);
       await sendEmailToAddress(
         [email],
-        `Your one-time password from regalflowers is ${OTPRecord.code}. This code expires in 10 minutes`,
+        `Your one-time password from regalflowers is ${OTPRecord.code}. This password expires in 10 minutes`,
         "One-time password"
       );
       new SuccessResponse("success", null).send(res);

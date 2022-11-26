@@ -17,7 +17,8 @@ const schema = new Schema({
   createdAt: String,
   expireAt: {
     type: Date,
-    default: Date.now() + 10 * 60 * 1000 // expires in 10 minutes
+    expires: 30
+    // default: Date.now() + 10 * 60 * 1000 // expires in 10 minutes
   }
 }).index({
   createdAt: 1

@@ -32,7 +32,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.0.7",
     "node-fetch": "^2.6.7",
-    "node-mailjet": "^5.1.1",
+    "node-mailjet": "^3.3.4",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.5"
   },
@@ -46,6 +46,7 @@
     "@types/mongoose": "^5.11.97",
     "@types/node": "^16.9.4",
     "@types/node-fetch": "^2.6.1",
+    "@types/node-mailjet": "^3.3.9",
     "@typescript-eslint/eslint-plugin": "^4.31.2",
     "@typescript-eslint/parser": "^4.31.2",
     "chai": "^4.3.6",
