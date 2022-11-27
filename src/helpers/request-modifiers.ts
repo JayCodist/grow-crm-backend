@@ -1,5 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import formidable from "formidable";
+import { BadTokenError } from "../core/ApiError";
+import User from "../database/model/User";
+import { decodeToken } from "./formatters";
 
 export const handleFormDataParsing = () => {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -21,6 +24,21 @@ export const handleFormDataParsing = () => {
       }
     } catch (error) {
       next();
+    }
+  };
+};
+
+export const handleAuthValidation = () => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const authToken = (req.headers.authorization || "").replace(
+        /^bearer /i,
+        ""
+      );
+      req.user = decodeToken<User>(authToken);
+      next();
+    } catch (err) {
+      next(new BadTokenError("Provided authentication token is invalid"));
     }
   };
 };

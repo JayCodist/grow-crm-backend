@@ -1,9 +1,11 @@
 import express from "express";
 import { ApiError, AuthFailureError } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
-import OTPRecordRepo from "../../../../database/repository/OTPRecordRepo";
 import UsersRepo from "../../../../database/repository/UserRepo";
-import { handleFormDataParsing } from "../../../../helpers/request-modifiers";
+import {
+  handleAuthValidation,
+  handleFormDataParsing
+} from "../../../../helpers/request-modifiers";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
 
@@ -13,18 +15,15 @@ changePassword.use(
   "/",
   handleFormDataParsing(),
   validator(validation.changePassword, "body"),
+  handleAuthValidation(),
   async (req, res) => {
     try {
-      const { email, password, code } = req.body;
-      const user = await UsersRepo.findByEmail(email);
+      const { password } = req.body;
+      const user = await UsersRepo.findByEmail(req.user?.email || "");
       if (!user) {
-        throw new AuthFailureError("Email does not belong to existing user");
+        throw new AuthFailureError("User not found");
       }
-      const OTPRecord = await OTPRecordRepo.findByEmail(email);
-      if (!OTPRecord || OTPRecord.code !== code) {
-        throw new AuthFailureError("One-time password is incorrect");
-      }
-      await OTPRecordRepo.delete(OTPRecord.id);
+
       await UsersRepo.update({ password, id: user.id });
       new SuccessResponse("Password changed successfully", user).send(res);
     } catch (error) {

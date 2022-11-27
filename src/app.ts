@@ -5,6 +5,15 @@ import { environment } from "./config";
 import "./database"; // initialize database
 import { NotFoundError, ApiError, InternalError } from "./core/ApiError";
 import routesV1 from "./routes/v1";
+import User from "./database/model/User";
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: Omit<User, "password">;
+    }
+  }
+}
 
 process.on("uncaughtException", e => {
   Logger.error(e);

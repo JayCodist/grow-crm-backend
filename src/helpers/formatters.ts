@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { BadTokenError } from "../core/ApiError";
 import User, { LoginResponse } from "../database/model/User";
 
 export const formatResponseRecord: (record: any) => any = record => {
@@ -17,8 +18,7 @@ export const hashPassword: (password: string) => Promise<string> =
 
 export const getLoginResponse: (user: Partial<User>) => LoginResponse =
   user => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...formattedUser } = formatResponseRecord(user);
+    const formattedUser = formatResponseRecord(user);
     return {
       ...formattedUser,
       authToken: jwt.sign(
@@ -30,3 +30,13 @@ export const getLoginResponse: (user: Partial<User>) => LoginResponse =
       )
     } as LoginResponse;
   };
+
+export const decodeToken: <T>(token: string) => T = token => {
+  const payload = jwt.verify(token, process.env.JWT_SIGNATURE_SECRET as string);
+  if (typeof payload === "string") {
+    throw new BadTokenError("Could not authenticate token");
+  }
+  delete payload.exp;
+  delete payload.iat;
+  return payload as any;
+};

@@ -20,9 +20,12 @@ const validation = {
   requestOTP: Joi.object().keys({
     email: Joi.string().required()
   }),
-  changePassword: Joi.object().keys({
+  validateOTP: Joi.object().keys({
     email: Joi.string().required(),
-    code: Joi.string().required(),
+    code: Joi.string().required()
+  }),
+  changePassword: Joi.object().keys({
+    token: Joi.string().required(),
     password: Joi.string().required()
   })
 };
