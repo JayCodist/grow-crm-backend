@@ -21,8 +21,12 @@ export const getLoginResponse: (user: Partial<User>) => LoginResponse =
     const { password, ...formattedUser } = formatResponseRecord(user);
     return {
       ...formattedUser,
-      authToken: jwt.sign(user, process.env.JWT_SIGNATURE_SECRET as string, {
-        expiresIn: "7d"
-      })
+      authToken: jwt.sign(
+        formattedUser,
+        process.env.JWT_SIGNATURE_SECRET as string,
+        {
+          expiresIn: "7d"
+        }
+      )
     } as LoginResponse;
   };
