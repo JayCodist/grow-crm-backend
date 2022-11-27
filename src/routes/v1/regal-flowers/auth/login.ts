@@ -1,7 +1,7 @@
 import express from "express";
 import { ApiError } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
-import AuthRepo from "../../../../database/repository/AuthRepo";
+import UsersRepo from "../../../../database/repository/UserRepo";
 import { handleFormDataParsing } from "../../../../helpers/request-modifiers";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
@@ -15,7 +15,7 @@ login.use(
   async (req, res) => {
     try {
       const { email, password } = req.body;
-      const response = await AuthRepo.login(email, password);
+      const response = await UsersRepo.login(email, password);
 
       new SuccessResponse("success", response).send(res);
     } catch (error) {

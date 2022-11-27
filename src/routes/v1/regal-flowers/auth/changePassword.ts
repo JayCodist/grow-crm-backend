@@ -26,7 +26,7 @@ changePassword.use(
       }
       await OTPRecordRepo.delete(OTPRecord.id);
       await UsersRepo.update({ password, id: user.id });
-      new SuccessResponse("Password changed successfully", null).send(res);
+      new SuccessResponse("Password changed successfully", user).send(res);
     } catch (error) {
       ApiError.handle(error as Error, res);
     }

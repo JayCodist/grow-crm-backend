@@ -1,10 +1,32 @@
 import dayjs from "dayjs";
-import User, { UserCreate, UserModel } from "../model/User";
+import bcrypt from "bcrypt";
+import User, { LoginResponse, UserCreate, UserModel } from "../model/User";
 import { PartialLoose } from "../../helpers/type-helpers";
-import { BadRequestError } from "../../core/ApiError";
-import { hashPassword } from "../../helpers/formatters";
+import { AuthFailureError, BadRequestError } from "../../core/ApiError";
+import { getLoginResponse, hashPassword } from "../../helpers/formatters";
 
 export default class UsersRepo {
+  public static async signup(userData: UserCreate) {
+    const password = await hashPassword(userData.password as string);
+    const user = await this.createUser({ ...userData, password });
+    return getLoginResponse(user);
+  }
+
+  public static async login(
+    email: string,
+    password: string
+  ): Promise<LoginResponse> {
+    const user = await UserModel.findOne({ email }).lean<User>().exec();
+    if (!user) {
+      throw new AuthFailureError("Credentials entered are not valid");
+    }
+    const passwordWorks = await bcrypt.compare(password, user.password);
+    if (!passwordWorks) {
+      throw new AuthFailureError("Credentials entered are not valid");
+    }
+    return getLoginResponse(user);
+  }
+
   public static async createUser(input: UserCreate): Promise<User> {
     const existingUser = await UserModel.findOne({ email: input.email })
       .lean<User>()
@@ -43,7 +65,7 @@ export default class UsersRepo {
       }
     );
 
-    return user;
+    return getLoginResponse(user);
   }
 
   public static async delete(id: string) {
@@ -52,17 +74,15 @@ export default class UsersRepo {
     return response;
   }
 
-  public static findById(id: string): Promise<User | null> {
-    return UserModel.findOne({ _id: id }).lean<User>().exec();
+  public static async findById(id: string): Promise<LoginResponse | null> {
+    const doc = await UserModel.findOne({ _id: id }).lean<User>().exec();
+    return doc ? getLoginResponse(doc) : null;
   }
 
-  public static async findByEmail(email: string): Promise<User | null> {
+  public static async findByEmail(
+    email: string
+  ): Promise<LoginResponse | null> {
     const doc = await UserModel.findOne({ email }).lean<User>().exec();
-    if (!doc) {
-      return null;
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { _id, __v, ...user } = doc as any;
-    return { ...user, id: _id };
+    return doc ? getLoginResponse(doc) : null;
   }
 }
