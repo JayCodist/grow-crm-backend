@@ -18,7 +18,8 @@ export const hashPassword: (password: string) => Promise<string> =
 
 export const getLoginResponse: (user: Partial<User>) => LoginResponse =
   user => {
-    const formattedUser = formatResponseRecord(user);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...formattedUser } = formatResponseRecord(user);
     return {
       ...formattedUser,
       authToken: jwt.sign(

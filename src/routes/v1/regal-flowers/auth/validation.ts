@@ -25,7 +25,6 @@ const validation = {
     code: Joi.string().required()
   }),
   changePassword: Joi.object().keys({
-    token: Joi.string().required(),
     password: Joi.string().required()
   })
 };

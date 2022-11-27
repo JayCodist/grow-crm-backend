@@ -36,6 +36,9 @@ export const handleAuthValidation = () => {
         ""
       );
       req.user = decodeToken<User>(authToken);
+      if (!req.user?.id) {
+        throw new BadTokenError("Provided authentication token is invalid");
+      }
       next();
     } catch (err) {
       next(new BadTokenError("Provided authentication token is invalid"));

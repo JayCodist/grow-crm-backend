@@ -19,7 +19,7 @@ changePassword.use(
   async (req, res) => {
     try {
       const { password } = req.body;
-      const user = await UsersRepo.findByEmail(req.user?.email || "");
+      const user = await UsersRepo.findById(req.user?.id as string);
       if (!user) {
         throw new AuthFailureError("User not found");
       }

@@ -12,6 +12,6 @@ authRoutes.post("/signup", signup);
 
 authRoutes.post("/otp/request", requestOTP);
 authRoutes.post("/otp/validate", validateOTP);
-authRoutes.put("/otp/change-password", changePassword);
+authRoutes.put("/change-password", changePassword);
 
 export default authRoutes;
