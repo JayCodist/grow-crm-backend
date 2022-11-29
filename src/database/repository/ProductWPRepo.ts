@@ -73,6 +73,13 @@ export default class ProductWPRepo {
       .exec();
   }
 
+  public static findBySlugs(slugs: string[]): Promise<ProductWP[]> {
+    return ProductWPModel.find({ slug: { $in: slugs } })
+      .select(productWPProjection.join(" "))
+      .lean<ProductWP[]>()
+      .exec();
+  }
+
   public static async getAllProducts(): Promise<{
     data: ProductWP[];
     count: number;

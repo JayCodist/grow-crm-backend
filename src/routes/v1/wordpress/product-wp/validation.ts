@@ -57,6 +57,9 @@ const validation = {
   }),
   slug: Joi.object().keys({
     slug: Joi.string().required()
+  }),
+  slugMultiple: Joi.object().keys({
+    slugs: Joi.string().required()
   })
 };
 

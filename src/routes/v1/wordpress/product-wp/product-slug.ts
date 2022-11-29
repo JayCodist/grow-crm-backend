@@ -10,8 +10,8 @@ import validation from "./validation";
 
 const productWPSlug = express.Router();
 
-productWPSlug.get(
-  "/:slug",
+productWPSlug.use(
+  "/",
   validator(validation.slug, "params"),
   async (req, res) => {
     try {

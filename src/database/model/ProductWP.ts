@@ -91,7 +91,7 @@ const schema = new Schema({
   _nameSearch: { type: [String], index: true },
   subtitle: String,
   temporaryNotes: [String],
-  slug: String,
+  slug: { type: String, index: true },
   categories: { type: [String], index: true },
   type: String,
   featured: Boolean,

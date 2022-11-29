@@ -5,7 +5,7 @@ import ProductWPRepo from "../../../../database/repository/ProductWPRepo";
 
 const allProductWp = express.Router();
 
-allProductWp.get("/all", async (req, res) => {
+allProductWp.use("/", async (req, res) => {
   try {
     const response = await ProductWPRepo.getAllProducts();
 

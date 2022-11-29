@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import express from "express";
 import { ApiError, AuthFailureError } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
@@ -24,7 +25,12 @@ validateOTP.use(
       if (!OTPRecord || OTPRecord.code !== code) {
         throw new AuthFailureError("One-time password is incorrect");
       }
+      const tenMinsAgo = dayjs().subtract(10, "minute");
+      const isOutdated = dayjs(OTPRecord.createdAt).isBefore(tenMinsAgo);
       await OTPRecordRepo.delete(OTPRecord.id);
+      if (isOutdated) {
+        throw new AuthFailureError("One-time password has expired");
+      }
 
       new SuccessResponse("success", user).send(res);
     } catch (error) {

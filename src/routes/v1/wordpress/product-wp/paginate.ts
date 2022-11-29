@@ -7,8 +7,8 @@ import validation from "./validation";
 
 const productWP = express.Router();
 
-productWP.get(
-  "/paginate",
+productWP.use(
+  "/",
   validator(validation.paginate, "query"),
   async (req, res) => {
     try {

@@ -14,9 +14,7 @@ import zoneGroup from "./firebase/zone/zone-group";
 import regalFlowersRoutes from "./regal-flowers";
 import paymentRoutes from "./regal-flowers/payments";
 import categoryWP from "./wordpress/category-wp/paginate";
-import allProductWp from "./wordpress/product-wp/all";
-import productWP from "./wordpress/product-wp/paginate";
-import productWPSlug from "./wordpress/product-wp/product-slug";
+import wordpressProductRoutes from "./wordpress/product-wp";
 
 const router = express.Router();
 
@@ -50,9 +48,7 @@ router.use("/contacts", updateContact);
 router.use("/contacts", deleteContact);
 router.use("/contacts", getRecord);
 
-router.use("/wordpress/product", allProductWp);
-router.use("/wordpress/product", productWP);
-router.use("/wordpress/product", productWPSlug);
+router.use("/wordpress/product", wordpressProductRoutes);
 
 router.use("/wordpress/category", categoryWP);
 
