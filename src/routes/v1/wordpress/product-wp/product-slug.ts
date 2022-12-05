@@ -11,7 +11,7 @@ import validation from "./validation";
 const productWPSlug = express.Router();
 
 productWPSlug.use(
-  "/",
+  "/:slug",
   validator(validation.slug, "params"),
   async (req, res) => {
     try {
