@@ -9,6 +9,6 @@ const wordpressProductRoutes = express.Router();
 wordpressProductRoutes.get("/all", allProductWp);
 wordpressProductRoutes.get("/paginate", productWP);
 wordpressProductRoutes.get("/slug-multiple", productWPSlugMultiple);
-wordpressProductRoutes.get("/single/:slug", productWPSlug);
+wordpressProductRoutes.use("/single", productWPSlug);
 
 export default wordpressProductRoutes;

@@ -10,7 +10,7 @@ import validation from "./validation";
 
 const productWPSlug = express.Router();
 
-productWPSlug.use(
+productWPSlug.get(
   "/:slug",
   validator(validation.slug, "params"),
   async (req, res) => {
@@ -19,6 +19,7 @@ productWPSlug.use(
 
       if (!response) {
         new BadRequestResponse("Product not found").send(res);
+        return;
       }
       new SuccessResponse("success", response).send(res);
     } catch (error) {
