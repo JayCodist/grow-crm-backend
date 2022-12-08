@@ -101,11 +101,4 @@ export default class ProductWPRepo {
       });
     });
   }
-
-  public static async findByFeatured(): Promise<ProductWP[]> {
-    return ProductWPModel.find({ featured: true })
-      .select(productWPProjection.join(" "))
-      .lean<ProductWP[]>()
-      .exec();
-  }
 }
