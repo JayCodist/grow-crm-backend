@@ -24,6 +24,16 @@ export const productWPProjection = [
   "type"
 ];
 
+export const productWPProjectionMinimal = [
+  "key",
+  "name",
+  "price",
+  "images",
+  "slug",
+  "subtitle",
+  "sku"
+];
+
 interface Addon {
   name: string;
   price: number;
@@ -56,6 +66,16 @@ export type DesignOptionsMap = Partial<
   Record<DesignOption, "default" | "option">
 >;
 
+export interface MinimalProductWP {
+  key: number;
+  name: string;
+  subtitle: string;
+  sku: string;
+  slug: string;
+  price: number;
+  images: ProductImage;
+}
+
 export interface ProductWP {
   key: number;
   name: string;
@@ -77,6 +97,7 @@ export interface ProductWP {
   budgetNote: string;
   designNote: string;
   relatedVIPRef: number | null;
+  relatedProducts?: MinimalProductWP[];
 }
 
 export interface ProductWPCreate extends ProductWP {

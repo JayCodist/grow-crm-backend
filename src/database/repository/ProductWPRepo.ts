@@ -1,13 +1,17 @@
 // type SortLogic =
 
 import { InternalError } from "../../core/ApiError";
-import { formatResponseRecord } from "../../helpers/formatters";
+import {
+  formatResponseRecord,
+  minimizeProduct
+} from "../../helpers/formatters";
 import { wPCollectionIsReady } from "../../helpers/search-helpers";
 import { PartialLoose } from "../../helpers/type-helpers";
 import {
   ProductWP,
   ProductWPModel,
-  productWPProjection
+  productWPProjection,
+  productWPProjectionMinimal
 } from "../model/ProductWP";
 
 type SortLogic = PartialLoose<ProductWP, "asc" | "desc">;
@@ -66,11 +70,36 @@ export default class ProductWPRepo {
     });
   }
 
-  public static findBySlug(slug: string): Promise<ProductWP | null> {
-    return ProductWPModel.findOne({ slug })
+  public static async findBySlug(
+    slug: string,
+    relatedProductsCount = 0
+  ): Promise<ProductWP | null> {
+    const product = await ProductWPModel.findOne({ slug })
       .select(productWPProjection.join(" "))
       .lean<ProductWP>()
       .exec();
+    if (!product) {
+      return null;
+    }
+    const relatedProducts = relatedProductsCount
+      ? await ProductWPModel.find({ categories: { $in: product.categories } })
+          .limit(relatedProductsCount + 1)
+          .select(productWPProjectionMinimal.join(" "))
+          .lean<ProductWP[]>()
+          .exec()
+      : null;
+
+    return {
+      ...product,
+      ...(relatedProducts
+        ? {
+            relatedProducts: relatedProducts
+              .filter(prod => prod.slug !== slug)
+              .slice(0, relatedProductsCount)
+              .map(minimizeProduct)
+          }
+        : {})
+    };
   }
 
   public static findBySlugs(slugs: string[]): Promise<ProductWP[]> {

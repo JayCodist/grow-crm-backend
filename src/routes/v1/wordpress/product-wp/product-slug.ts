@@ -15,7 +15,11 @@ productWPSlug.get(
   validator(validation.slug, "params"),
   async (req, res) => {
     try {
-      const response = await ProductWPRepo.findBySlug(req.params.slug);
+      const { relatedProductsCount } = req.query;
+      const response = await ProductWPRepo.findBySlug(
+        req.params.slug,
+        Number(relatedProductsCount) || 0
+      );
 
       if (!response) {
         new BadRequestResponse("Product not found").send(res);

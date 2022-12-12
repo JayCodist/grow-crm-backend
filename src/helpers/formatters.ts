@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { BadTokenError } from "../core/ApiError";
+import { MinimalProductWP, ProductWP } from "../database/model/ProductWP";
 import User, { LoginResponse } from "../database/model/User";
 
 export const formatResponseRecord: (record: any) => any = record => {
@@ -41,3 +42,16 @@ export const decodeToken: <T>(token: string) => T = token => {
   delete payload.iat;
   return payload as any;
 };
+
+export const minimizeProduct: (product: ProductWP) => MinimalProductWP =
+  product => {
+    return {
+      name: product.name,
+      sku: product.subtitle,
+      key: product.key,
+      images: product.images[0],
+      subtitle: product.subtitle,
+      slug: product.slug,
+      price: product.price
+    };
+  };
