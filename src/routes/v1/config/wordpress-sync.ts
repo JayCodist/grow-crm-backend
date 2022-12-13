@@ -79,7 +79,7 @@ const getVariants: (
       (attr: { name: string }) => attr?.name === "Select Size"
     )?.option;
     return {
-      class: "regular",
+      class: /vip/i.test(variantName) ? "vip" : "regular",
       sku: variation.sku,
       price: Number(variation.sale_price || variation.price) || 0,
       name:
@@ -94,7 +94,7 @@ const getVariants: (
       (attr: { name: string }) => attr?.name === "Select Size"
     )?.option;
     return {
-      class: "vip",
+      class: /vip/i.test(variantName) ? "vip" : "regular",
       sku: variation.sku,
       price: Number(variation.sale_price || variation.price) || 0,
       name:
