@@ -3,6 +3,6 @@ import verifyPaystack from "./verify-paystack";
 
 const paymentRoutes = express.Router();
 
-paymentRoutes.use("/verify-payment-paystack", verifyPaystack);
+paymentRoutes.use("/paystack/verify", verifyPaystack);
 
 export default paymentRoutes;
