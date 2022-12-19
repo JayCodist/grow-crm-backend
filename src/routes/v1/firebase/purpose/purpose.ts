@@ -5,11 +5,11 @@ import firebaseAdmin from "../../../../helpers/firebase-admin";
 
 const purposes = express.Router();
 
-purposes.get("/groups", async (req, res) => {
+purposes.get("/", async (req, res) => {
   try {
     const { firestore } = firebaseAdmin;
 
-    const response = await firestore().collection("zoneGroups").get();
+    const response = await firestore().collection("purposes").get();
 
     return new SuccessResponse(
       "success",
