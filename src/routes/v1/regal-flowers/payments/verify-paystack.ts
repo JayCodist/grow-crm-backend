@@ -25,9 +25,7 @@ verifyPaystack.post(
         return new SuccessResponse("Payment is successful", true).send(res);
       }
 
-      return new PaymentFailureError(
-        `Unable to make payment: ${json.data.message}`
-      );
+      return new PaymentFailureError(json.data.message);
     } catch (err) {
       return ApiError.handle(err as Error, res);
     }
