@@ -1,9 +1,18 @@
 import express from "express";
+import { firestore } from "firebase-admin";
 import fetch from "node-fetch";
-import { ApiError, PaymentFailureError } from "../../../../core/ApiError";
+import {
+  ApiError,
+  InternalError,
+  PaymentFailureError
+} from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
+import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
+import { Order } from "../../firebase/order/update";
 import validation from "./validation";
+
+const db = firestore();
 
 const verifyPaystack = express.Router();
 
@@ -22,6 +31,23 @@ verifyPaystack.post(
       );
       const json = await response.json();
       if (json.status && json.data.status === "success") {
+        const snap = await db
+          .collection("orders")
+          .doc(req.query.ref as string)
+          .get();
+        const order = snap.data() as Order | undefined;
+        if (!order || order.amount >= json.data.amount) {
+          return new InternalError(
+            "Unexpected error occured. Please contact your administrator"
+          );
+        }
+        await firestore()
+          .collection("orders")
+          .doc(req.query.ref as string)
+          .update({
+            paymentStatus: "PAID - GO AHEAD (Website - Card)"
+          });
+        await PaymentLogRepo.createPaymentLog("paystack", json);
         return new SuccessResponse("Payment is successful", true).send(res);
       }
 

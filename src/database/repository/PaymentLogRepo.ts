@@ -3,7 +3,7 @@ import { OTPRecord, OTPRecordModel } from "../model/OTPRecord";
 import { PaymentLogModel, PaymentType } from "../model/PaymentLog";
 
 export default class PaymentLogRepo {
-  public static async createOTPRecord(
+  public static async createPaymentLog(
     paymentType: PaymentType,
     logData: unknown
   ): Promise<void> {
