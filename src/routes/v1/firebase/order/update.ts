@@ -103,7 +103,7 @@ updateOrder.put("/update/:id", handleFormDataParsing(), async (req, res) => {
     const response = await firestore()
       .collection("orders")
       .doc(req.params.id)
-      .update(payload);
+      .update(payload as any);
 
     if (!response) {
       return new NotFoundResponse("Order not found").send(res);

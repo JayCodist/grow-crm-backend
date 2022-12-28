@@ -19,6 +19,7 @@ steps:
       - "JWT_SIGNATURE_SECRET=${_JWT_SIGNATURE_SECRET}"
       - "MAILJET_API_KEY=${_MAILJET_API_KEY}"
       - "MAILJET_SECRET_KEY=${_MAILJET_SECRET_KEY}"
+      - "PAYSTACK_SECRET_KEY=${_PAYSTACK_SECRET_KEY}"
   - name: "gcr.io/cloud-builders/gcloud"
     args:
       [

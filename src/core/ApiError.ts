@@ -109,6 +109,13 @@ export class BadTokenError extends ApiError {
   }
 }
 
+export class PaymentFailureError extends ApiError {
+  constructor(message = "Unable to make payment") {
+    super(ErrorType.BAD_TOKEN, message);
+    Object.setPrototypeOf(this, BadTokenError.prototype);
+  }
+}
+
 export class TokenExpiredError extends ApiError {
   constructor(message = "Token is expired") {
     super(ErrorType.TOKEN_EXPIRED, message);
