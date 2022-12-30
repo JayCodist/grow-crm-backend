@@ -130,18 +130,18 @@ doWordpressSync.post(
               ?.find((attribute: any) => attribute.name === "VIP Pricing IDS")
               ?.options?.[0]?.replace(/\D/g, "")
           ) || null;
+        const prodName = rawProd.title.split("-")[0].trim() || "N/A";
         const product: ProductWPCreate = {
           key: rawProd.id,
-          name: rawProd.title.split("-")[0].trim(),
-          _nameSearch: getSearchArray(
-            rawProd.title?.replace(/\.\s*.\..*$/, "").trim() || ""
-          ),
+          name: prodName,
+          _nameSearch: getSearchArray(prodName),
           subtitle:
             rawProd.title
               .split("-")[1]
               // To remove trailing ellipsis
               ?.replace(/\.\s*.\..*$/, "")
               .trim() || "",
+          class: /^vip/i.test(prodName) ? "vip" : "regular",
           slug:
             rawProd.permalink
               ?.split("/product")

@@ -84,6 +84,7 @@ export interface ProductWP {
   slug: string;
   categories: string[];
   type: "simple" | "variable";
+  class: "regular" | "vip";
   featured: boolean;
   sku: string;
   price: number;
