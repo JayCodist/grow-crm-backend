@@ -21,7 +21,8 @@ export const productWPProjection = [
   "variants",
   "addonsGroups",
   "designOptions",
-  "type"
+  "type",
+  "class"
 ];
 
 export const productWPProjectionMinimal = [
@@ -31,7 +32,8 @@ export const productWPProjectionMinimal = [
   "images",
   "slug",
   "subtitle",
-  "sku"
+  "sku",
+  "class"
 ];
 
 interface Addon {
@@ -115,6 +117,7 @@ const schema = new Schema({
   temporaryNotes: [String],
   slug: { type: String, index: true },
   categories: { type: [String], index: true },
+  class: { type: String, index: true },
   type: String,
   featured: Boolean,
   sku: String,
