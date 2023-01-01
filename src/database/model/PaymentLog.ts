@@ -1,4 +1,5 @@
 import { Document, model, Schema } from "mongoose";
+import { Environment } from "../../config";
 import Logger from "../../core/Logger";
 
 const DOCUMENT_NAME = "PaymentLog";
@@ -11,12 +12,14 @@ export interface PaymentLog {
   type: PaymentType;
   createdAt: string;
   logData: any;
+  environment: Environment;
 }
 
 const schema = new Schema({
-  type: String,
+  type: { type: String, index: true },
   createdAt: String,
-  logData: Object
+  logData: Object,
+  environment: { type: String, index: true }
 }).index({
   createdAt: 1
 });

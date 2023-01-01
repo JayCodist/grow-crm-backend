@@ -1,13 +1,17 @@
 import express from "express";
 import { firestore } from "firebase-admin";
 import fetch from "node-fetch";
+import { unescape } from "querystring";
 import { Environment } from "../../../../config";
 import {
   ApiError,
   InternalError,
   PaymentFailureError
 } from "../../../../core/ApiError";
-import { SuccessResponse } from "../../../../core/ApiResponse";
+import {
+  InternalErrorResponse,
+  SuccessResponse
+} from "../../../../core/ApiResponse";
 import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
 import { Order } from "../../firebase/order/update";
@@ -15,18 +19,45 @@ import validation from "./validation";
 
 const db = firestore();
 
-const verifyPaystack = express.Router();
+const verifyMonnify = express.Router();
 
-verifyPaystack.post(
+const handleMonnifyLogin: () => Promise<string> = async () => {
+  try {
+    const base64Pass = Buffer.from(
+      unescape(
+        encodeURIComponent(
+          `${process.env.MONNIFY_API_KEY}:${process.env.MONNIFY_SECRET_KEY}`
+        )
+      )
+    ).toString("base64");
+    const response = await fetch(
+      "https://sandbox.monnify.com/api/v1/auth/login",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Basic ${base64Pass}`
+        }
+      }
+    );
+    const json = await response.json();
+    return json.responseBody?.accessToken;
+  } catch (err) {
+    console.error("Unable to login to monnify: ", err);
+    throw new InternalErrorResponse("Failed monnify authorization");
+  }
+};
+
+verifyMonnify.post(
   "/",
-  validator(validation.verifyPaymentPaystack, "query"),
+  validator(validation.verifyPaymentMonnify, "query"),
   async (req, res) => {
     try {
+      const monnifyToken = await handleMonnifyLogin();
       const response = await fetch(
-        `https://api.paystack.co/transaction/verify/${req.query.ref}`,
+        `${process.env.MONNIFY_BASE_URL}/api/v2/transactions/${req.query.ref}`,
         {
           headers: {
-            Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`
+            Authorization: `Bearer ${monnifyToken}`
           }
         }
       );
@@ -48,12 +79,12 @@ verifyPaystack.post(
           .update({
             paymentStatus: "PAID - GO AHEAD (Website - Card)"
           });
-        const environment: Environment = /test/i.test(
-          process.env.PAYSTACK_SECRET_KEY || ""
+        const environment: Environment = /sandbox/i.test(
+          process.env.MONNIFY_BASE_URL || ""
         )
           ? "development"
           : "production";
-        await PaymentLogRepo.createPaymentLog("paystack", json, environment);
+        await PaymentLogRepo.createPaymentLog("monnify", json, environment);
         return new SuccessResponse("Payment is successful", true).send(res);
       }
 
@@ -64,4 +95,4 @@ verifyPaystack.post(
   }
 );
 
-export default verifyPaystack;
+export default verifyMonnify;

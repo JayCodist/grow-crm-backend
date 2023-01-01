@@ -1,17 +1,23 @@
 import dayjs from "dayjs";
-import { OTPRecord, OTPRecordModel } from "../model/OTPRecord";
-import { PaymentLogModel, PaymentType } from "../model/PaymentLog";
+import { Environment } from "../../config";
+import { PaymentLog, PaymentLogModel, PaymentType } from "../model/PaymentLog";
 
 export default class PaymentLogRepo {
   public static async createPaymentLog(
     paymentType: PaymentType,
-    logData: unknown
+    logData: unknown,
+    environment: Environment
   ): Promise<void> {
     const createdAt = dayjs().format();
-    await OTPRecordModel.create({ paymentType, createdAt, logData });
+    await PaymentLogModel.create({
+      paymentType,
+      createdAt,
+      logData,
+      environment
+    });
   }
 
-  public static findById(id: string): Promise<OTPRecord | null> {
-    return PaymentLogModel.findOne({ _id: id }).lean<OTPRecord>().exec();
+  public static findById(id: string): Promise<PaymentLog | null> {
+    return PaymentLogModel.findOne({ _id: id }).lean<PaymentLog>().exec();
   }
 }

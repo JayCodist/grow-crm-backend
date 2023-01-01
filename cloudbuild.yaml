@@ -20,6 +20,9 @@ steps:
       - "MAILJET_API_KEY=${_MAILJET_API_KEY}"
       - "MAILJET_SECRET_KEY=${_MAILJET_SECRET_KEY}"
       - "PAYSTACK_SECRET_KEY=${_PAYSTACK_SECRET_KEY}"
+      - "MONNIFY_API_KEY=${_MONNIFY_API_KEY}"
+      - "MONNIFY_SECRET_KEY=${_MONNIFY_SECRET_KEY}"
+      - "MONNIFY_BASE_URL=${_MONNIFY_BASE_URL}"
   - name: "gcr.io/cloud-builders/gcloud"
     args:
       [
