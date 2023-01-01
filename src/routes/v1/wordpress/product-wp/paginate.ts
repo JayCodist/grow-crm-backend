@@ -12,8 +12,15 @@ productWP.use(
   validator(validation.paginate, "query"),
   async (req, res) => {
     try {
-      const { pageNumber, pageSize, sortField, sortType, categories, tags } =
-        req.query;
+      const {
+        pageNumber,
+        pageSize,
+        sortField,
+        sortType,
+        categories,
+        productClass,
+        tags
+      } = req.query;
 
       const categoryArr = String(categories || "")
         .trim()
@@ -39,6 +46,7 @@ productWP.use(
             }
           }
         : {};
+      const classProps = productClass ? { class: productClass } : {};
 
       const data = await ProductWPRepo.getPaginatedProducts({
         sortLogic:
@@ -51,7 +59,8 @@ productWP.use(
         pageNumber: Number(pageNumber) || undefined,
         filter: {
           ...categoryProps,
-          ...tagProps
+          ...tagProps,
+          ...classProps
         }
       });
 

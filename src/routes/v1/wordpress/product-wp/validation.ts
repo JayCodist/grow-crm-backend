@@ -7,7 +7,8 @@ const validation = {
     sortField: Joi.string().allow(""),
     categories: Joi.string().allow(""),
     tags: Joi.string().allow(""),
-    sortType: Joi.string().valid("asc", "desc")
+    sortType: Joi.string().valid("asc", "desc"),
+    productClass: Joi.string().valid("vip", "regular").optional()
   }),
   create: Joi.object().keys({
     name: Joi.string().required(),
