@@ -5,4 +5,6 @@ const paymentRoutes = express.Router();
 
 paymentRoutes.use("/paystack/verify", verifyPaystack);
 
+paymentRoutes.use("/monnify/verify", verifyPaystack);
+
 export default paymentRoutes;
