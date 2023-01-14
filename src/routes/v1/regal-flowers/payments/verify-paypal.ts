@@ -2,6 +2,7 @@ import express from "express";
 import { firestore } from "firebase-admin";
 import fetch from "node-fetch";
 import { unescape } from "querystring";
+import { URLSearchParams } from "url";
 import { Environment } from "../../../../config";
 import { ApiError, PaymentFailureError } from "../../../../core/ApiError";
 import {
@@ -29,13 +30,16 @@ const handlePaypalLogin: () => Promise<string> = async () => {
       `${process.env.PAYPAL_BASE_URL}/v1/oauth2/token`,
       {
         method: "POST",
+        body: new URLSearchParams({
+          grant_type: "client_credentials"
+        }),
         headers: {
           Authorization: `Basic ${base64Pass}`
         }
       }
     );
     const json = await response.json();
-    return json.responseBody?.accessToken;
+    return json.access_token;
   } catch (err) {
     console.error("Unable to login to paypal: ", err);
     throw new InternalErrorResponse("Failed paypal authorization");
@@ -56,6 +60,7 @@ verifyPaypal.post(
   async (req, res) => {
     try {
       const paypalToken = await handlePaypalLogin();
+      console.log(req.query.ref, paypalToken);
       const response = await fetch(
         `${process.env.PAYPAL_BASE_URL}/v2/checkout/orders/${req.query.ref}`,
         {
@@ -67,11 +72,10 @@ verifyPaypal.post(
       const json = await response.json();
       if (
         json.status &&
-        json.data.status === "COMPLETED" &&
-        json.data.purchase_units?.length
+        (json.status === "COMPLETED" || json.status === "APPROVED") &&
+        json.purchase_units?.length
       ) {
-        const paymentDetails: PapPalPaymentDetails =
-          json.data.purchase_units[0];
+        const paymentDetails: PapPalPaymentDetails = json.purchase_units[0];
 
         // TODO: confirm amount is good
 
@@ -86,6 +90,7 @@ verifyPaypal.post(
         //     "Unexpected error occured. Please contact your administrator"
         //   );
         // }
+
         await db
           .collection("orders")
           .doc(paymentDetails.reference_id as string)
@@ -100,7 +105,6 @@ verifyPaypal.post(
         await PaymentLogRepo.createPaymentLog("paypal", json, environment);
         return new SuccessResponse("Payment is successful", true).send(res);
       }
-
       throw new PaymentFailureError(
         json.error_description || "Invalid details"
       );
