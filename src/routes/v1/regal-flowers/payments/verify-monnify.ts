@@ -68,6 +68,7 @@ verifyMonnify.post(
           .doc(req.query.ref as string)
           .get();
         const order = snap.data() as Order | undefined;
+        // TODO: confirm currency is right
         if (!order || order.amount >= json.data.amount) {
           return new InternalError(
             "Unexpected error occured. Please contact your administrator"

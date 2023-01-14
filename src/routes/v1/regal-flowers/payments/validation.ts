@@ -6,6 +6,9 @@ const validation = {
   }),
   verifyPaymentMonnify: Joi.object().keys({
     ref: Joi.string().required()
+  }),
+  verifyPaymentPaypal: Joi.object().keys({
+    ref: Joi.string().required()
   })
 };
 

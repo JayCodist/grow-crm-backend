@@ -5,7 +5,7 @@ import Logger from "../../core/Logger";
 const DOCUMENT_NAME = "PaymentLog";
 const COLLECTION_NAME = "paymentLog";
 
-export type PaymentType = "paystack" | "monnify";
+export type PaymentType = "paystack" | "monnify" | "paypal";
 
 export interface PaymentLog {
   id: string;

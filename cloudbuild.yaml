@@ -23,6 +23,9 @@ steps:
       - "MONNIFY_API_KEY=${_MONNIFY_API_KEY}"
       - "MONNIFY_SECRET_KEY=${_MONNIFY_SECRET_KEY}"
       - "MONNIFY_BASE_URL=${_MONNIFY_BASE_URL}"
+      - "PAYPAL_CLIENT_ID=${_PAYPAL_CLIENT_ID}"
+      - "PAYPAL_CLIENT_SECRET=${_PAYPAL_CLIENT_SECRET}"
+      - "PAYPAL_BASE_URL=${_PAYPAL_BASE_URL}"
   - name: "gcr.io/cloud-builders/gcloud"
     args:
       [
