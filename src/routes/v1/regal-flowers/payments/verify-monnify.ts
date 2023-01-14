@@ -31,7 +31,7 @@ const handleMonnifyLogin: () => Promise<string> = async () => {
       )
     ).toString("base64");
     const response = await fetch(
-      "https://sandbox.monnify.com/api/v1/auth/login",
+      `${process.env.MONNIFY_BASE_URL}/api/v1/auth/login`,
       {
         method: "POST",
         headers: {
