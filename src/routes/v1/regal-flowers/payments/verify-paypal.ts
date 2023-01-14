@@ -101,7 +101,9 @@ verifyPaypal.post(
         return new SuccessResponse("Payment is successful", true).send(res);
       }
 
-      return new PaymentFailureError(json.data.message);
+      throw new PaymentFailureError(
+        json.error_description || "Invalid details"
+      );
     } catch (err) {
       return ApiError.handle(err as Error, res);
     }

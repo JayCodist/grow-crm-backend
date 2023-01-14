@@ -86,7 +86,7 @@ verifyMonnify.post(
           ? "development"
           : "production";
         await PaymentLogRepo.createPaymentLog("monnify", json, environment);
-        return new SuccessResponse("Payment is successful", true).send(res);
+        throw new SuccessResponse("Payment is successful", true).send(res);
       }
 
       return new PaymentFailureError(json.data.message);
