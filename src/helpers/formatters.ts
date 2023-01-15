@@ -55,3 +55,12 @@ export const minimizeProduct: (product: ProductWP) => MinimalProductWP =
       price: product.price
     };
   };
+
+export const slugify: (str: string) => string = str => {
+  return str
+    .replace(/(\s|&)+/g, "-")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9-]/g, "")
+    .replace(/-+/g, "-");
+};

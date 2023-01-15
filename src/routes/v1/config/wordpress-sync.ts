@@ -13,6 +13,7 @@ import {
   ProductWPModel
 } from "../../../database/model/ProductWP";
 import AppConfigRepo from "../../../database/repository/AppConfigRepo";
+import { slugify } from "../../../helpers/formatters";
 import { getSearchArray } from "../../../helpers/search-helpers";
 import validator from "../../../helpers/validator";
 import validation from "./validation";
@@ -153,7 +154,7 @@ doWordpressSync.post(
           type: rawProd.type,
           description: rawProd.longDescription,
           longDescription: rawProd.shortDescription,
-          categories: rawProd.categories,
+          categories: rawProd.categories.map(slugify),
           tags: rawProd.tags,
           images:
             rawProd.images?.map((image: any) => ({
@@ -199,6 +200,7 @@ doWordpressSync.post(
       await CategoryWPModel.insertMany(
         categories.map(category => ({
           ...category,
+          slug: slugify(category.name),
           _nameSearch: getSearchArray(category.name)
         })),
         { ordered: false }

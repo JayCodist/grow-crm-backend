@@ -9,6 +9,7 @@ export const categoryWPProjection = ["key", "createdAt", "name"];
 export default interface CategoryWP {
   id: string;
   name: string;
+  slug: string;
   createdAt: string;
 }
 
@@ -24,6 +25,7 @@ const schema = new Schema(
     _id: String,
     key: String,
     name: String,
+    slug: String,
     _nameSearch: { type: [String], index: true }
   },
   { _id: false }
