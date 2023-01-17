@@ -4,7 +4,7 @@ import Logger from "../../core/Logger";
 const DOCUMENT_NAME = "CategoryWP";
 const COLLECTION_NAME = "categoryWP";
 
-export const categoryWPProjection = ["key", "createdAt", "name"];
+export const categoryWPProjection = ["key", "createdAt", "name", "slug"];
 
 export default interface CategoryWP {
   id: string;
@@ -15,7 +15,6 @@ export default interface CategoryWP {
 
 export interface CategoryWPCreate extends Omit<CategoryWP, "id"> {
   _nameSearch: string[];
-  createdAt: string;
 }
 
 interface CategoryWPDocument extends Document, CategoryWPCreate {}
