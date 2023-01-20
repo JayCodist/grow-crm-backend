@@ -28,7 +28,7 @@ const schema = new Schema(
     currencies: [
       {
         name: String,
-        conversionRate: String
+        conversionRate: Number
       }
     ],
     currenciesLastSyncDate: String
