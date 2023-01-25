@@ -6,7 +6,7 @@ const validation = {
     shouldSaveAddress: Joi.boolean().required(),
     orderData: Joi.object().keys({
       deliveryDate: Joi.string().required(),
-      message: Joi.string().required(),
+      deliveryMessage: Joi.string().required(),
       purpose: Joi.string().required(),
       adminNotes: Joi.string().required(),
       recipient: Joi.object().keys({
