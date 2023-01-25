@@ -7,6 +7,7 @@ import deleteContact from "./contacts/delete";
 import contactLoglist from "./contacts/paginate";
 import getRecord from "./contacts/record";
 import updateContact from "./contacts/update";
+import checkoutOrder from "./firebase/order/checkout-order";
 import createOrder from "./firebase/order/create";
 import orderID from "./firebase/order/order-id";
 import purposes from "./firebase/purpose/purpose";
@@ -31,6 +32,7 @@ const router = express.Router();
 
 router.use("/firebase/order", orderID);
 router.use("/firebase/order", createOrder);
+router.use("/firebase/order/checkout-order", checkoutOrder);
 
 // Deprecated
 // router.use("/firebase/order", updateOrder);

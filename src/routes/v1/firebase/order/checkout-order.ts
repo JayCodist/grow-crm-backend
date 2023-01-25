@@ -121,7 +121,7 @@ export interface Order {
 const checkoutOrder = express.Router();
 
 checkoutOrder.put(
-  "/checkout-order/:id",
+  "/:id",
   handleFormDataParsing(),
   validator(validation.checkoutOrder, "body"),
   handleAuthValidation(true),
