@@ -88,12 +88,12 @@ type DeliveryStatus =
   | "Despatched (drivers update)"
   | "Delivered (drivers update)";
 
-interface OrderActor {
+export interface OrderActor {
   id?: string;
   name?: string;
   firstName?: string;
   lastName?: string;
-  address?: string;
+  address?: string[];
   phone?: string;
   phoneAlt?: string;
   phoneAlt2?: string;
@@ -132,7 +132,7 @@ checkoutOrder.put(
         req.body as {
           shouldCreateAccount: boolean;
           shouldSaveAddress: boolean;
-          orderData: Partial<Order>;
+          orderData: any;
           userData: UserCreate;
         };
       let user: Omit<User, "password"> | null = req.user || null;
@@ -168,6 +168,8 @@ checkoutOrder.put(
                   ? {
                       ...recipient,
                       ...orderData.recipient,
+                      message: orderData.deliveryMessage,
+                      despatchLocation: orderData.despatchLocation,
                       phoneAlt: formatPhoneNumber(
                         orderData.recipient?.phoneAlt ||
                           recipient.phoneAlt ||
@@ -180,6 +182,8 @@ checkoutOrder.put(
                 ...recipients,
                 {
                   ...(orderData.recipient as Recipient),
+                  message: orderData.deliveryMessage,
+                  despatchLocation: orderData.despatchLocation,
                   phone: formatPhoneNumber(orderData.recipient?.phone || ""),
                   phoneAlt: formatPhoneNumber(
                     orderData.recipient?.phoneAlt || ""

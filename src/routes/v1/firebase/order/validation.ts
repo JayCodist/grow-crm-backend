@@ -7,6 +7,7 @@ const validation = {
     orderData: Joi.object().keys({
       deliveryDate: Joi.string().required(),
       deliveryMessage: Joi.string().valid("").default(""),
+      despatchLocation: Joi.string().valid("").default(""),
       purpose: Joi.string().valid("").default(""),
       adminNotes: Joi.string().valid("").default(""),
       recipient: Joi.object().keys({

@@ -28,7 +28,7 @@ export interface Recipient {
   message: string;
   method: string;
   state: string;
-  pickupLocation: string;
+  despatchLocation: string;
 }
 
 export default interface User {
