@@ -211,7 +211,7 @@ checkoutOrder.put(
         });
 
       if (!response) {
-        return new NotFoundResponse("Order not found").send(res);
+        return new NotFoundResponse("Order could not be updated").send(res);
       }
 
       const updatedOrder = await firestore()
