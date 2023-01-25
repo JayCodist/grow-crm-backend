@@ -20,9 +20,11 @@ export const hashPassword: (password: string) => Promise<string> =
 export const getLoginResponse: (user: Partial<User>) => LoginResponse =
   user => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...formattedUser } = formatResponseRecord(user);
+    const { password, recipients, ...formattedUser } =
+      formatResponseRecord(user);
     return {
       ...formattedUser,
+      recipients,
       authToken: jwt.sign(
         formattedUser,
         process.env.JWT_SIGNATURE_SECRET as string,
@@ -63,4 +65,13 @@ export const slugify: (str: string) => string = str => {
     .trim()
     .replace(/[^a-z0-9-]/g, "")
     .replace(/-+/g, "-");
+};
+
+export const formatPhoneNumber = (str: string) => {
+  if (!str || str === "undefined" || typeof str !== "string") return "";
+  const output = str
+    .replace(/[\s|/]/g, "")
+    .replace(/^\+?234\(0\)/, "0")
+    .replace(/^\+?234/, "0");
+  return output;
 };

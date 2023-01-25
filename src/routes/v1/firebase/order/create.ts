@@ -1,9 +1,6 @@
 import express from "express";
-import { ApiError } from "../../../../core/ApiError";
-import {
-  NotFoundResponse,
-  SuccessResponse
-} from "../../../../core/ApiResponse";
+import { ApiError, NoDataError } from "../../../../core/ApiError";
+import { SuccessResponse } from "../../../../core/ApiResponse";
 import firebaseAdmin from "../../../../helpers/firebase-admin";
 import { handleFormDataParsing } from "../../../../helpers/request-modifiers";
 
@@ -18,7 +15,7 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
       .add({ ...req.body, timestamp: firestore.FieldValue.serverTimestamp() });
 
     if (!response) {
-      return new NotFoundResponse("Order not created").send(res);
+      throw new NoDataError("Order not created");
     }
 
     const createdOrder = await firestore()

@@ -10,7 +10,7 @@ import {
 import { SuccessResponse } from "../../../../core/ApiResponse";
 import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
-import { Order } from "../../firebase/order/update";
+import { Order } from "../../firebase/order/checkout-order";
 import validation from "./validation";
 
 const db = firestore();

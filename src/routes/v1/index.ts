@@ -9,7 +9,6 @@ import getRecord from "./contacts/record";
 import updateContact from "./contacts/update";
 import createOrder from "./firebase/order/create";
 import orderID from "./firebase/order/order-id";
-import updateOrder from "./firebase/order/update";
 import purposes from "./firebase/purpose/purpose";
 import zoneGroup from "./firebase/zone/zone-group";
 import regalFlowersRoutes from "./regal-flowers";
@@ -32,7 +31,9 @@ const router = express.Router();
 
 router.use("/firebase/order", orderID);
 router.use("/firebase/order", createOrder);
-router.use("/firebase/order", updateOrder);
+
+// Deprecated
+// router.use("/firebase/order", updateOrder);
 
 router.use("/firebase/zone", zoneGroup);
 router.use("/firebase/purposes", purposes);

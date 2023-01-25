@@ -3,7 +3,11 @@ import bcrypt from "bcrypt";
 import User, { LoginResponse, UserCreate, UserModel } from "../model/User";
 import { PartialLoose } from "../../helpers/type-helpers";
 import { AuthFailureError, BadRequestError } from "../../core/ApiError";
-import { getLoginResponse, hashPassword } from "../../helpers/formatters";
+import {
+  formatPhoneNumber,
+  getLoginResponse,
+  hashPassword
+} from "../../helpers/formatters";
 
 export default class UsersRepo {
   public static async signup(userData: UserCreate) {
@@ -38,11 +42,11 @@ export default class UsersRepo {
       ...input,
       createdAt: input.createdAt || dayjs().format(),
       name: input.name || "",
-      addresses: input.addresses || [],
+      recipients: input.recipients || [],
       gender: input.gender || "",
       city: input.city || "",
-      phone: input.phone || "",
-      phoneAlt: input.phoneAlt || "",
+      phone: formatPhoneNumber(input.phone || ""),
+      phoneAlt: formatPhoneNumber(input.phoneAlt || ""),
       state: input.state || "",
       dob: input.dob || ""
     };

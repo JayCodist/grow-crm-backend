@@ -28,7 +28,7 @@ export const handleFormDataParsing = () => {
   };
 };
 
-export const handleAuthValidation = () => {
+export const handleAuthValidation = (allowAbsentTokens = false) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const authToken = (req.headers.authorization || "").replace(
@@ -36,7 +36,7 @@ export const handleAuthValidation = () => {
         ""
       );
       req.user = decodeToken<User>(authToken);
-      if (!req.user?.id) {
+      if (!allowAbsentTokens && !req.user?.id) {
         throw new BadTokenError("Provided authentication token is invalid");
       }
       next();

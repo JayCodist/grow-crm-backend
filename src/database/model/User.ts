@@ -10,7 +10,7 @@ export const userProjection = [
   "name",
   "phone",
   "email",
-  "addresses",
+  "recipients",
   "city",
   "state",
   "phoneAlt",
@@ -19,10 +19,21 @@ export const userProjection = [
   "password"
 ];
 
+export interface Recipient {
+  name: string;
+  address: string;
+  phone: string;
+  phoneAlt: string;
+  residenceType: string;
+  message: string;
+  method: string;
+  state: string;
+  pickupLocation: string;
+}
+
 export default interface User {
   id: string;
   name: string;
-  addresses: string[];
   password: string;
   gender: string;
   city: string;
@@ -32,6 +43,7 @@ export default interface User {
   state: string;
   dob: string;
   createdAt: string;
+  recipients: Recipient[];
 }
 
 export interface LoginResponse extends Omit<User, "password"> {
@@ -42,7 +54,19 @@ export type UserCreate = Partial<User> & { email: string; password: string };
 
 const schema = new Schema({
   name: String,
-  addresses: [String],
+  recipients: [
+    {
+      name: String,
+      address: String,
+      phone: String,
+      phoneAlt: String,
+      residenceType: String,
+      message: String,
+      method: String,
+      state: String,
+      pickupLocation: String
+    }
+  ],
   gender: String,
   city: String,
   email: String,
