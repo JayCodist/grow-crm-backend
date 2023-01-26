@@ -35,7 +35,7 @@ export const handleAuthValidation = (allowAbsentTokens = false) => {
         /^bearer /i,
         ""
       );
-      req.user = decodeToken<User>(authToken);
+      req.user = decodeToken<User>(authToken, allowAbsentTokens);
       if (!allowAbsentTokens && !req.user?.id) {
         throw new BadTokenError("Provided authentication token is invalid");
       }

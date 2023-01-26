@@ -8,6 +8,8 @@ import {
   AppCurrencyName
 } from "../../../database/model/AppConfig";
 import AppConfigRepo from "../../../database/repository/AppConfigRepo";
+import UsersRepo from "../../../database/repository/UserRepo";
+import { handleAuthValidation } from "../../../helpers/request-modifiers";
 
 const getCurrencies: () => Promise<Record<AppCurrencyName, number>> =
   async () => {
@@ -29,7 +31,7 @@ const getCurrencies: () => Promise<Record<AppCurrencyName, number>> =
 
 const handshake = express.Router();
 
-handshake.get("/", async (req, res) => {
+handshake.get("/", handleAuthValidation(true), async (req, res) => {
   try {
     const config = await AppConfigRepo.getConfig();
     let currencies: AppCurrency[] = config?.currencies || [];
@@ -50,7 +52,10 @@ handshake.get("/", async (req, res) => {
         currenciesLastSyncDate: dayjs().format()
       });
     }
-    return new SuccessResponse("success", { currencies }).send(res);
+
+    const user = req.user ? await UsersRepo.findByEmail(req.user.email) : null;
+
+    return new SuccessResponse("success", { currencies, user }).send(res);
   } catch (err) {
     return ApiError.handle(err as Error, res);
   }

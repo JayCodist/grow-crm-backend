@@ -35,8 +35,15 @@ export const getLoginResponse: (user: Partial<User>) => LoginResponse =
     } as LoginResponse;
   };
 
-export const decodeToken: <T>(token: string) => T = token => {
-  const payload = jwt.verify(token, process.env.JWT_SIGNATURE_SECRET as string);
+export const decodeToken: <T>(token: string, ignoreExpiration: boolean) => T = (
+  token,
+  ignoreExpiration = false
+) => {
+  const payload = jwt.verify(
+    token,
+    process.env.JWT_SIGNATURE_SECRET as string,
+    { ignoreExpiration }
+  );
   if (typeof payload === "string") {
     throw new BadTokenError("Could not authenticate token");
   }

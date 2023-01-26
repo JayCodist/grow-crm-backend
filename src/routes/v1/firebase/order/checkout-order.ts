@@ -218,17 +218,9 @@ checkoutOrder.put(
         return new NotFoundResponse("Order could not be updated").send(res);
       }
 
-      const updatedOrder = await firestore()
-        .collection("orders")
-        .doc(req.params.id)
-        .get();
-
-      const updatedOrderResponse = {
-        ...updatedOrder.data(),
-        id: req.params.id
-      };
-
-      return new SuccessResponse("success", updatedOrderResponse).send(res);
+      return new SuccessResponse("Order successfully checked out", null).send(
+        res
+      );
     } catch (error) {
       return ApiError.handle(error as Error, res);
     }
