@@ -1,29 +1,29 @@
 import Joi from "@hapi/joi";
 
 const validation = {
-  checkoutOrder: Joi.object().keys({
+  checkoutOrder: Joi.object({
     shouldCreateAccount: Joi.boolean().required(),
     shouldSaveAddress: Joi.boolean().required(),
-    orderData: Joi.object().keys({
+    orderData: Joi.object({
       deliveryDate: Joi.string().required(),
-      deliveryMessage: Joi.string().valid("").default(""),
-      despatchLocation: Joi.string().valid("").default(""),
-      purpose: Joi.string().valid("").default(""),
-      adminNotes: Joi.string().valid("").default(""),
-      recipient: Joi.object().keys({
+      deliveryMessage: Joi.string().default("").allow(""),
+      despatchLocation: Joi.string().default("").allow(""),
+      purpose: Joi.string().default("").allow(""),
+      adminNotes: Joi.string().default("").allow(""),
+      recipient: Joi.object({
         name: Joi.string().required(),
         phone: Joi.string().required(),
-        phoneAlt: Joi.string().valid("").default(""),
-        residenceType: Joi.string().valid("").default(""),
-        state: Joi.string().valid("").default(""),
-        address: Joi.string().valid("").default(""),
-        method: Joi.string().valid("").default("")
+        phoneAlt: Joi.string().default("").allow(""),
+        residenceType: Joi.string().default("").allow(""),
+        state: Joi.string().default("").allow(""),
+        address: Joi.string().default("").allow(""),
+        method: Joi.string().default("").allow("")
       })
     }),
     userData: Joi.object().keys({
       name: Joi.string().required(),
       phone: Joi.string().required(),
-      email: Joi.string().valid("").default(""),
+      email: Joi.string().default("").allow(""),
       password: Joi.string()
     })
   })

@@ -8,12 +8,14 @@ export type ValidationSource = "body" | "headers" | "query" | "params";
 const validator = (schema: Joi.ObjectSchema, source: ValidationSource) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { error } = schema.validate(req[source]);
+      const { error, value } = schema.validate(req[source]);
 
       if (!error) {
         next();
         return;
       }
+
+      req[source] = value;
 
       const { details } = error;
       const message = details
