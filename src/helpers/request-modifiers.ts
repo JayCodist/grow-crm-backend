@@ -41,7 +41,11 @@ export const handleAuthValidation = (allowAbsentTokens = false) => {
       }
       next();
     } catch (err) {
-      next(new BadTokenError("Provided authentication token is invalid"));
+      next(
+        allowAbsentTokens
+          ? null
+          : new BadTokenError("Provided authentication token is invalid")
+      );
     }
   };
 };
