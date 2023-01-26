@@ -169,6 +169,7 @@ checkoutOrder.put(
                       ...recipient,
                       ...orderData.recipient,
                       message: orderData.deliveryMessage,
+                      adminNotes: orderData.adminNotes,
                       despatchLocation: orderData.despatchLocation,
                       phoneAlt: formatPhoneNumber(
                         orderData.recipient?.phoneAlt ||
@@ -184,6 +185,7 @@ checkoutOrder.put(
                   ...(orderData.recipient as Recipient),
                   message: orderData.deliveryMessage,
                   despatchLocation: orderData.despatchLocation,
+                  adminNotes: orderData.adminNotes,
                   phone: formatPhoneNumber(orderData.recipient?.phone || ""),
                   phoneAlt: formatPhoneNumber(
                     orderData.recipient?.phoneAlt || ""

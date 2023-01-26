@@ -29,6 +29,7 @@ export interface Recipient {
   method: string;
   state: string;
   despatchLocation: string;
+  adminNotes: string;
 }
 
 export default interface User {

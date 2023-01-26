@@ -5,7 +5,6 @@ const validation = {
     email: Joi.string().email().required(),
     password: Joi.string().required(),
     name: Joi.string().allow("").default(""),
-    address: Joi.array().items(Joi.string()),
     gender: Joi.string().allow("").default(""),
     city: Joi.string().allow("").default(""),
     phone: Joi.string().allow("").default(""),
