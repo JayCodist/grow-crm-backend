@@ -29,6 +29,7 @@ export interface Recipient {
   method: string;
   state: string;
   despatchLocation: string;
+  deliveryLocation: string;
   adminNotes: string;
 }
 
@@ -65,7 +66,8 @@ const schema = new Schema({
       message: String,
       method: String,
       state: String,
-      pickupLocation: String
+      pickupLocation: String,
+      deliveryLocation: String
     }
   ],
   gender: String,

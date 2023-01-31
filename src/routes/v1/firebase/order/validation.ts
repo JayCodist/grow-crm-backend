@@ -4,6 +4,11 @@ const validation = {
   checkoutOrder: Joi.object({
     shouldCreateAccount: Joi.boolean().required(),
     shouldSaveAddress: Joi.boolean().required(),
+    deliveryLocation: Joi.object({
+      name: Joi.string().required(),
+      amount: Joi.number().greater(-1),
+      label: Joi.string().allow("")
+    }).allow(null),
     orderData: Joi.object({
       deliveryDate: Joi.string().required(),
       deliveryMessage: Joi.string().default("").allow(""),
