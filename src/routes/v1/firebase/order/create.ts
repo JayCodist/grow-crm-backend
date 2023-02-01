@@ -163,7 +163,7 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
       arrangementTime: "",
       business: "Regal Flowers",
       channel: "Regal Website",
-      contactDepsArray: [client.id] as string[],
+      contactDepsArray: [client.id].filter(Boolean) as string[],
       costBreakdown: "",
       deliveryMessage: "",
       deliveryNotePrinted: false,
