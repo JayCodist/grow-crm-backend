@@ -167,6 +167,7 @@ type Purpose =
   | "Complimentary";
 
 export interface Order {
+  id: string;
   orderProducts: OrderItem[];
   paymentStatus: PaymentStatus;
   cost: number;
@@ -213,3 +214,5 @@ export interface Order {
   client: OrderActor;
   driver: OrderActor;
 }
+
+export type OrderCreate = Omit<Order, "id">;

@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import express from "express";
 import {
   ApiError,
@@ -18,9 +19,47 @@ import {
   handleFormDataParsing
 } from "../../../../helpers/request-modifiers";
 import validator from "../../../../helpers/validator";
+import { handleContactHooks } from "./order-utils";
 import validation from "./validation";
 
+const { firestore } = firebaseAdmin;
+const db = firestore();
+
 const checkoutOrder = express.Router();
+
+const resolveReminders = async (orderData: Order) => {
+  const dayMonth = dayjs(orderData.deliveryDate, "YYYY-MM-DD")
+    .subtract(7, "days")
+    .format("DD-MM");
+  let reminderType:
+    | "birthdayReminder"
+    | "anniversaryReminder"
+    | "valentineReminder"
+    | "christmasReminder"
+    | "easterReminder"
+    | null = null;
+  const yearList: string[] = [];
+  if (/birthday/i.test(orderData.purpose)) {
+    reminderType = "birthdayReminder";
+  } else if (/anniversary/i.test(orderData.purpose)) {
+    reminderType = "anniversaryReminder";
+  } else if (/valentine/i.test(orderData.purpose)) {
+    reminderType = "valentineReminder";
+  } else if (/christmas/i.test(orderData.purpose)) {
+    reminderType = "christmasReminder";
+  } else if (/easter/i.test(orderData.purpose)) {
+    reminderType = "easterReminder";
+  }
+  if (reminderType) {
+    await db.collection("reminders").add({
+      orderID: orderData.id,
+      type: reminderType,
+      dayMonth,
+      yearList
+    });
+  }
+  return Boolean(reminderType);
+};
 
 checkoutOrder.put(
   "/:id",
@@ -29,7 +68,6 @@ checkoutOrder.put(
   handleAuthValidation(true),
   async (req, res) => {
     try {
-      const { firestore } = firebaseAdmin;
       const {
         shouldCreateAccount,
         shouldSaveAddress,
@@ -122,13 +160,39 @@ checkoutOrder.put(
         });
       }
 
-      // TODO: update firebase contact for recipient and client after updating order
+      const client = await handleContactHooks(userData, "client");
+      const recipient = await handleContactHooks(
+        orderData.recipient.method === "delivery"
+          ? orderData.recipient
+          : {
+              name: `Pickup ${orderData.despatchLocation}`,
+              phone: `Pickup${orderData.despatchLocation}`
+            },
+        "recipient"
+      );
 
-      await firestore()
+      const recipientAddress = `${orderData.recipient.address} (${
+        orderData.recipient.residenceType || ""
+      })`;
+
+      const sendReminders = orderData.purpose
+        ? await resolveReminders({
+            ...existingOrder,
+            ...orderData
+          })
+        : false;
+
+      await db
         .collection("orders")
         .doc(req.params.id)
         .update({
           ...orderData,
+          client,
+          recipient,
+          purpose: orderData.purpose || "Unknown",
+          recipientAddress,
+          sendReminders,
+          isClientRecipient: orderData.recipient.method === "pick-up",
           orderDetails: deliveryLocation
             ? `${(
                 existingOrder.orderDetails.split("=")[0] || ""
@@ -136,11 +200,7 @@ checkoutOrder.put(
                 existingOrder.amount + (deliveryLocation?.amount || 0)
               }`
             : existingOrder.orderDetails,
-          amount: existingOrder.amount + (deliveryLocation?.amount || 0),
-          recipient: {
-            ...orderData.recipient,
-            address: [orderData.recipient?.address || ""].filter(Boolean)
-          }
+          amount: existingOrder.amount + (deliveryLocation?.amount || 0)
         } as Partial<Order>);
 
       return new SuccessResponse("Order successfully checked out", null).send(

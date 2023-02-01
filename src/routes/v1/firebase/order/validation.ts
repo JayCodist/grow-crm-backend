@@ -1,6 +1,17 @@
 import Joi from "@hapi/joi";
 
 const validation = {
+  createOrder: Joi.object({
+    cartItems: Joi.array().items(
+      Joi.object({
+        key: Joi.number().required(),
+        design: Joi.string().allow(""),
+        size: Joi.string().allow(""),
+        quantity: Joi.number().required().positive().integer().invalid(0)
+      })
+    ),
+    deliveryDate: Joi.string().allow("")
+  }),
   checkoutOrder: Joi.object({
     shouldCreateAccount: Joi.boolean().required(),
     shouldSaveAddress: Joi.boolean().required(),
@@ -22,7 +33,7 @@ const validation = {
         residenceType: Joi.string().default("").allow(""),
         state: Joi.string().default("").allow(""),
         address: Joi.string().default("").allow(""),
-        method: Joi.string().default("").allow("")
+        method: Joi.string().required().valid("pick-up", "delivery")
       })
     }),
     userData: Joi.object().keys({
@@ -31,17 +42,6 @@ const validation = {
       email: Joi.string().default("").allow(""),
       password: Joi.string()
     })
-  }),
-  createOrder: Joi.object({
-    cartItems: Joi.array().items(
-      Joi.object({
-        key: Joi.number().required(),
-        design: Joi.string().allow(""),
-        size: Joi.string().allow(""),
-        quantity: Joi.number().required().positive().integer().invalid(0)
-      })
-    ),
-    deliveryDate: Joi.string().allow("")
   })
 };
 

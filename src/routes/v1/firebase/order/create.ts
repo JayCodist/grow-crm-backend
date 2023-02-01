@@ -5,12 +5,12 @@ import {
   NoDataError
 } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
-import { Order, OrderActor } from "../../../../database/model/Order";
+import { OrderCreate } from "../../../../database/model/Order";
 import { ProductWP } from "../../../../database/model/ProductWP";
-import User from "../../../../database/model/User";
 import ProductWPRepo from "../../../../database/repository/ProductWPRepo";
 import firebaseAdmin from "../../../../helpers/firebase-admin";
 import { handleFormDataParsing } from "../../../../helpers/request-modifiers";
+import { handleContactHooks } from "./order-utils";
 
 const createOrder = express.Router();
 const { firestore } = firebaseAdmin;
@@ -83,59 +83,10 @@ const getFirebaseProducts: (skus: string[]) => Promise<any[]> = async skus => {
   return responses.flat();
 };
 
-const handleClientHooks: (
-  user?: Omit<User, "password">
-) => Promise<OrderActor> = async user => {
-  let client: OrderActor = {};
-  if (user?.phone) {
-    const { docs } = await firestore()
-      .collection("contacts")
-      .where("phones", "array-contains", user.phone)
-      .limit(1)
-      .get();
-    client = docs[0]?.exists ? { id: docs[0].id, ...docs[0].data() } : {};
-  }
-  if (client.id) {
-    // Update client if changed
-    if (
-      (user?.name && client.name !== user?.name) ||
-      (user?.email && client.email !== user?.email) ||
-      !client.category?.includes("client")
-    ) {
-      await firestore()
-        .collection("contacts")
-        .doc(client.id)
-        .update({
-          ...client,
-          name: user?.name || client.name,
-          email: user?.email || client.email,
-          category: Array.from(new Set([...(client.category || []), "client"]))
-        });
-    }
-  } else {
-    // Create new client
-    const contactData = {
-      firstname: (user?.name || "").split(" ")[0],
-      lastname: (user?.name || "").split(" ")[1],
-      address: [],
-      category: ["client"],
-      phone: user?.phone || "",
-      phoneAlt: "",
-      phoneAlt2: "",
-      phones: [user?.phone].filter(Boolean),
-      email: user?.email,
-      timestamp: firestore.FieldValue.serverTimestamp()
-    } as OrderActor;
-    const doc = await firestore().collection("contacts").add(contactData);
-    client = { id: doc.id, ...contactData };
-  }
-  return client;
-};
-
 createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
   try {
     const { user } = req;
-    const client = await handleClientHooks(user);
+    const client = user?.phone ? await handleContactHooks(user, "client") : {};
 
     const { cartItems, deliveryDate } = req.body as {
       cartItems: {
@@ -179,7 +130,7 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
       };
     });
 
-    const orderDetails = orderProducts
+    let orderDetails = orderProducts
       .map(product => {
         const wpProductIndex = wpProducts.findIndex(
           _prod => _prod.sku === product.SKU
@@ -196,8 +147,9 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
         } ${getFBProductDisplayName(product)} (${price * product.quantity})`;
       })
       .join(" + ");
+    orderDetails += ` = ${totalPrice}`;
 
-    const payload: Order = {
+    const payload: OrderCreate = {
       amount: totalPrice,
       orderProducts,
       orderDetails,
@@ -213,7 +165,7 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
       channel: "Regal Website",
       contactDepsArray: [client.id] as string[],
       costBreakdown: "",
-      deliveryMessage: "", // Set laster
+      deliveryMessage: "",
       deliveryNotePrinted: false,
       deliveryStatus: "Not Arranged",
       deliveryZone: "WEB",
@@ -221,7 +173,7 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
       driver: {},
       editingAdminsRevised: [],
       feedback: {},
-      isClientRecipient: false, // Set later
+      isClientRecipient: false,
       isDuplicatedOrder: false,
       lastDeliveryNotePrintedAdmin: "",
       lastDeliveryNotePrintedTime: "",
@@ -231,15 +183,15 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
       lastMessagePrintedTime: "",
       lastPaymentStatusAdmin: "",
       lastPaymentStatusTime: "",
-      line: "Unselected",
+      line: "NA",
       messagePrinted: false,
       profit: 0,
-      purpose: "Unknown", // Set later
-      recipient: {}, // Resolve on the backend
-      recipientAddress: "", // Set later
+      purpose: "Unknown",
+      recipient: {},
+      recipientAddress: "",
       receivedByName: "",
       receivedByPhone: "",
-      sendReminders: false, // Set later
+      sendReminders: false,
       upsellProfit: 0,
       websiteOrderID: "",
       driverAlerted: false
