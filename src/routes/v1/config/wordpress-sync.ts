@@ -155,6 +155,7 @@ doWordpressSync.post(
           description: rawProd.longDescription,
           longDescription: rawProd.shortDescription,
           categories: rawProd.categories.map(slugify),
+          addonSlug: rawProd.addonSlug,
           tags: rawProd.tags,
           images:
             rawProd.images?.map((image: any) => ({

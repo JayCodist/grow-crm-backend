@@ -109,6 +109,13 @@ export default class ProductWPRepo {
       .exec();
   }
 
+  public static findByKeys(keys: number[]): Promise<ProductWP[]> {
+    return ProductWPModel.find({ key: { $in: keys } })
+      .select(productWPProjection.join(" "))
+      .lean<ProductWP[]>()
+      .exec();
+  }
+
   public static async getAllProducts(): Promise<{
     data: ProductWP[];
     count: number;

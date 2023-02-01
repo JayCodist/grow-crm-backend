@@ -77,6 +77,8 @@ export interface DeliveryLocationOption {
   amount: number;
 }
 
+export type OrderActorCategory = "client" | "recipient" | "driver" | "supplier";
+
 export interface OrderActor {
   id?: string;
   name?: string;
@@ -90,6 +92,7 @@ export interface OrderActor {
   residenceType?: string;
   state?: string;
   method?: string;
+  category?: OrderActorCategory[];
 }
 
 type DeliveryZone =

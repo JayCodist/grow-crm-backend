@@ -31,6 +31,17 @@ const validation = {
       email: Joi.string().default("").allow(""),
       password: Joi.string()
     })
+  }),
+  createOrder: Joi.object({
+    cartItems: Joi.array().items(
+      Joi.object({
+        key: Joi.number().required(),
+        design: Joi.string().allow(""),
+        size: Joi.string().allow(""),
+        quantity: Joi.number().required().positive().integer().invalid(0)
+      })
+    ),
+    deliveryDate: Joi.string().allow("")
   })
 };
 

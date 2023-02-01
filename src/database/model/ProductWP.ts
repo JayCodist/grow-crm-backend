@@ -22,6 +22,7 @@ export const productWPProjection = [
   "addonsGroups",
   "designOptions",
   "type",
+  "addonSlug",
   "class"
 ];
 
@@ -93,6 +94,7 @@ export interface ProductWP {
   images: ProductImage[];
   variants: ProductVariant[];
   addonsGroups: AddonGroup[];
+  addonSlug: string;
   description: string;
   longDescription: string;
   designOptions: DesignOptionsMap;
@@ -110,12 +112,13 @@ export interface ProductWPCreate extends ProductWP {
 interface ProductWPDocument extends ProductWPCreate {}
 
 const schema = new Schema({
-  key: Number,
+  key: { type: Number, index: true },
   name: String,
   _nameSearch: { type: [String], index: true },
   subtitle: String,
   temporaryNotes: [String],
   slug: { type: String, index: true },
+  addonSlug: String,
   categories: { type: [String], index: true },
   class: { type: String, index: true },
   type: String,
