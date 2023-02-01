@@ -12,9 +12,9 @@ import {
   InternalErrorResponse,
   SuccessResponse
 } from "../../../../core/ApiResponse";
+import { Order } from "../../../../database/model/Order";
 import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
-import { Order } from "../../firebase/order/checkout-order";
 import validation from "./validation";
 
 const db = firestore();
