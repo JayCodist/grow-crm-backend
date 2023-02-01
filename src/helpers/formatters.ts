@@ -24,7 +24,7 @@ export const getLoginResponse: (user: Partial<User>) => LoginResponse =
       formatResponseRecord(user);
     return {
       ...formattedUser,
-      recipients,
+      recipients: recipients || [],
       authToken: jwt.sign(
         formattedUser,
         process.env.JWT_SIGNATURE_SECRET as string,
