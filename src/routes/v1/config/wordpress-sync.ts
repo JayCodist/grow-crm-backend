@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import express from "express";
+import he from "he";
 import fetch, { Response } from "node-fetch";
 import { wCAuthString } from "../../../config";
 import { ApiError } from "../../../core/ApiError";
@@ -131,17 +132,18 @@ doWordpressSync.post(
               ?.find((attribute: any) => attribute.name === "VIP Pricing IDS")
               ?.options?.[0]?.replace(/\D/g, "")
           ) || null;
-        const prodName = rawProd.title.split("-")[0].trim() || "N/A";
+        const prodName = he.decode(rawProd.title.split("-")[0].trim() || "N/A");
         const product: ProductWPCreate = {
           key: rawProd.id,
           name: prodName,
           _nameSearch: getSearchArray(prodName),
-          subtitle:
+          subtitle: he.decode(
             rawProd.title
               .split("-")[1]
               // To remove trailing ellipsis
               ?.replace(/\.\s*.\..*$/, "")
-              .trim() || "",
+              .trim() || ""
+          ),
           class: /^vip/i.test(prodName) ? "vip" : "regular",
           slug:
             rawProd.permalink
@@ -152,8 +154,8 @@ doWordpressSync.post(
           sku: rawProd.sku,
           price: Number(rawProd.sale_price || rawProd.price) || 0,
           type: rawProd.type,
-          description: rawProd.longDescription,
-          longDescription: rawProd.shortDescription,
+          longDescription: rawProd.description,
+          description: rawProd.short_description || "",
           categories: rawProd.categories.map(slugify),
           addonSlug: rawProd.addonSlug,
           tags: rawProd.tags,
@@ -206,7 +208,10 @@ doWordpressSync.post(
         })),
         { ordered: false }
       );
-      await ProductWPModel.insertMany(products, { ordered: false });
+      await ProductWPModel.insertMany(
+        products.filter(prod => prod.price),
+        { ordered: false }
+      );
 
       const currentSyncTotal =
         (await AppConfigRepo.getConfig())?.wPTotalSyncs || 0;
