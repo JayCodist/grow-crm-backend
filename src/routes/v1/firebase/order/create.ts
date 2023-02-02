@@ -115,7 +115,15 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
     }, 0);
 
     const fbProducts = await getFirebaseProducts(
-      wpProducts.map(prod => prod.sku).filter(Boolean)
+      wpProducts
+        .map((prod, index) =>
+          prod.variants.length
+            ? prod.variants.find(
+                variant => variant.name === cartItems[index].size
+              )?.sku || ""
+            : prod.sku
+        )
+        .filter(Boolean)
     );
 
     const orderProducts = fbProducts.map(prod => {
