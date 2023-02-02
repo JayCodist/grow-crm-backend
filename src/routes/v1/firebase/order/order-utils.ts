@@ -54,6 +54,7 @@ export const handleContactHooks: (
       firstname: (user.name || "").split(" ")[0],
       lastname: (user.name || "").split(" ")[1],
       address: [user.address || ""].filter(Boolean),
+      name: user.name || "",
       category: [contactType],
       phone: user.phone || "",
       phoneAlt: user.phoneAlt || "",
