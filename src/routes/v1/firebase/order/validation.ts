@@ -27,15 +27,15 @@ const validation = {
       purpose: Joi.string().default("").allow(""),
       adminNotes: Joi.string().default("").allow(""),
       recipient: Joi.object({
-        name: Joi.string().required(),
-        phone: Joi.string().required(),
+        name: Joi.string().default("").allow(""),
+        phone: Joi.string().default("").allow(""),
         phoneAlt: Joi.string().default("").allow(""),
         residenceType: Joi.string().default("").allow(""),
         state: Joi.string().default("").allow(""),
         address: Joi.string().default("").allow(""),
         method: Joi.string().required().valid("pick-up", "delivery")
-      })
-    }),
+      }).required()
+    }).required(),
     userData: Joi.object().keys({
       name: Joi.string().required(),
       phone: Joi.string().required(),

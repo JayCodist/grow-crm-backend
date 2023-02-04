@@ -74,7 +74,7 @@ export const slugify: (str: string) => string = str => {
     .replace(/-+/g, "-");
 };
 
-export const formatPhoneNumber = (str: string) => {
+export const formatPhoneNumber = (str: string | undefined) => {
   if (!str || str === "undefined" || typeof str !== "string") return "";
   const output = str
     .replace(/[\s|/]/g, "")

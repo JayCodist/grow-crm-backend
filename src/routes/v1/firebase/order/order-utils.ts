@@ -3,6 +3,7 @@ import {
   OrderActorCategory
 } from "../../../../database/model/Order";
 import firebaseAdmin from "../../../../helpers/firebase-admin";
+import { formatPhoneNumber } from "../../../../helpers/formatters";
 
 const { firestore } = firebaseAdmin;
 
@@ -17,10 +18,12 @@ export const handleContactHooks: (
   contactType: OrderActorCategory
 ) => Promise<OrderActor> = async (user, contactType) => {
   let contact: OrderActor = {};
-  if (user.phone) {
+  const phone = formatPhoneNumber(user.phone);
+  const phoneAlt = formatPhoneNumber(user.phoneAlt);
+  if (phone) {
     const { docs } = await firestore()
       .collection("contacts")
-      .where("phones", "array-contains", user.phone)
+      .where("phones", "array-contains", phone)
       .limit(1)
       .get();
     contact = docs[0]?.exists ? { id: docs[0].id, ...docs[0].data() } : {};
@@ -56,10 +59,10 @@ export const handleContactHooks: (
       address: [user.address || ""].filter(Boolean),
       name: user.name || "",
       category: [contactType],
-      phone: user.phone || "",
-      phoneAlt: user.phoneAlt || "",
+      phone: phone || "",
+      phoneAlt: phoneAlt || "",
       phoneAlt2: "",
-      phones: [user.phone, user.phoneAlt].filter(Boolean),
+      phones: [phone, phoneAlt].filter(Boolean),
       email: user.email,
       timestamp: firestore.FieldValue.serverTimestamp()
     } as OrderActor;

@@ -80,7 +80,10 @@ const getFirebaseProducts: (skus: string[]) => Promise<any[]> = async skus => {
       firestore().collection("products").where("SKU", "in", chunk).get()
     )
   );
-  return responses.flat();
+  return responses
+    .map(snap => snap.docs)
+    .flat()
+    .map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
 createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
@@ -102,6 +105,18 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
     );
     const wpProducts = cartItems
       .map(item => _wpProducts.find(prod => prod.key === item.key))
+      .map((prod, i) =>
+        prod
+          ? {
+              ...prod,
+              sku: prod.variants.length
+                ? prod.variants.find(
+                    variant => variant.name === cartItems[i].size
+                  )?.sku || ""
+                : prod.sku
+            }
+          : null
+      )
       .filter(Boolean) as ProductWP[];
 
     if (wpProducts.length !== cartItems.length) {
@@ -115,15 +130,7 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
     }, 0);
 
     const fbProducts = await getFirebaseProducts(
-      wpProducts
-        .map((prod, index) =>
-          prod.variants.length
-            ? prod.variants.find(
-                variant => variant.name === cartItems[index].size
-              )?.sku || ""
-            : prod.sku
-        )
-        .filter(Boolean)
+      wpProducts.map(prod => prod.sku).filter(Boolean)
     );
 
     const orderProducts = fbProducts.map(prod => {
