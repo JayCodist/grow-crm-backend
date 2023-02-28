@@ -158,7 +158,7 @@ doWordpressSync.post(
           description: rawProd.short_description || "",
           categories: rawProd.categories.map(slugify),
           addonSlug: rawProd.addonSlug,
-          tags: rawProd.tags,
+          tags: rawProd.tags.map((tag: string) => tag.toLowerCase()),
           images:
             rawProd.images?.map((image: any) => ({
               src: image.src,
