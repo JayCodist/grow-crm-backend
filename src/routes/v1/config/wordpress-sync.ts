@@ -78,7 +78,7 @@ const getVariants: (
 ) => ProductVariant[] = (productVariations, vipVariations) => {
   const regularVariants: ProductVariant[] = productVariations.map(variation => {
     const variantName: string = variation.attributes?.find(
-      (attr: { name: string }) => attr?.name === "Select Size"
+      (attr: { option: string }) => attr?.option
     )?.option;
     return {
       class: /vip/i.test(variantName) ? "vip" : "regular",
