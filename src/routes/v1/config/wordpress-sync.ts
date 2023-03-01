@@ -87,13 +87,14 @@ const getVariants: (
       name:
         variantName
           ?.replace(/-/g, " ")
+          .replace(/vip/i, "VIP")
           .replace(/^./, char => char.toUpperCase()) || "N/A"
     };
   });
 
   const vipVariants: ProductVariant[] = vipVariations.map(variation => {
     const variantName: string = variation.attributes?.find(
-      (attr: { name: string }) => attr?.name === "Select Size"
+      (attr: { option: string }) => attr?.option
     )?.option;
     return {
       class: /vip/i.test(variantName) ? "vip" : "regular",
@@ -102,6 +103,7 @@ const getVariants: (
       name:
         variantName
           ?.replace(/-/g, " ")
+          .replace(/vip/i, "VIP")
           .replace(/^./, char => char.toUpperCase()) || "N/A"
     };
   });
