@@ -59,14 +59,16 @@ const getDesignOptionMap: (rawProd: any) => DesignOptionsMap = (
     ?.replace(/default/i, "")
     .trim();
   const designOptionsMap = attributeOptions.reduce(
-    (map: Record<string, string>, option) =>
-      conversionMap[option]
+    (map: Record<string, string>, option) => {
+      const optionName = option.replace(/ default/i, "");
+      return conversionMap[optionName]
         ? ({
             ...map,
-            [conversionMap[option]]:
-              option === defaultAttribute ? "default" : "option"
+            [conversionMap[optionName]]:
+              optionName === defaultAttribute ? "default" : "option"
           } as DesignOptionsMap)
-        : map,
+        : map;
+    },
     {}
   );
   return designOptionsMap;
