@@ -136,7 +136,8 @@ const schema = new Schema({
       name: String,
       price: Number,
       class: String,
-      sku: String
+      sku: String,
+      design: String
     }
   ],
   addonsGroups: [
