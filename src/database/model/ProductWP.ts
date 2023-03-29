@@ -164,7 +164,9 @@ const schema = new Schema({
     box: String
   },
   tags: { type: [String], index: true },
-  timeStamp: String
+  timeStamp: String,
+  designNote: String,
+  budgetNote: String
 });
 
 export const ProductWPModel = model<ProductWPDocument & Document>(
