@@ -79,9 +79,14 @@ const getVariants: (
   vipVariations: any[]
 ) => ProductVariant[] = (productVariations, vipVariations) => {
   const regularVariants: ProductVariant[] = productVariations.map(variation => {
-    const variantName: string = variation.attributes?.find(
-      (attr: { option: string }) => attr?.option
-    )?.option;
+    let variantName = null;
+    let variantDesign = null;
+    if (variation.attributes?.length > 1) {
+      variantName = variation.attributes[0].option;
+      variantDesign = variation.attributes[1].option;
+    } else {
+      variantName = variation.attributes[0].option;
+    }
     return {
       class: /vip/i.test(variantName) ? "vip" : "regular",
       sku: variation.sku,
@@ -90,14 +95,20 @@ const getVariants: (
         variantName
           ?.replace(/-/g, " ")
           .replace(/vip/i, "VIP")
-          .replace(/^./, char => char.toUpperCase()) || "N/A"
+          .replace(/^./, (char: string) => char.toUpperCase()) || "N/A",
+      design: variantDesign?.replace(/-/g, " ")
     };
   });
 
   const vipVariants: ProductVariant[] = vipVariations.map(variation => {
-    const variantName: string = variation.attributes?.find(
-      (attr: { option: string }) => attr?.option
-    )?.option;
+    let variantName = null;
+    let variantDesign = null;
+    if (variation.attributes?.length > 1) {
+      variantName = variation.attributes[0].option;
+      variantDesign = variation.attributes[1].option;
+    } else {
+      variantName = variation.attributes[0].option;
+    }
     return {
       class: /vip/i.test(variantName) ? "vip" : "regular",
       sku: variation.sku,
@@ -106,7 +117,8 @@ const getVariants: (
         variantName
           ?.replace(/-/g, " ")
           .replace(/vip/i, "VIP")
-          .replace(/^./, char => char.toUpperCase()) || "N/A"
+          .replace(/^./, (char: string) => char.toUpperCase()) || "N/A",
+      design: variantDesign?.replace(/-/g, " ")
     };
   });
 
