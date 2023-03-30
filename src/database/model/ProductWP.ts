@@ -136,7 +136,8 @@ const schema = new Schema({
       name: String,
       price: Number,
       class: String,
-      sku: String
+      sku: String,
+      design: String
     }
   ],
   addonsGroups: [
@@ -163,7 +164,9 @@ const schema = new Schema({
     box: String
   },
   tags: { type: [String], index: true },
-  timeStamp: String
+  timeStamp: String,
+  designNote: String,
+  budgetNote: String
 });
 
 export const ProductWPModel = model<ProductWPDocument & Document>(
