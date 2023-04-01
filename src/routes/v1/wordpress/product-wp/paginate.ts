@@ -7,6 +7,14 @@ import validation from "./validation";
 
 const productWP = express.Router();
 
+const createArray = (value: string) => {
+  return String(value || "")
+    .trim()
+    .split(",")
+    .map(item => item.trim())
+    .filter(Boolean);
+};
+
 productWP.use(
   "/",
   validator(validation.paginate, "query"),
@@ -19,19 +27,31 @@ productWP.use(
         sortType,
         categories,
         productClass,
-        tags
+        budget,
+        flowerType,
+        design,
+        packages,
+        delivery,
+        flowerName
       } = req.query;
+
+      console.log("req.query", req.query);
 
       const categoryArr = String(categories || "")
         .trim()
         .split(",")
         .map(item => item.trim())
         .filter(Boolean);
-      const tagArr = String(tags || "")
-        .trim()
-        .split(",")
-        .map(item => item.trim())
-        .filter(Boolean);
+
+      const budgetArr = createArray(String(budget || ""));
+      const flowerTypeArr = createArray(String(flowerType || ""));
+      const designArr = createArray(String(design || ""));
+      const packagesArr = createArray(String(packages || ""));
+      const deliveryArr = createArray(String(delivery || ""));
+      const flowerNameArr = createArray(String(flowerName || ""));
+
+      console.log("budgetArr", budgetArr);
+
       const categoryProps = categoryArr.length
         ? {
             categories: {
@@ -39,13 +59,31 @@ productWP.use(
             }
           }
         : {};
-      const tagProps = tagArr.length
-        ? {
-            tags: {
-              $in: tagArr
-            }
-          }
+
+      const budgetProps = budgetArr.length
+        ? { "tags.budget": { $in: budgetArr } }
         : {};
+
+      const flowerNameProps = flowerNameArr.length
+        ? { "tags.flowerName": { $in: flowerNameArr } }
+        : {};
+
+      const designProps = designArr.length
+        ? { "tags.design": { $in: designArr } }
+        : {};
+
+      const packagesProps = packagesArr.length
+        ? { "tags.packages": { $in: packagesArr } }
+        : {};
+
+      const deliveryProps = deliveryArr.length
+        ? { "tags.delivery": { $in: deliveryArr } }
+        : {};
+
+      const flowerTypeProps = flowerTypeArr.length
+        ? { "tags.flowerType": { $in: flowerTypeArr } }
+        : {};
+
       const classProps = productClass ? { class: productClass } : {};
 
       const data = await ProductWPRepo.getPaginatedProducts({
@@ -59,8 +97,13 @@ productWP.use(
         pageNumber: Number(pageNumber) || undefined,
         filter: {
           ...categoryProps,
-          ...tagProps,
-          ...classProps
+          ...classProps,
+          ...budgetProps,
+          ...flowerNameProps,
+          ...designProps,
+          ...packagesProps,
+          ...deliveryProps,
+          ...flowerTypeProps
         }
       });
 
