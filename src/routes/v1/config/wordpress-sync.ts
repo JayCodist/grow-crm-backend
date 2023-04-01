@@ -74,6 +74,41 @@ const getDesignOptionMap: (rawProd: any) => DesignOptionsMap = (
   return designOptionsMap;
 };
 
+const getTagsMap: (rawProd: any) => any = rawProd => {
+  const tagsMap: Record<string, string[]> = {
+    budget: ["vip", "regular"],
+    flowerType: ["forever roses", "fresh flowers", "plants"],
+    design: [
+      "box arrangements",
+      "bouquets",
+      "others",
+      "wrapped bouquet",
+      "bouquet"
+    ],
+    packages: ["bundled products"],
+    delivery: ["same day delivery"],
+    flowerName: ["roses", "chrysanthemums", "lilies", "million stars"]
+  };
+
+  const tags = rawProd.tags.reduce(
+    (map: Record<string, string[]>, tag: string) => {
+      const tagKey = Object.keys(tagsMap).find(key => {
+        return tagsMap[key].includes(tag.toLocaleLowerCase());
+      });
+      if (tagKey) {
+        return {
+          ...map,
+          [tagKey]: [...(map[tagKey] || []), tag.toLowerCase()]
+        };
+      }
+      return map;
+    },
+    {}
+  );
+
+  return tags;
+};
+
 const getVariants: (
   productVariations: any[],
   vipVariations: any[]
@@ -174,7 +209,7 @@ doWordpressSync.post(
           description: rawProd.short_description || "",
           categories: rawProd.categories.map(slugify),
           addonSlug: rawProd.addonSlug,
-          tags: rawProd.tags.map((tag: string) => tag.toLowerCase()),
+          tags: getTagsMap(rawProd),
           images:
             rawProd.images?.map((image: any) => ({
               src: image.src,
@@ -238,9 +273,10 @@ doWordpressSync.post(
         wPTotalSyncs: currentSyncTotal + 1
       });
 
-      new SuccessResponse("Successfully synchronized Wordpress", null).send(
-        res
-      );
+      new SuccessResponse(
+        "Successfully synchronized Wordpress",
+        productsRaw
+      ).send(res);
     } catch (e) {
       await AppConfigRepo.updateConfig({ wPSyncInProgress: false });
       ApiError.handle(e as Error, res);

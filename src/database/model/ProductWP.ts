@@ -23,7 +23,8 @@ export const productWPProjection = [
   "designOptions",
   "type",
   "addonSlug",
-  "class"
+  "class",
+  "designNote"
 ];
 
 export const productWPProjectionMinimal = [
@@ -163,7 +164,14 @@ const schema = new Schema({
     inLargeVase: String,
     box: String
   },
-  tags: { type: [String], index: true },
+  tags: {
+    budget: [String],
+    design: [String],
+    flowerType: [String],
+    packages: [String],
+    delivery: [String],
+    flowerName: [String]
+  },
   timeStamp: String,
   designNote: String,
   budgetNote: String

@@ -8,7 +8,13 @@ const validation = {
     categories: Joi.string().allow(""),
     tags: Joi.string().allow(""),
     sortType: Joi.string().valid("asc", "desc"),
-    productClass: Joi.string().valid("vip", "regular").optional()
+    productClass: Joi.string().valid("vip", "regular").optional(),
+    budget: Joi.string().allow(""),
+    flowerType: Joi.string().allow(""),
+    design: Joi.string().allow(""),
+    packages: Joi.string().allow(""),
+    delivery: Joi.string().allow(""),
+    flowerName: Joi.string().allow("")
   }),
   create: Joi.object().keys({
     name: Joi.string().required(),
