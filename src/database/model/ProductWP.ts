@@ -64,10 +64,14 @@ export interface ProductVariant {
   class: "regular" | "vip";
 }
 
-export type DesignOption = "wrappedBouquet" | "inVase" | "inLargeVase" | "box";
+export type DesignOptionName =
+  | "wrappedBouquet"
+  | "inVase"
+  | "inLargeVase"
+  | "box";
 
 export type DesignOptionsMap = Partial<
-  Record<DesignOption, "default" | "option">
+  Record<DesignOptionName, "default" | "option">
 >;
 
 export interface MinimalProductWP {
@@ -138,7 +142,14 @@ const schema = new Schema({
       price: Number,
       class: String,
       sku: String,
-      design: String
+      design: [
+        {
+          name: String,
+          title: String,
+          price: Number,
+          default: Boolean
+        }
+      ]
     }
   ],
   addonsGroups: [

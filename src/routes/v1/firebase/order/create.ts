@@ -16,34 +16,43 @@ const createOrder = express.Router();
 const { firestore } = firebaseAdmin;
 const db = firestore().collection("orders");
 
-type DesignOptionName = "wrappedBouquet" | "inVase" | "inLargeVase" | "box";
+export type DesignOptionName =
+  | "wrappedBouquet"
+  | "inVase"
+  | "inLargeVase"
+  | "box";
 
-interface DesignOption {
+export interface DesignOption {
   name: DesignOptionName;
   price: number;
   title: string;
+  default?: boolean;
 }
 
-const allDesignOptions: DesignOption[] = [
+export const allDesignOptions: DesignOption[] = [
   {
     name: "wrappedBouquet",
     title: "Wrapped Bouquet",
-    price: 0
+    price: 0,
+    default: true
   },
   {
     name: "inVase",
     title: "In Vase",
-    price: 15000
+    price: 15000,
+    default: false
   },
   {
     name: "inLargeVase",
     title: "In Large Vase",
-    price: 30000
+    price: 30000,
+    default: false
   },
   {
     name: "box",
     title: "Box",
-    price: 0
+    price: 0,
+    default: false
   }
 ];
 
