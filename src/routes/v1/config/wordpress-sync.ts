@@ -7,7 +7,7 @@ import { ApiError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
 import { CategoryWPModel } from "../../../database/model/CategoryWP";
 import {
-  DesignOption,
+  DesignOptionName,
   DesignOptionsMap,
   ProductVariant,
   ProductWPCreate,
@@ -18,6 +18,7 @@ import { slugify } from "../../../helpers/formatters";
 import { getSearchArray } from "../../../helpers/search-helpers";
 import validator from "../../../helpers/validator";
 import validation from "./validation";
+import { DesignOption, allDesignOptions } from "../firebase/order/create";
 
 export type WPBusiness = "regalFlowers" | "floralHub";
 
@@ -42,7 +43,7 @@ const fetchWPContent: <T = any>(
 const getDesignOptionMap: (rawProd: any) => DesignOptionsMap = (
   rawProd: any
 ) => {
-  const conversionMap: Record<string, DesignOption> = {
+  const conversionMap: Record<string, DesignOptionName> = {
     "Box Arrangement": "box",
     "Wrapped Bouquet": "wrappedBouquet",
     "In a Vase": "inVase",
@@ -113,15 +114,26 @@ const getVariants: (
   productVariations: any[],
   vipVariations: any[]
 ) => ProductVariant[] = (productVariations, vipVariations) => {
+  const conversionMap: Record<string, DesignOptionName> = {
+    "box-arrangement": "box",
+    "wrapped-bouquet": "wrappedBouquet",
+    "in-a-vase": "inVase",
+    "in-large-vase": "inLargeVase"
+  };
+
   const regularVariants: ProductVariant[] = productVariations.map(variation => {
     let variantName = null;
-    let variantDesign = null;
+    let variantDesign: null | DesignOption[] = null;
     if (variation.attributes?.length > 1) {
       variantName = variation.attributes[0].option;
-      variantDesign = variation.attributes[1].option;
-    } else {
-      variantName = variation.attributes[0].option;
+
+      const design = allDesignOptions.filter(design => {
+        return conversionMap[variation.attributes[1].option] === design.name;
+      });
+      variantDesign = [allDesignOptions[0], ...design];
     }
+    variantName = variation.attributes[0].option;
+
     return {
       class: /vip/i.test(variantName) ? "vip" : "regular",
       sku: variation.sku,
@@ -131,16 +143,20 @@ const getVariants: (
           ?.replace(/-/g, " ")
           .replace(/vip/i, "VIP")
           .replace(/^./, (char: string) => char.toUpperCase()) || "N/A",
-      design: variantDesign?.replace(/-/g, " ")
+      design: variantDesign
     };
   });
 
   const vipVariants: ProductVariant[] = vipVariations.map(variation => {
     let variantName = null;
-    let variantDesign = null;
+    let variantDesign: null | DesignOption[] = null;
     if (variation.attributes?.length > 1) {
       variantName = variation.attributes[0].option;
-      variantDesign = variation.attributes[1].option;
+
+      const design = allDesignOptions.filter(design => {
+        return conversionMap[variation.attributes[1].option] === design.name;
+      });
+      variantDesign = [allDesignOptions[0], ...design];
     } else {
       variantName = variation.attributes[0].option;
     }
@@ -153,7 +169,7 @@ const getVariants: (
           ?.replace(/-/g, " ")
           .replace(/vip/i, "VIP")
           .replace(/^./, (char: string) => char.toUpperCase()) || "N/A",
-      design: variantDesign?.replace(/-/g, " ")
+      design: variantDesign
     };
   });
 
