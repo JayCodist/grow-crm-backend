@@ -171,9 +171,9 @@ checkoutOrder.put(
         "recipient"
       );
 
-      const recipientAddress = `${orderData.recipient.address} (${
-        orderData.recipient.residenceType || ""
-      })`;
+      const recipientAddress = `(${orderData.recipient.residenceType || ""}) ${
+        orderData.recipient.address
+      }`;
 
       const sendReminders = orderData.purpose
         ? await resolveReminders({
