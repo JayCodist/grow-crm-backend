@@ -16,6 +16,7 @@ import regalFlowersRoutes from "./regal-flowers";
 import paymentRoutes from "./regal-flowers/payments";
 import categoryWP from "./wordpress/category-wp/paginate";
 import wordpressProductRoutes from "./wordpress/product-wp";
+import residentTypes from "./firebase/residentType/residentType";
 
 const router = express.Router();
 
@@ -39,6 +40,7 @@ router.use("/firebase/order/checkout-order", checkoutOrder);
 
 router.use("/firebase/zone", zoneGroup);
 router.use("/firebase/purposes", purposes);
+router.use("/firebase/resident-types", residentTypes);
 
 /*-------------------------------------------------------------------------*/
 
