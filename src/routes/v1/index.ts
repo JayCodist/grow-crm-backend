@@ -17,6 +17,7 @@ import paymentRoutes from "./regal-flowers/payments";
 import categoryWP from "./wordpress/category-wp/paginate";
 import wordpressProductRoutes from "./wordpress/product-wp";
 import residentTypes from "./firebase/residentType/residentType";
+import { updateOrder } from "./firebase/order/update";
 
 const router = express.Router();
 
@@ -33,6 +34,7 @@ const router = express.Router();
 
 router.use("/firebase/order", orderID);
 router.use("/firebase/order", createOrder);
+router.use("/firebase/order", updateOrder);
 router.use("/firebase/order/checkout-order", checkoutOrder);
 
 // Deprecated

@@ -6,9 +6,9 @@ import {
 } from "../../../../core/ApiResponse";
 import firebaseAdmin from "../../../../helpers/firebase-admin";
 
-const ordertID = express.Router();
+const orderID = express.Router();
 
-ordertID.get("/:id", async (req, res) => {
+orderID.get("/:id", async (req, res) => {
   try {
     const { firestore } = firebaseAdmin;
 
@@ -39,4 +39,4 @@ ordertID.get("/:id", async (req, res) => {
   }
 });
 
-export default ordertID;
+export default orderID;

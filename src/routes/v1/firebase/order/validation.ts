@@ -12,6 +12,21 @@ const validation = {
     ),
     deliveryDate: Joi.string().allow("")
   }),
+  updateOrder: Joi.object({
+    cartItems: Joi.array().items(
+      Joi.object({
+        key: Joi.number().required(),
+        design: Joi.string().allow(""),
+        size: Joi.string().allow(""),
+        quantity: Joi.number().required().positive().integer().invalid(0),
+        image: Joi.object({
+          alt: Joi.string().required(),
+          src: Joi.string().required()
+        }).allow(null)
+      })
+    ),
+    deliveryDate: Joi.string().allow("")
+  }),
   checkoutOrder: Joi.object({
     shouldCreateAccount: Joi.boolean().required(),
     shouldSaveAddress: Joi.boolean().required(),
