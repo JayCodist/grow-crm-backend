@@ -166,6 +166,8 @@ type Purpose =
   | "Other"
   | "Complimentary";
 
+type OrderStatus = "created" | "processing";
+
 export interface Order {
   id: string;
   orderProducts: OrderItem[];
@@ -213,6 +215,9 @@ export interface Order {
   recipient: OrderActor;
   client: OrderActor;
   driver: OrderActor;
+  orderStatus: OrderStatus;
+  zone: string;
+  state: string;
 }
 
 export type OrderCreate = Omit<Order, "id">;

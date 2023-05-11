@@ -242,7 +242,10 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
       sendReminders: false,
       upsellProfit: 0,
       websiteOrderID: "",
-      driverAlerted: false
+      driverAlerted: false,
+      orderStatus: "created",
+      state: "",
+      zone: ""
     };
 
     const response = await db.add({

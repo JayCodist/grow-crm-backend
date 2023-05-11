@@ -49,7 +49,9 @@ const validation = {
         state: Joi.string().default("").allow(""),
         address: Joi.string().default("").allow(""),
         method: Joi.string().required().valid("pick-up", "delivery")
-      }).required()
+      }).required(),
+      zone: Joi.string().default("").allow(""),
+      state: Joi.string().default("").allow("")
     }).required(),
     userData: Joi.object().keys({
       name: Joi.string().required(),
@@ -57,6 +59,14 @@ const validation = {
       email: Joi.string().default("").allow(""),
       password: Joi.string()
     })
+  }),
+  saveSenderInfo: Joi.object({
+    userData: Joi.object().keys({
+      name: Joi.string().required(),
+      phone: Joi.string().required(),
+      email: Joi.string().default("").allow("")
+    }),
+    deliveryDate: Joi.string().required()
   })
 };
 
