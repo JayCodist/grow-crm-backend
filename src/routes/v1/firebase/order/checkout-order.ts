@@ -200,7 +200,8 @@ checkoutOrder.put(
                 existingOrder.amount + (deliveryLocation?.amount || 0)
               }`
             : existingOrder.orderDetails,
-          amount: existingOrder.amount + (deliveryLocation?.amount || 0)
+          amount: existingOrder.amount + (deliveryLocation?.amount || 0),
+          orderStatus: "processing"
         } as Partial<Order>);
 
       return new SuccessResponse("Order successfully checked out", null).send(
