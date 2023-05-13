@@ -12,6 +12,21 @@ const validation = {
     ),
     deliveryDate: Joi.string().allow("")
   }),
+  updateOrder: Joi.object({
+    cartItems: Joi.array().items(
+      Joi.object({
+        key: Joi.number().required(),
+        design: Joi.string().allow(""),
+        size: Joi.string().allow(""),
+        quantity: Joi.number().required().positive().integer().invalid(0),
+        image: Joi.object({
+          alt: Joi.string().required(),
+          src: Joi.string().required()
+        }).allow(null)
+      })
+    ),
+    deliveryDate: Joi.string().allow("")
+  }),
   checkoutOrder: Joi.object({
     shouldCreateAccount: Joi.boolean().required(),
     shouldSaveAddress: Joi.boolean().required(),
@@ -34,7 +49,9 @@ const validation = {
         state: Joi.string().default("").allow(""),
         address: Joi.string().default("").allow(""),
         method: Joi.string().required().valid("pick-up", "delivery")
-      }).required()
+      }).required(),
+      zone: Joi.string().default("").allow(""),
+      state: Joi.string().default("").allow("")
     }).required(),
     userData: Joi.object().keys({
       name: Joi.string().required(),
@@ -42,6 +59,14 @@ const validation = {
       email: Joi.string().default("").allow(""),
       password: Joi.string()
     })
+  }),
+  saveSenderInfo: Joi.object({
+    userData: Joi.object().keys({
+      name: Joi.string().required(),
+      phone: Joi.string().required(),
+      email: Joi.string().default("").allow("")
+    }),
+    deliveryDate: Joi.string().required()
   })
 };
 
