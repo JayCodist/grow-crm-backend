@@ -169,6 +169,16 @@ type Purpose =
 
 type OrderStatus = "created" | "processing";
 
+export type DeliveryDetails = {
+  state: string;
+  zone: string;
+  recipientPhone: string;
+  recipientAltPhone: string;
+  recipientName: string;
+  recipientAddress: string;
+  recidenceType: string;
+};
+
 export interface Order {
   id: string;
   orderProducts: OrderItem[];
@@ -217,8 +227,7 @@ export interface Order {
   client: OrderActor;
   driver: OrderActor;
   orderStatus: OrderStatus;
-  zone: string;
-  state: string;
+  deliveryDetails: DeliveryDetails;
 }
 
 export type OrderCreate = Omit<Order, "id">;
