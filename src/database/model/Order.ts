@@ -2,6 +2,7 @@ interface OrderItem {
   SKU?: string;
   name: string;
   quantity: number;
+  price: number;
 }
 
 type PaymentStatus =
@@ -166,6 +167,18 @@ type Purpose =
   | "Other"
   | "Complimentary";
 
+type OrderStatus = "created" | "processing";
+
+export type DeliveryDetails = {
+  state: string;
+  zone: string;
+  recipientPhone: string;
+  recipientAltPhone: string;
+  recipientName: string;
+  recipientAddress: string;
+  recidenceType: string;
+};
+
 export interface Order {
   id: string;
   orderProducts: OrderItem[];
@@ -213,6 +226,8 @@ export interface Order {
   recipient: OrderActor;
   client: OrderActor;
   driver: OrderActor;
+  orderStatus: OrderStatus;
+  deliveryDetails: DeliveryDetails;
 }
 
 export type OrderCreate = Omit<Order, "id">;

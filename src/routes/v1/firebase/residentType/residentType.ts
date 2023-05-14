@@ -3,13 +3,13 @@ import { ApiError } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
 import firebaseAdmin from "../../../../helpers/firebase-admin";
 
-const purposes = express.Router();
+const residentTypes = express.Router();
 
-purposes.get("/", async (req, res) => {
+residentTypes.get("/", async (req, res) => {
   try {
     const { firestore } = firebaseAdmin;
 
-    const response = await firestore().collection("purposes").get();
+    const response = await firestore().collection("residentTypes").get();
 
     return new SuccessResponse(
       "success",
@@ -23,4 +23,4 @@ purposes.get("/", async (req, res) => {
   }
 });
 
-export default purposes;
+export default residentTypes;

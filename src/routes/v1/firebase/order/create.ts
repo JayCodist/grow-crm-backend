@@ -56,10 +56,10 @@ export const allDesignOptions: DesignOption[] = [
   }
 ];
 
-const getFBProductDisplayName = (product: any) =>
+export const getFBProductDisplayName = (product: any) =>
   product.displayNameAdmin || product.name.split("-").slice(1).join("-").trim();
 
-const deduceProductTruePrice = (
+export const deduceProductTruePrice = (
   product: ProductWP,
   cartItem: { key: number; design?: string; size?: string; quantity: number }
 ) => {
@@ -78,21 +78,57 @@ const deduceProductTruePrice = (
   return subTotal + designPrice;
 };
 
-const getFirebaseProducts: (skus: string[]) => Promise<any[]> = async skus => {
-  const chunks = [];
-  const chunkSize = 10;
-  for (let i = 0, len = skus.length; i < len; i += chunkSize) {
-    chunks.push(skus.slice(i, i + chunkSize));
-  }
-  const responses = await Promise.all(
-    chunks.map(chunk =>
-      firestore().collection("products").where("SKU", "in", chunk).get()
+export const getFirebaseProducts: (skus: string[]) => Promise<any[]> =
+  async skus => {
+    const chunks = [];
+    const chunkSize = 10;
+    for (let i = 0, len = skus.length; i < len; i += chunkSize) {
+      chunks.push(skus.slice(i, i + chunkSize));
+    }
+    const responses = await Promise.all(
+      chunks.map(chunk =>
+        firestore().collection("products").where("SKU", "in", chunk).get()
+      )
+    );
+    return responses
+      .map(snap => snap.docs)
+      .flat()
+      .map(doc => ({ id: doc.id, ...doc.data() }));
+  };
+
+export interface OrderItemImage {
+  alt: string;
+  src: string;
+}
+export interface CartItem {
+  key: number;
+  design?: string;
+  size?: string;
+  quantity: number;
+  image: OrderItemImage;
+}
+
+export const getWpProducts: (
+  cartItems: CartItem[],
+  wpProducts: ProductWP[]
+) => ProductWP[] = (cartItems, wpProducts) => {
+  const _wpProducts = cartItems
+    .map(item => wpProducts.find(prod => prod.key === item.key))
+    .map((prod, i) =>
+      prod
+        ? {
+            ...prod,
+            sku: prod.variants.length
+              ? prod.variants.find(
+                  variant => variant.name === cartItems[i].size
+                )?.sku || ""
+              : prod.sku
+          }
+        : null
     )
-  );
-  return responses
-    .map(snap => snap.docs)
-    .flat()
-    .map(doc => ({ id: doc.id, ...doc.data() }));
+    .filter(Boolean) as ProductWP[];
+
+  return _wpProducts;
 };
 
 createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
@@ -101,32 +137,13 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
     const client = user?.phone ? await handleContactHooks(user, "client") : {};
 
     const { cartItems, deliveryDate } = req.body as {
-      cartItems: {
-        key: number;
-        design?: string;
-        size?: string;
-        quantity: number;
-      }[];
+      cartItems: CartItem[];
       deliveryDate: string;
     };
     const _wpProducts = await ProductWPRepo.findByKeys(
       cartItems.map(item => item.key)
     );
-    const wpProducts = cartItems
-      .map(item => _wpProducts.find(prod => prod.key === item.key))
-      .map((prod, i) =>
-        prod
-          ? {
-              ...prod,
-              sku: prod.variants.length
-                ? prod.variants.find(
-                    variant => variant.name === cartItems[i].size
-                  )?.sku || ""
-                : prod.sku
-            }
-          : null
-      )
-      .filter(Boolean) as ProductWP[];
+    const wpProducts = getWpProducts(cartItems, _wpProducts);
 
     if (wpProducts.length !== cartItems.length) {
       throw new BadRequestError("Some products not found");
@@ -144,13 +161,20 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
 
     const orderProducts = fbProducts.map(prod => {
       const prodIndex = wpProducts.findIndex(_prod => _prod.sku === prod.SKU);
-      const { quantity, size, design } = cartItems[prodIndex];
+      const { quantity, size, design, image } = cartItems[prodIndex];
+
       return {
         name: prod.name,
         SKU: prod.SKU,
         size,
         design,
-        quantity
+        quantity,
+        image,
+        key: wpProducts[prodIndex].key,
+        price: deduceProductTruePrice(
+          wpProducts[prodIndex],
+          cartItems[prodIndex]
+        )
       };
     });
 
@@ -218,7 +242,17 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
       sendReminders: false,
       upsellProfit: 0,
       websiteOrderID: "",
-      driverAlerted: false
+      driverAlerted: false,
+      orderStatus: "created",
+      deliveryDetails: {
+        recidenceType: "",
+        recipientAddress: "",
+        recipientName: "",
+        recipientPhone: "",
+        recipientAltPhone: "",
+        state: "",
+        zone: ""
+      }
     };
 
     const response = await db.add({
@@ -234,7 +268,9 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
 
     const createdOrderResponse = { ...createdOrder.data(), id: response.id };
 
-    return new SuccessResponse("success", createdOrderResponse).send(res);
+    return new SuccessResponse("success", {
+      ...createdOrderResponse
+    }).send(res);
   } catch (error) {
     return ApiError.handle(error as Error, res);
   }

@@ -79,6 +79,6 @@ export const formatPhoneNumber = (str: string | undefined) => {
   const output = str
     .replace(/[\s|/]/g, "")
     .replace(/^\+?234\(0\)/, "0")
-    .replace(/^\+?234/, "0");
+    .replace(/^\+?2340*/, "0");
   return output;
 };

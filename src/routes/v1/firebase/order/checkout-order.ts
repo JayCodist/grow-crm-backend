@@ -21,6 +21,10 @@ import {
 import validator from "../../../../helpers/validator";
 import { handleContactHooks } from "./order-utils";
 import validation from "./validation";
+import {
+  DeliveryZoneAmount,
+  deliveryZoneAmount
+} from "../../../../helpers/constants";
 
 const { firestore } = firebaseAdmin;
 const db = firestore();
@@ -171,9 +175,9 @@ checkoutOrder.put(
         "recipient"
       );
 
-      const recipientAddress = `${orderData.recipient.address} (${
-        orderData.recipient.residenceType || ""
-      })`;
+      const recipientAddress = `(${orderData.recipient.residenceType || ""}) ${
+        orderData.recipient.address
+      }`;
 
       const sendReminders = orderData.purpose
         ? await resolveReminders({
@@ -181,6 +185,17 @@ checkoutOrder.put(
             ...orderData
           })
         : false;
+
+      const deliveryAmount =
+        deliveryZoneAmount[
+          orderData.deliveryDetails.zone.split("-")[0] as DeliveryZoneAmount
+        ] || 0;
+
+      const total =
+        existingOrder.orderProducts.reduce(
+          (acc, product) => acc + product.price * product.quantity,
+          0
+        ) + deliveryAmount;
 
       await db
         .collection("orders")
@@ -195,12 +210,14 @@ checkoutOrder.put(
           isClientRecipient: orderData.recipient.method === "pick-up",
           orderDetails: deliveryLocation
             ? `${(
-                existingOrder.orderDetails.split("=")[0] || ""
-              ).trim()} + delivery(${deliveryLocation.amount}) = ${
-                existingOrder.amount + (deliveryLocation?.amount || 0)
-              }`
+                existingOrder.orderDetails
+                  .split("+")
+                  .filter(part => !part.includes("delivery"))
+                  .join("+") || ""
+              ).trim()} + delivery(${deliveryLocation.amount}) = ${total}`
             : existingOrder.orderDetails,
-          amount: existingOrder.amount + (deliveryLocation?.amount || 0)
+          amount: total,
+          orderStatus: "processing"
         } as Partial<Order>);
 
       return new SuccessResponse("Order successfully checked out", null).send(

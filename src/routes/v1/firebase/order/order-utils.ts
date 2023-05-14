@@ -63,7 +63,7 @@ export const handleContactHooks: (
       phoneAlt: phoneAlt || "",
       phoneAlt2: "",
       phones: [phone, phoneAlt].filter(Boolean),
-      email: user.email,
+      email: user.email || "",
       timestamp: firestore.FieldValue.serverTimestamp()
     } as OrderActor;
     const doc = await firestore().collection("contacts").add(contactData);
