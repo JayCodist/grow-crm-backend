@@ -50,8 +50,16 @@ const validation = {
         address: Joi.string().default("").allow(""),
         method: Joi.string().required().valid("pick-up", "delivery")
       }).required(),
-      zone: Joi.string().default("").allow(""),
-      state: Joi.string().default("").allow("")
+
+      deliveryDetails: Joi.object({
+        state: Joi.string().allow(""),
+        zone: Joi.string().allow(""),
+        recipientPhone: Joi.string().allow(""),
+        recipientAltPhone: Joi.string().allow(""),
+        recipientName: Joi.string().allow(""),
+        recipientAddress: Joi.string().allow(""),
+        recidenceType: Joi.string().allow("")
+      }).allow(null)
     }).required(),
     userData: Joi.object().keys({
       name: Joi.string().required(),

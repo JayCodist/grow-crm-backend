@@ -188,7 +188,7 @@ checkoutOrder.put(
 
       const deliveryAmount =
         deliveryZoneAmount[
-          orderData.zone.split("-")[0] as DeliveryZoneAmount
+          orderData.deliveryDetails.zone.split("-")[0] as DeliveryZoneAmount
         ] || 0;
 
       const total =

@@ -244,8 +244,15 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
       websiteOrderID: "",
       driverAlerted: false,
       orderStatus: "created",
-      state: "",
-      zone: ""
+      deliveryDetails: {
+        recidenceType: "",
+        recipientAddress: "",
+        recipientName: "",
+        recipientPhone: "",
+        recipientAltPhone: "",
+        state: "",
+        zone: ""
+      }
     };
 
     const response = await db.add({
