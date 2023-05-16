@@ -14,6 +14,8 @@ export const handleContactHooks: (
     phone?: string;
     phoneAlt?: string;
     address?: string;
+    phoneCountryCode?: string;
+    altPhoneCountryCode?: string;
   },
   contactType: OrderActorCategory
 ) => Promise<OrderActor> = async (user, contactType) => {
@@ -60,6 +62,8 @@ export const handleContactHooks: (
       name: user.name || "",
       category: [contactType],
       phone: phone || "",
+      phoneCountryCode: user.phoneCountryCode || "",
+      altPhoneCountryCode: user.altPhoneCountryCode || "",
       phoneAlt: phoneAlt || "",
       phoneAlt2: "",
       phones: [phone, phoneAlt].filter(Boolean),

@@ -46,6 +46,8 @@ export default interface User {
   dob: string;
   createdAt: string;
   recipients: Recipient[];
+  phoneCountryCode: string;
+  altPhoneCountryCode: string;
 }
 
 export interface LoginResponse extends Omit<User, "password"> {
