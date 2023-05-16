@@ -48,7 +48,9 @@ const validation = {
         residenceType: Joi.string().default("").allow(""),
         state: Joi.string().default("").allow(""),
         address: Joi.string().default("").allow(""),
-        method: Joi.string().required().valid("pick-up", "delivery")
+        method: Joi.string().required().valid("pick-up", "delivery"),
+        phoneCountryCode: Joi.string().default("").allow(""),
+        altPhoneCountryCode: Joi.string().default("").allow("")
       }).required(),
 
       deliveryDetails: Joi.object({
@@ -58,21 +60,25 @@ const validation = {
         recipientAltPhone: Joi.string().allow(""),
         recipientName: Joi.string().allow(""),
         recipientAddress: Joi.string().allow(""),
-        recidenceType: Joi.string().allow("")
+        recidenceType: Joi.string().allow(""),
+        recipientPhoneCountryCode: Joi.string().default("").allow(""),
+        recipientAltPhoneCountryCode: Joi.string().default("").allow("")
       }).allow(null)
     }).required(),
     userData: Joi.object().keys({
       name: Joi.string().required(),
       phone: Joi.string().required(),
       email: Joi.string().default("").allow(""),
-      password: Joi.string()
+      password: Joi.string(),
+      phoneCountryCode: Joi.string().default("").allow("")
     })
   }),
   saveSenderInfo: Joi.object({
     userData: Joi.object().keys({
       name: Joi.string().required(),
       phone: Joi.string().required(),
-      email: Joi.string().default("").allow("")
+      email: Joi.string().default("").allow(""),
+      phoneCountryCode: Joi.string().default("").allow("")
     }),
     deliveryDate: Joi.string().required()
   })
