@@ -57,7 +57,7 @@ updateOrder.put(
       const totalPrice = wpProducts.reduce((price, product, index) => {
         const cartItem = cartItems[index];
         const productPrice = deduceProductTruePrice(product, cartItem);
-        return price + productPrice;
+        return price + productPrice * cartItem.quantity;
       }, 0);
 
       const fbProducts = await getFirebaseProducts(
