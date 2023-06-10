@@ -4,7 +4,11 @@ import fetch from "node-fetch";
 import { unescape } from "querystring";
 import { URLSearchParams } from "url";
 import { Environment } from "../../../../config";
-import { ApiError, PaymentFailureError } from "../../../../core/ApiError";
+import {
+  ApiError,
+  InternalError,
+  PaymentFailureError
+} from "../../../../core/ApiError";
 import {
   InternalErrorResponse,
   SuccessResponse
@@ -12,6 +16,8 @@ import {
 import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
+import { Order } from "../../../../database/model/Order";
+import { getCurrencies } from "../handshake";
 
 const db = firestore();
 
@@ -77,33 +83,46 @@ verifyPaypal.post(
       ) {
         const paymentDetails: PapPalPaymentDetails = json.purchase_units[0];
 
-        // TODO: confirm amount is good
+        if (
+          paymentDetails.amount.currency_code === "USD" ||
+          paymentDetails.amount.currency_code === "GBP"
+        ) {
+          // TODO: confirm amount is good
 
-        // const snap = await db
-        //   .collection("orders")
-        //   .doc(paymentDetails.reference_id as string)
-        //   .get();
+          const snap = await db
+            .collection("orders")
+            .doc(paymentDetails.reference_id as string)
+            .get();
 
-        // const order = snap.data() as Order | undefined;
-        // if (!order || order.amount >= json.data.amount) {
-        //   return new InternalError(
-        //     "Unexpected error occured. Please contact your administrator"
-        //   );
-        // }
+          const order = snap.data() as Order | undefined;
 
-        await db
-          .collection("orders")
-          .doc(paymentDetails.reference_id as string)
-          .update({
-            paymentStatus: "PAID - GO AHEAD (Website - Card)"
-          });
-        const environment: Environment = /sandbox/i.test(
-          process.env.PAYPAL_BASE_URL || ""
-        )
-          ? "development"
-          : "production";
-        await PaymentLogRepo.createPaymentLog("paypal", json, environment);
-        return new SuccessResponse("Payment is successful", true).send(res);
+          const rate = await getCurrencies([
+            paymentDetails.amount.currency_code
+          ]);
+          const conversionRate = 1 / rate[paymentDetails.amount.currency_code];
+          const nairaAmount = Math.round(
+            parseFloat(paymentDetails.amount.value) * conversionRate
+          );
+          if (!order || order.amount >= nairaAmount) {
+            return new InternalError(
+              "Unexpected error occured. Please contact your administrator"
+            );
+          }
+
+          await db
+            .collection("orders")
+            .doc(paymentDetails.reference_id as string)
+            .update({
+              paymentStatus: "PAID - GO AHEAD (Website - Card)"
+            });
+          const environment: Environment = /sandbox/i.test(
+            process.env.PAYPAL_BASE_URL || ""
+          )
+            ? "development"
+            : "production";
+          await PaymentLogRepo.createPaymentLog("paypal", json, environment);
+          return new SuccessResponse("Payment is successful", true).send(res);
+        }
       }
       throw new PaymentFailureError(
         json.error_description || "Invalid details"

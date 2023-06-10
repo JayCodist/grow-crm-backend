@@ -11,23 +11,28 @@ import AppConfigRepo from "../../../database/repository/AppConfigRepo";
 import UsersRepo from "../../../database/repository/UserRepo";
 import { handleAuthValidation } from "../../../helpers/request-modifiers";
 
-const getCurrencies: () => Promise<Record<AppCurrencyName, number>> =
-  async () => {
-    const response = await fetch(
-      "https://api.apilayer.com/exchangerates_data/latest?symbols=USD,GBP&base=NGN",
-      {
-        headers: {
-          apiKey: process.env.API_LAYER_KEY as string
-        }
+export const getCurrencies: (
+  symbols?: string[]
+) => Promise<Record<AppCurrencyName, number>> = async (
+  symbols = ["USD", "GBP"]
+) => {
+  const response = await fetch(
+    `https://api.apilayer.com/exchangerates_data/latest?symbols=${symbols.join(
+      ","
+    )}&base=NGN`,
+    {
+      headers: {
+        apiKey: process.env.API_LAYER_KEY as string
       }
-    );
-    const json = await response.json();
-    if (response.ok) {
-      return json.rates;
     }
-    console.error("Unable to reach api-layer: ", json);
-    throw new InternalError("Unexpected error occured");
-  };
+  );
+  const json = await response.json();
+  if (response.ok) {
+    return json.rates;
+  }
+  console.error("Unable to reach api-layer: ", json);
+  throw new InternalError("Unexpected error occured");
+};
 
 const handshake = express.Router();
 

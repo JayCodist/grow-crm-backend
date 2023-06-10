@@ -57,7 +57,7 @@ export const handleContactHooks: (
     // Create new contact
     const contactData = {
       firstname: (user.name || "").split(" ")[0],
-      lastname: (user.name || "").split(" ")[1],
+      lastname: (user.name || "").split(" ")[1] || "",
       address: [user.address || ""].filter(Boolean),
       name: user.name || "",
       category: [contactType],
