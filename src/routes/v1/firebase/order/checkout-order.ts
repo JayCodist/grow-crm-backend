@@ -31,7 +31,7 @@ const db = firestore();
 
 const checkoutOrder = express.Router();
 
-const resolveReminders = async (orderData: Order) => {
+const resolveReminders = async (orderData: Order, orderID: string) => {
   const dayMonth = dayjs(orderData.deliveryDate, "YYYY-MM-DD")
     .subtract(7, "days")
     .format("DD-MM");
@@ -56,7 +56,7 @@ const resolveReminders = async (orderData: Order) => {
   }
   if (reminderType) {
     await db.collection("reminders").add({
-      orderID: orderData.id,
+      orderID,
       type: reminderType,
       dayMonth,
       yearList
@@ -180,10 +180,13 @@ checkoutOrder.put(
       }`;
 
       const sendReminders = orderData.purpose
-        ? await resolveReminders({
-            ...existingOrder,
-            ...orderData
-          })
+        ? await resolveReminders(
+            {
+              ...existingOrder,
+              ...orderData
+            },
+            req.params.id
+          )
         : false;
 
       const deliveryAmount =
