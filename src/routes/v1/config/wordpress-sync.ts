@@ -173,7 +173,7 @@ const getVariants: (
     };
   });
 
-  return [...regularVariants, ...vipVariants];
+  return [...regularVariants, ...vipVariants].sort((a, b) => a.price - b.price);
 };
 
 doWordpressSync.post(
