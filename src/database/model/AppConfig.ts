@@ -8,6 +8,7 @@ export type AppCurrencyName = "NGN" | "GBP" | "USD";
 export interface AppCurrency {
   name: AppCurrencyName;
   conversionRate: number;
+  sign: string;
 }
 
 export default interface AppConfig {
