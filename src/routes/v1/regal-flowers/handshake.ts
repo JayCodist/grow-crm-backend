@@ -10,6 +10,7 @@ import {
 import AppConfigRepo from "../../../database/repository/AppConfigRepo";
 import UsersRepo from "../../../database/repository/UserRepo";
 import { handleAuthValidation } from "../../../helpers/request-modifiers";
+import { currencyOptions } from "../../../helpers/constants";
 
 export const getCurrencies: (
   symbols?: string[]
@@ -46,11 +47,7 @@ handshake.get("/", handleAuthValidation(true), async (req, res) => {
         dayjs().subtract(12, "hour")
       )
     ) {
-      const rates = await getCurrencies();
-      currencies = Object.keys(rates).map(currencyName => ({
-        name: currencyName as AppCurrencyName,
-        conversionRate: Math.round(1 / rates[currencyName as AppCurrencyName])
-      }));
+      currencies = currencyOptions;
       await AppConfigRepo.updateConfig({
         ...config,
         currencies,

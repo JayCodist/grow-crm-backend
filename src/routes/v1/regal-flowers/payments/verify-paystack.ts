@@ -12,6 +12,7 @@ import { Order } from "../../../../database/model/Order";
 import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
+import { currencyOptions } from "../../../../helpers/constants";
 
 const db = firestore();
 
@@ -32,16 +33,41 @@ verifyPaystack.post(
       );
       const json = await response.json();
       if (json.status && json.data.status === "success") {
+        const { data } = json;
         const snap = await db
           .collection("orders")
           .doc(req.query.ref as string)
           .get();
         const order = snap.data() as Order | undefined;
-        // TODO: confirm currency is rightt
-        if (!order || order.amount >= json.data.amount) {
-          return new InternalError(
-            "Unexpected error occured. Please contact your administrator"
+
+        if (!order) {
+          throw new InternalError(
+            "Payment Verification Failed: The order does not exist"
           );
+        }
+
+        if (data.currency === "USD") {
+          const conversionRate = currencyOptions.find(
+            currency => currency.name === "USD"
+          )?.conversionRate as number;
+
+          const nairaAmount = Math.round(
+            (parseFloat(data.amount) / 100) * conversionRate
+          );
+
+          if (order.amount > nairaAmount) {
+            throw new InternalError(
+              "Payment Verification Failed: The amount paid is less than the order's total amount."
+            );
+          }
+        } else if (data.currency === "NGN") {
+          const paidAmount = data.amount / 100;
+
+          if (order.amount > paidAmount) {
+            throw new InternalError(
+              "Payment Verification Failed: The amount paid is less than the order's total amount."
+            );
+          }
         }
         await firestore()
           .collection("orders")

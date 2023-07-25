@@ -253,7 +253,8 @@ doWordpressSync.post(
                   ?.variations || []
               : []
           ),
-          addonsGroups: []
+          addonsGroups: [],
+          inStock: rawProd.in_stock
         };
         return product;
       });

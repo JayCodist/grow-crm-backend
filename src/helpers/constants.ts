@@ -1,3 +1,5 @@
+import { AppCurrency } from "../database/model/AppConfig";
+
 export const createdAtDateFormat = "dddd, D MMM YYYY hh:mm:ss A";
 
 export type DeliveryZoneAmount =
@@ -24,3 +26,15 @@ export const deliveryZoneAmount: Record<DeliveryZoneAmount, number> = {
   freeAbujaVals: 0,
   highAbuja: 6000
 };
+
+export const defaultCurrency: AppCurrency = {
+  name: "NGN",
+  conversionRate: 1,
+  sign: "₦"
+};
+
+export const currencyOptions: AppCurrency[] = [
+  { ...defaultCurrency },
+  { name: "USD", conversionRate: 700, sign: "$" },
+  { name: "GBP", conversionRate: 890, sign: "£" }
+];
