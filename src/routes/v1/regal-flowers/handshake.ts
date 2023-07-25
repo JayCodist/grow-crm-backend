@@ -57,7 +57,10 @@ handshake.get("/", handleAuthValidation(true), async (req, res) => {
 
     const user = req.user ? await UsersRepo.findByEmail(req.user.email) : null;
 
-    return new SuccessResponse("success", { currencies, user }).send(res);
+    return new SuccessResponse("success", {
+      currencies: currencyOptions,
+      user
+    }).send(res);
   } catch (err) {
     return ApiError.handle(err as Error, res);
   }
