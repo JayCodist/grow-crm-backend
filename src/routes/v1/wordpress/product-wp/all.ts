@@ -9,7 +9,11 @@ allProductWp.use("/", async (req, res) => {
   try {
     const response = await ProductWPRepo.getAllProducts();
 
-    new SuccessResponse("success", response).send(res);
+    const data = response.data.filter(product => product.inStock);
+    new SuccessResponse("success", {
+      ...response,
+      data
+    }).send(res);
   } catch (error) {
     ApiError.handle(error as Error, res);
   }
