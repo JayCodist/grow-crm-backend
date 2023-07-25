@@ -24,7 +24,9 @@ export const productWPProjection = [
   "type",
   "addonSlug",
   "class",
-  "designNote"
+  "designNote",
+  "budgetNote",
+  "inStock"
 ];
 
 export const productWPProjectionMinimal = [
@@ -108,6 +110,7 @@ export interface ProductWP {
   designNote: string;
   relatedVIPRef: number | null;
   relatedProducts?: MinimalProductWP[];
+  inStock: boolean;
 }
 
 export interface ProductWPCreate extends ProductWP {
@@ -185,7 +188,8 @@ const schema = new Schema({
   },
   timeStamp: String,
   designNote: String,
-  budgetNote: String
+  budgetNote: String,
+  inStock: Boolean
 });
 
 export const ProductWPModel = model<ProductWPDocument & Document>(
