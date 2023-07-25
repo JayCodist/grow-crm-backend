@@ -20,10 +20,12 @@ productWPSlugMultiple.use(
         .map(slug => slug.trim().toLowerCase());
       const response = await ProductWPRepo.findBySlugs(slugs);
 
+      const data = response.filter(product => product.inStock);
+
       if (!response) {
         new BadRequestResponse("Products not found").send(res);
       }
-      new SuccessResponse("success", response).send(res);
+      new SuccessResponse("success", data).send(res);
     } catch (error) {
       ApiError.handle(error as Error, res);
     }

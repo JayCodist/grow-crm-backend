@@ -86,7 +86,7 @@ productWP.use(
 
       const classProps = productClass ? { class: productClass } : {};
 
-      const data = await ProductWPRepo.getPaginatedProducts({
+      const response = await ProductWPRepo.getPaginatedProducts({
         sortLogic:
           sortField && sortType
             ? {
@@ -107,7 +107,9 @@ productWP.use(
         }
       });
 
-      new SuccessResponse("success", data).send(res);
+      const data = response.data.filter(product => product.inStock);
+
+      new SuccessResponse("success", { ...response, data }).send(res);
     } catch (error) {
       ApiError.handle(error as Error, res);
     }
