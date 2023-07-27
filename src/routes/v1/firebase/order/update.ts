@@ -21,6 +21,9 @@ import {
   getFirebaseProducts,
   getWpProducts
 } from "./create";
+import { AppCurrencyName } from "../../../../database/model/AppConfig";
+import { currencyOptions } from "../../../../helpers/constants";
+import { getPriceDisplay } from "../../../../helpers/type-conversion";
 
 export const updateOrder = express.Router();
 
@@ -34,7 +37,7 @@ updateOrder.put(
   handleAuthValidation(true),
   async (req, res) => {
     try {
-      const { cartItems, deliveryDate } = req.body as {
+      const { cartItems, deliveryDate, currency } = req.body as {
         cartItems: {
           key: number;
           design?: string;
@@ -43,6 +46,7 @@ updateOrder.put(
           image: OrderItemImage;
         }[];
         deliveryDate: string;
+        currency: AppCurrencyName;
       };
 
       const _wpProducts = await ProductWPRepo.findByKeys(
@@ -109,11 +113,19 @@ updateOrder.put(
         throw new NoDataError("Order not found");
       }
 
+      const _currency =
+        currencyOptions.find(_currency => _currency.name === currency) || "";
+
       await db.doc(req.params.id).update({
         amount: totalPrice,
         orderProducts,
         orderDetails,
-        deliveryDate
+        deliveryDate,
+        adminNotes: `${
+          _currency &&
+          _currency.name !== "NGN" &&
+          getPriceDisplay(totalPrice, _currency)
+        }`
       });
 
       const response = await db.doc(req.params.id).get();

@@ -25,7 +25,8 @@ const validation = {
         }).allow(null)
       })
     ),
-    deliveryDate: Joi.string().allow("")
+    deliveryDate: Joi.string().allow(""),
+    currency: Joi.string().required().valid("NGN", "USD", "GBP")
   }),
   checkoutOrder: Joi.object({
     shouldCreateAccount: Joi.boolean().required(),
