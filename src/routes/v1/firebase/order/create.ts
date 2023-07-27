@@ -11,6 +11,9 @@ import ProductWPRepo from "../../../../database/repository/ProductWPRepo";
 import firebaseAdmin from "../../../../helpers/firebase-admin";
 import { handleFormDataParsing } from "../../../../helpers/request-modifiers";
 import { handleContactHooks } from "./order-utils";
+import { AppCurrencyName } from "../../../../database/model/AppConfig";
+import { currencyOptions } from "../../../../helpers/constants";
+import { getPriceDisplay } from "../../../../helpers/type-conversion";
 
 const createOrder = express.Router();
 const { firestore } = firebaseAdmin;
@@ -136,9 +139,10 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
     const { user } = req;
     const client = user?.phone ? await handleContactHooks(user, "client") : {};
 
-    const { cartItems, deliveryDate } = req.body as {
+    const { cartItems, deliveryDate, currency } = req.body as {
       cartItems: CartItem[];
       deliveryDate: string;
+      currency: AppCurrencyName;
     };
     const _wpProducts = await ProductWPRepo.findByKeys(
       cartItems.map(item => item.key)
@@ -197,6 +201,9 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
       .join(" + ");
     orderDetails += ` = ${totalPrice}`;
 
+    const _currency =
+      currencyOptions.find(_currency => _currency.name === currency) || "";
+
     const payload: OrderCreate = {
       amount: totalPrice,
       orderProducts,
@@ -206,7 +213,11 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
       cost: 0,
       deliveryDate: deliveryDate || "",
       admin: "regalflowersnigeria@gmail.com",
-      adminNotes: "",
+      adminNotes: `${
+        _currency && _currency.name !== "NGN"
+          ? getPriceDisplay(totalPrice, _currency)
+          : ""
+      }`,
       anonymousClient: false,
       arrangementTime: "",
       business: "Regal Flowers",

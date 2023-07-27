@@ -94,6 +94,10 @@ checkoutOrder.put(
         throw new NoDataError("Order not found");
       }
 
+      const adminNotes = `${orderData.adminNotes} - ${
+        existingOrder.adminNotes || ""
+      }`;
+
       let user: Omit<User, "password"> | null = req.user || null;
 
       if (shouldCreateAccount && !user) {
@@ -121,6 +125,7 @@ checkoutOrder.put(
           const existingRecipient = recipients.find(
             recipient => recipient.phone === recipientPhone
           );
+
           recipients = existingRecipient
             ? recipients.map(recipient =>
                 recipient === existingRecipient
@@ -128,7 +133,7 @@ checkoutOrder.put(
                       ...recipient,
                       ...orderData.recipient,
                       message: orderData.deliveryMessage,
-                      adminNotes: orderData.adminNotes,
+                      adminNotes,
                       despatchLocation: orderData.despatchLocation,
                       phoneAlt: formatPhoneNumber(
                         orderData.recipient?.phoneAlt ||
@@ -145,7 +150,7 @@ checkoutOrder.put(
                   ...(orderData.recipient as Recipient),
                   message: orderData.deliveryMessage,
                   despatchLocation: orderData.despatchLocation,
-                  adminNotes: orderData.adminNotes,
+                  adminNotes,
                   phone: formatPhoneNumber(orderData.recipient?.phone || ""),
                   phoneAlt: formatPhoneNumber(
                     orderData.recipient?.phoneAlt || ""
@@ -220,7 +225,8 @@ checkoutOrder.put(
               ).trim()} + delivery(${deliveryLocation.amount}) = ${total}`
             : existingOrder.orderDetails,
           amount: total,
-          orderStatus: "processing"
+          orderStatus: "processing",
+          adminNotes
         } as Partial<Order>);
 
       return new SuccessResponse("Order successfully checked out", null).send(

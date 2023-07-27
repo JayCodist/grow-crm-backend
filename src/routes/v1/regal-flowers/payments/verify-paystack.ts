@@ -13,6 +13,7 @@ import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
 import { currencyOptions } from "../../../../helpers/constants";
+import { AppCurrency } from "../../../../database/model/AppConfig";
 
 const db = firestore();
 
@@ -32,6 +33,7 @@ verifyPaystack.post(
         }
       );
       const json = await response.json();
+      let adminNotes = "";
       if (json.status && json.data.status === "success") {
         const { data } = json;
         const snap = await db
@@ -47,12 +49,16 @@ verifyPaystack.post(
         }
 
         if (data.currency === "USD") {
-          const conversionRate = currencyOptions.find(
+          const currency = currencyOptions.find(
             currency => currency.name === "USD"
-          )?.conversionRate as number;
+          ) as AppCurrency;
+
+          adminNotes = `${order.adminNotes.split("-")[0]} - ${currency.sign} ${
+            data.amount / 100
+          }`;
 
           const nairaAmount = Math.round(
-            (parseFloat(data.amount) / 100) * conversionRate
+            (parseFloat(data.amount) / 100) * currency?.conversionRate || 1
           );
 
           if (order.amount > nairaAmount) {
@@ -63,17 +69,21 @@ verifyPaystack.post(
         } else if (data.currency === "NGN") {
           const paidAmount = data.amount / 100;
 
+          adminNotes = `${order.adminNotes.split("-")[0]}`;
+
           if (order.amount > paidAmount) {
             throw new InternalError(
               "Payment Verification Failed: The amount paid is less than the order's total amount."
             );
           }
         }
+
         await firestore()
           .collection("orders")
           .doc(req.query.ref as string)
           .update({
-            paymentStatus: "PAID - GO AHEAD (Website - Card)"
+            paymentStatus: "PAID - GO AHEAD (Website - Card)",
+            adminNotes
           });
         const environment: Environment = /test/i.test(
           process.env.PAYSTACK_SECRET_KEY || ""

@@ -66,7 +66,6 @@ verifyPaypal.post(
   async (req, res) => {
     try {
       const paypalToken = await handlePaypalLogin();
-      console.log(req.query.ref, paypalToken);
       const response = await fetch(
         `${process.env.PAYPAL_BASE_URL}/v2/checkout/orders/${req.query.ref}`,
         {
@@ -105,11 +104,19 @@ verifyPaypal.post(
             );
           }
 
+          const currencySymbol = currencyOptions.find(
+            currency => currency.name === currencyCode
+          )?.sign as string;
+          const adminNotes = `${
+            order.adminNotes.split("-")[0]
+          } - ${currencySymbol}${paymentDetails.amount.value}`;
+
           await db
             .collection("orders")
             .doc(paymentDetails.reference_id as string)
             .update({
-              paymentStatus: "PAID - GO AHEAD (Website - Card)"
+              paymentStatus: "PAID - GO AHEAD (Website - Card)",
+              adminNotes
             });
           const environment: Environment = /sandbox/i.test(
             process.env.PAYPAL_BASE_URL || ""
