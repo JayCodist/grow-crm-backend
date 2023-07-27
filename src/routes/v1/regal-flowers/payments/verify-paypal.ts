@@ -17,7 +17,7 @@ import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
 import { Order } from "../../../../database/model/Order";
-import { getCurrencies } from "../handshake";
+import { currencyOptions } from "../../../../helpers/constants";
 
 const db = firestore();
 
@@ -82,13 +82,9 @@ verifyPaypal.post(
         json.purchase_units?.length
       ) {
         const paymentDetails: PapPalPaymentDetails = json.purchase_units[0];
+        const currencyCode = paymentDetails.amount.currency_code;
 
-        if (
-          paymentDetails.amount.currency_code === "USD" ||
-          paymentDetails.amount.currency_code === "GBP"
-        ) {
-          // TODO: confirm amount is good
-
+        if (currencyCode === "USD" || currencyCode === "GBP") {
           const snap = await db
             .collection("orders")
             .doc(paymentDetails.reference_id as string)
@@ -96,16 +92,16 @@ verifyPaypal.post(
 
           const order = snap.data() as Order | undefined;
 
-          const rate = await getCurrencies([
-            paymentDetails.amount.currency_code
-          ]);
-          const conversionRate = 1 / rate[paymentDetails.amount.currency_code];
+          const conversionRate = currencyOptions.find(
+            currency => currency.name === currencyCode
+          )?.conversionRate as number;
           const nairaAmount = Math.round(
             parseFloat(paymentDetails.amount.value) * conversionRate
           );
+
           if (!order || order.amount >= nairaAmount) {
-            return new InternalError(
-              "Unexpected error occured. Please contact your administrator"
+            throw new InternalError(
+              "Payment Verification Failed: The amount paid is less than the order's total amount."
             );
           }
 
