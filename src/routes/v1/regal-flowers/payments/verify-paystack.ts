@@ -14,6 +14,7 @@ import validator from "../../../../helpers/validator";
 import validation from "./validation";
 import { currencyOptions } from "../../../../helpers/constants";
 import { AppCurrency } from "../../../../database/model/AppConfig";
+import { getAdminNoteText } from "../../../../helpers/formatters";
 
 const db = firestore();
 
@@ -33,7 +34,6 @@ verifyPaystack.post(
         }
       );
       const json = await response.json();
-      let adminNotes = "";
       if (json.status && json.data.status === "success") {
         const { data } = json;
         const snap = await db
@@ -53,10 +53,6 @@ verifyPaystack.post(
             currency => currency.name === "USD"
           ) as AppCurrency;
 
-          adminNotes = `${order.adminNotes.split("-")[0]} - ${currency.sign} ${
-            data.amount / 100
-          }`;
-
           const nairaAmount = Math.round(
             (parseFloat(data.amount) / 100) * currency?.conversionRate || 1
           );
@@ -69,14 +65,18 @@ verifyPaystack.post(
         } else if (data.currency === "NGN") {
           const paidAmount = data.amount / 100;
 
-          adminNotes = `${order.adminNotes.split("-")[0]}`;
-
           if (order.amount > paidAmount) {
             throw new InternalError(
               "Payment Verification Failed: The amount paid is less than the order's total amount."
             );
           }
         }
+
+        const adminNotes = getAdminNoteText(
+          order.adminNotes,
+          data.currency,
+          order.amount
+        );
 
         await firestore()
           .collection("orders")

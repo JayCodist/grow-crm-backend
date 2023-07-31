@@ -24,10 +24,16 @@ orderID.get("/:id", async (req, res) => {
       bus => bus.name === order?.business
     )?.letter;
 
+    const adminNotes = order?.adminNotes.replace(
+      /([£$]\d+(?:[.,]\d{2})?)/gu,
+      ""
+    );
+
     const data = {
       ...order,
       fullOrderId: `${businessLetter}${order?.deliveryZone}${order?.orderID}`,
-      id: req.params.id
+      id: req.params.id,
+      adminNotes
     };
 
     if (!order) {

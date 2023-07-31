@@ -72,7 +72,8 @@ const validation = {
       email: Joi.string().default("").allow(""),
       password: Joi.string(),
       phoneCountryCode: Joi.string().default("").allow("")
-    })
+    }),
+    currency: Joi.string().required().valid("NGN", "USD", "GBP")
   }),
   saveSenderInfo: Joi.object({
     userData: Joi.object().keys({

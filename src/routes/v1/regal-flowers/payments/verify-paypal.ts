@@ -18,6 +18,7 @@ import validator from "../../../../helpers/validator";
 import validation from "./validation";
 import { Order } from "../../../../database/model/Order";
 import { currencyOptions } from "../../../../helpers/constants";
+import { getAdminNoteText } from "../../../../helpers/formatters";
 
 const db = firestore();
 
@@ -104,12 +105,11 @@ verifyPaypal.post(
             );
           }
 
-          const currencySymbol = currencyOptions.find(
-            currency => currency.name === currencyCode
-          )?.sign as string;
-          const adminNotes = `${
-            order.adminNotes.split("-")[0]
-          } - ${currencySymbol}${paymentDetails.amount.value}`;
+          const adminNotes = getAdminNoteText(
+            order.adminNotes,
+            currencyCode,
+            order.amount
+          );
 
           await db
             .collection("orders")
