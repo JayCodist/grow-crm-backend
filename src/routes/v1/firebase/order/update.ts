@@ -22,8 +22,7 @@ import {
   getWpProducts
 } from "./create";
 import { AppCurrencyName } from "../../../../database/model/AppConfig";
-import { currencyOptions } from "../../../../helpers/constants";
-import { getPriceDisplay } from "../../../../helpers/type-conversion";
+import { getAdminNoteText } from "../../../../helpers/formatters";
 
 export const updateOrder = express.Router();
 
@@ -113,19 +112,15 @@ updateOrder.put(
         throw new NoDataError("Order not found");
       }
 
-      const _currency =
-        currencyOptions.find(_currency => _currency.name === currency) || "";
+      let { adminNotes } = existingOrder;
+      adminNotes = getAdminNoteText(adminNotes, currency, totalPrice);
 
       await db.doc(req.params.id).update({
         amount: totalPrice,
         orderProducts,
         orderDetails,
         deliveryDate,
-        adminNotes: `${
-          _currency &&
-          _currency.name !== "NGN" &&
-          getPriceDisplay(totalPrice, _currency)
-        }`
+        adminNotes
       });
 
       const response = await db.doc(req.params.id).get();
