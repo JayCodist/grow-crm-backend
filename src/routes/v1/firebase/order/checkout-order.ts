@@ -13,7 +13,10 @@ import {
 import User, { Recipient, UserCreate } from "../../../../database/model/User";
 import UsersRepo from "../../../../database/repository/UserRepo";
 import firebaseAdmin from "../../../../helpers/firebase-admin";
-import { formatPhoneNumber } from "../../../../helpers/formatters";
+import {
+  formatPhoneNumber,
+  getAdminNoteText
+} from "../../../../helpers/formatters";
 import {
   handleAuthValidation,
   handleFormDataParsing
@@ -25,6 +28,7 @@ import {
   DeliveryZoneAmount,
   deliveryZoneAmount
 } from "../../../../helpers/constants";
+import { AppCurrencyName } from "../../../../database/model/AppConfig";
 
 const { firestore } = firebaseAdmin;
 const db = firestore();
@@ -77,13 +81,15 @@ checkoutOrder.put(
         shouldSaveAddress,
         orderData,
         userData,
-        deliveryLocation
+        deliveryLocation,
+        currency
       } = req.body as {
         shouldCreateAccount: boolean;
         shouldSaveAddress: boolean;
         orderData: any;
         userData: UserCreate;
         deliveryLocation: DeliveryLocationOption | null;
+        currency: AppCurrencyName;
       };
 
       const existingOrder = (
@@ -94,9 +100,11 @@ checkoutOrder.put(
         throw new NoDataError("Order not found");
       }
 
-      const adminNotes = `${orderData.adminNotes} - ${
-        existingOrder.adminNotes || ""
-      }`;
+      const adminNotes = getAdminNoteText(
+        orderData.adminNotes,
+        currency,
+        existingOrder.amount
+      );
 
       let user: Omit<User, "password"> | null = req.user || null;
 

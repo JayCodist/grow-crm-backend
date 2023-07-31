@@ -3,6 +3,9 @@ import jwt from "jsonwebtoken";
 import { BadTokenError } from "../core/ApiError";
 import { MinimalProductWP, ProductWP } from "../database/model/ProductWP";
 import User, { LoginResponse } from "../database/model/User";
+import { AppCurrency, AppCurrencyName } from "../database/model/AppConfig";
+import { getPriceDisplay } from "./type-conversion";
+import { currencyOptions } from "./constants";
 
 export const formatResponseRecord: (record: any) => any = record => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -81,4 +84,43 @@ export const formatPhoneNumber = (str: string | undefined) => {
     .replace(/^\+?234\(0\)/, "0")
     .replace(/^\+?2340*/, "0");
   return output;
+};
+
+export const extractAmountFromNote = (note: string) => {
+  const amountRegex = /([£$]\d+(?:[.,]\d{2})?)/gu;
+  return note.match(amountRegex);
+};
+
+export const getAdminNoteText = (
+  note: string,
+  currency: AppCurrencyName,
+  totalPrice?: number
+) => {
+  let adminNotes = note;
+  const amount = extractAmountFromNote(note);
+  const _currency = currencyOptions.find(
+    _currency => _currency.name === currency
+  ) as AppCurrency;
+
+  if (amount && _currency?.name !== "NGN") {
+    adminNotes = adminNotes.replace(
+      amount[0],
+      `${getPriceDisplay(parseInt(amount[0], 10), _currency)}`
+    );
+  } else if ((amount || totalPrice) && _currency?.name === "NGN") {
+    console.log("amount");
+    adminNotes = adminNotes.replace(amount ? amount[0] : "", "");
+  } else {
+    console.log("else");
+    adminNotes = `${adminNotes} ${
+      _currency.name !== "NGN"
+        ? getPriceDisplay(
+            parseInt(amount ? amount[0] : `${totalPrice}`, 10),
+            _currency
+          )
+        : ""
+    }`;
+  }
+
+  return adminNotes;
 };

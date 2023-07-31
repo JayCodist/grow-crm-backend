@@ -16,6 +16,7 @@ import { Order } from "../../../../database/model/Order";
 import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
+import { getAdminNoteText } from "../../../../helpers/formatters";
 
 const db = firestore();
 
@@ -74,11 +75,18 @@ verifyMonnify.post(
             "Unexpected error occured. Please contact your administrator"
           );
         }
+
+        const adminNotes = getAdminNoteText(
+          order.adminNotes,
+          "NGN",
+          order.amount
+        );
         await firestore()
           .collection("orders")
           .doc(req.query.ref as string)
           .update({
-            paymentStatus: "PAID - GO AHEAD (Website - Card)"
+            paymentStatus: "PAID - GO AHEAD (Website - Card)",
+            adminNotes
           });
         const environment: Environment = /sandbox/i.test(
           process.env.MONNIFY_BASE_URL || ""
