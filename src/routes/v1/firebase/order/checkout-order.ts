@@ -100,10 +100,21 @@ checkoutOrder.put(
         throw new NoDataError("Order not found");
       }
 
+      const deliveryAmount =
+        deliveryZoneAmount[
+          orderData.deliveryDetails.zone.split("-")[0] as DeliveryZoneAmount
+        ] || 0;
+
+      const total =
+        existingOrder.orderProducts.reduce(
+          (acc, product) => acc + product.price * product.quantity,
+          0
+        ) + deliveryAmount;
+
       const adminNotes = getAdminNoteText(
         orderData.adminNotes,
         currency,
-        existingOrder.amount
+        total
       );
 
       let user: Omit<User, "password"> | null = req.user || null;
@@ -201,17 +212,6 @@ checkoutOrder.put(
             req.params.id
           )
         : false;
-
-      const deliveryAmount =
-        deliveryZoneAmount[
-          orderData.deliveryDetails.zone.split("-")[0] as DeliveryZoneAmount
-        ] || 0;
-
-      const total =
-        existingOrder.orderProducts.reduce(
-          (acc, product) => acc + product.price * product.quantity,
-          0
-        ) + deliveryAmount;
 
       await db
         .collection("orders")
