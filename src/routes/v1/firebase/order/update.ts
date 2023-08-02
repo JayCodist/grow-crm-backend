@@ -23,6 +23,10 @@ import {
 } from "./create";
 import { AppCurrencyName } from "../../../../database/model/AppConfig";
 import { getAdminNoteText } from "../../../../helpers/formatters";
+import {
+  DeliveryZoneAmount,
+  deliveryZoneAmount
+} from "../../../../helpers/constants";
 
 export const updateOrder = express.Router();
 
@@ -48,6 +52,14 @@ updateOrder.put(
         currency: AppCurrencyName;
       };
 
+      const existingOrder = (
+        await firestore().collection("orders").doc(req.params.id).get()
+      ).data() as Order | null;
+
+      if (!existingOrder) {
+        throw new NoDataError("Order not found");
+      }
+
       const _wpProducts = await ProductWPRepo.findByKeys(
         cartItems.map(item => item.key)
       );
@@ -57,11 +69,17 @@ updateOrder.put(
         throw new BadRequestError("Some products not found");
       }
 
-      const totalPrice = wpProducts.reduce((price, product, index) => {
-        const cartItem = cartItems[index];
-        const productPrice = deduceProductTruePrice(product, cartItem);
-        return price + productPrice * cartItem.quantity;
-      }, 0);
+      const deliveryAmount =
+        deliveryZoneAmount[
+          existingOrder.deliveryDetails.zone.split("-")[0] as DeliveryZoneAmount
+        ] || 0;
+
+      const totalPrice =
+        wpProducts.reduce((price, product, index) => {
+          const cartItem = cartItems[index];
+          const productPrice = deduceProductTruePrice(product, cartItem);
+          return price + productPrice * cartItem.quantity;
+        }, 0) + deliveryAmount;
 
       const fbProducts = await getFirebaseProducts(
         wpProducts.map(prod => prod.sku).filter(Boolean)
@@ -103,14 +121,6 @@ updateOrder.put(
         })
         .join(" + ");
       orderDetails += ` = ${totalPrice}`;
-
-      const existingOrder = (
-        await firestore().collection("orders").doc(req.params.id).get()
-      ).data() as Order | null;
-
-      if (!existingOrder) {
-        throw new NoDataError("Order not found");
-      }
 
       let { adminNotes } = existingOrder;
       adminNotes = getAdminNoteText(adminNotes, currency, totalPrice);
