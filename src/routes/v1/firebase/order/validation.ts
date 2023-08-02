@@ -37,6 +37,7 @@ const validation = {
       label: Joi.string().allow("")
     }).allow(null),
     orderData: Joi.object({
+      deliveryInstruction: Joi.string().default("").allow(""),
       deliveryDate: Joi.string().required(),
       deliveryMessage: Joi.string().default("").allow(""),
       despatchLocation: Joi.string().default("").allow(""),
