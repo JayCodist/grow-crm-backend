@@ -94,7 +94,7 @@ export const extractAmountFromNote = (note: string) => {
 export const getAdminNoteText = (
   note: string,
   currency: AppCurrencyName,
-  totalPrice?: number
+  totalPrice: number
 ) => {
   let adminNotes = note;
   const amount = extractAmountFromNote(note);
@@ -105,19 +105,14 @@ export const getAdminNoteText = (
   if (amount && _currency?.name !== "NGN") {
     adminNotes = adminNotes.replace(
       amount[0],
-      `${getPriceDisplay(parseInt(amount[0], 10), _currency)}`
+      `${getPriceDisplay(totalPrice, _currency)}`
     );
   } else if ((amount || totalPrice) && _currency?.name === "NGN") {
-    console.log("amount");
     adminNotes = adminNotes.replace(amount ? amount[0] : "", "");
   } else {
-    console.log("else");
     adminNotes = `${adminNotes} ${
       _currency.name !== "NGN"
-        ? getPriceDisplay(
-            parseInt(amount ? amount[0] : `${totalPrice}`, 10),
-            _currency
-          )
+        ? getPriceDisplay(parseInt(`${totalPrice}`, 10), _currency)
         : ""
     }`;
   }
