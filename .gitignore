@@ -10,3 +10,5 @@ coverage
 *.env
 
 service-account*.json
+
+playground.js

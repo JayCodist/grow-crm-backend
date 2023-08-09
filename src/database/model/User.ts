@@ -16,7 +16,8 @@ export const userProjection = [
   "phoneAlt",
   "dob",
   "gender",
-  "password"
+  "password",
+  "phoneCountryCode"
 ];
 
 export interface Recipient {
@@ -31,6 +32,8 @@ export interface Recipient {
   despatchLocation: string;
   deliveryLocation: string;
   adminNotes: string;
+  phoneCountryCode: string;
+  altPhoneCountryCode: string;
 }
 
 export default interface User {
@@ -69,7 +72,9 @@ const schema = new Schema({
       method: String,
       state: String,
       pickupLocation: String,
-      deliveryLocation: String
+      deliveryLocation: String,
+      phoneCountryCode: String,
+      altPhoneCountryCode: String
     }
   ],
   gender: String,
@@ -79,7 +84,8 @@ const schema = new Schema({
   phoneAlt: String,
   state: String,
   dob: String,
-  password: String
+  password: String,
+  phoneCountryCode: String
 }).index({
   createdAt: 1
 });

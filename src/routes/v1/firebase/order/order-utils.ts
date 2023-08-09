@@ -50,7 +50,9 @@ export const handleContactHooks: (
           ),
           address: Array.from(
             new Set([...(contact.address || []), user.address || ""])
-          ).filter(Boolean)
+          ).filter(Boolean),
+          phoneCountryCode: user.phoneCountryCode || "",
+          altPhoneCountryCode: user.altPhoneCountryCode || ""
         });
     }
   } else {
