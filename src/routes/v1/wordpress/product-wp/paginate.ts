@@ -35,8 +35,6 @@ productWP.use(
         flowerName
       } = req.query;
 
-      console.log("req.query", req.query);
-
       const categoryArr = String(categories || "")
         .trim()
         .split(",")
@@ -49,8 +47,6 @@ productWP.use(
       const packagesArr = createArray(String(packages || ""));
       const deliveryArr = createArray(String(delivery || ""));
       const flowerNameArr = createArray(String(flowerName || ""));
-
-      console.log("budgetArr", budgetArr);
 
       const categoryProps = categoryArr.length
         ? {
