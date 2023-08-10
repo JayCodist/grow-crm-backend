@@ -159,7 +159,10 @@ checkoutOrder.put(
                           recipient.phoneAlt ||
                           ""
                       ),
-                      deliveryLocation: deliveryLocation?.name
+                      deliveryLocation: deliveryLocation?.name,
+                      phoneCountryCode: orderData.recipient?.phoneCountryCode,
+                      altPhoneCountryCode:
+                        orderData.recipient.altPhoneCountryCode
                     }
                   : recipient
               )
@@ -174,7 +177,9 @@ checkoutOrder.put(
                   phoneAlt: formatPhoneNumber(
                     orderData.recipient?.phoneAlt || ""
                   ),
-                  deliveryLocation: deliveryLocation?.name
+                  deliveryLocation: deliveryLocation?.name,
+                  phoneCountryCode: orderData.recipient?.phoneCountryCode,
+                  altPhoneCountryCode: orderData.recipient.altPhoneCountryCode
                 }
               ];
           await UsersRepo.update({ id: user.id, recipients });
@@ -184,7 +189,8 @@ checkoutOrder.put(
           id: user.id,
           email: userData.email,
           phone: formatPhoneNumber(userData.phone || ""),
-          phoneAlt: formatPhoneNumber(userData.phoneAlt || "")
+          phoneAlt: formatPhoneNumber(userData.phoneAlt || ""),
+          phoneCountryCode: userData.phoneCountryCode
         });
       }
 
