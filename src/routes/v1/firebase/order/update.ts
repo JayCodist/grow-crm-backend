@@ -130,7 +130,8 @@ updateOrder.put(
         orderProducts,
         orderDetails,
         deliveryDate,
-        adminNotes
+        adminNotes,
+        currency
       });
 
       const response = await db.doc(req.params.id).get();

@@ -218,6 +218,7 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
           ? getPriceDisplay(totalPrice, _currency)
           : ""
       }`,
+      currency: currency || "NGN",
       anonymousClient: false,
       arrangementTime: "",
       business: "Regal Flowers",
