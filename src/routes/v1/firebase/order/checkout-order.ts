@@ -240,7 +240,8 @@ checkoutOrder.put(
             : existingOrder.orderDetails,
           amount: total,
           orderStatus: "processing",
-          adminNotes
+          adminNotes,
+          currency
         } as Partial<Order>);
 
       return new SuccessResponse("Order successfully checked out", null).send(

@@ -1,3 +1,5 @@
+import { AppCurrencyName } from "./AppConfig";
+
 interface OrderItem {
   SKU?: string;
   name: string;
@@ -228,6 +230,7 @@ export interface Order {
   driver: OrderActor;
   orderStatus: OrderStatus;
   deliveryDetails: DeliveryDetails;
+  currency: AppCurrencyName;
 }
 
 export type OrderCreate = Omit<Order, "id">;
