@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order</title>
+    <style type="text/css">
+      html {
+        scroll-behavior: smooth;
+        font-size: 92%;
+      }
+      @media (max-width: 1180px) {
+        html {
+          font-size: 84%;
+        }
+      }
+      @media (max-width: 1080px) {
+        html {
+          font-size: 77%;
+        }
+      }
+      @media (max-width: 980px) {
+        html {
+          font-size: 68%;
+        }
+      }
+      @media (max-width: 850px) {
+        html {
+          font-size: 90%;
+        }
+      }
+      @media (max-width: 650px) {
+        html {
+          font-size: 80%;
+        }
+      }
+      @media (min-width: 1500px) {
+        html {
+          font-size: 100%;
+        }
+      }
+      @media (min-width: 1700px) {
+        html {
+          font-size: 130%;
+        }
+      }
+      @media (min-width: 2000px) {
+        html {
+          font-size: 150%;
+        }
+      }
+      @media (min-width: 2500px) {
+        html {
+          font-size: 200%;
+        }
+      }
+      @media (min-width: 2800px) {
+        html {
+          font-size: 215%;
+        }
+      }
+      @media (min-width: 3000px) {
+        html {
+          font-size: 225%;
+        }
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", Verdana, Geneva, Tahoma, sans-serif;
+      }
+
+      table.details,
+      .details th,
+      .details td {
+        border: 0.1rem solid #e4e4e4;
+        padding: 0.8rem;
+        text-align: left;
+        border-collapse: collapse;
+      }
+
+      .details {
+        width: 100%;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        color: #737373;
+        border: 0.1rem solid #e4e4e4;
+        vertical-align: middle;
+        width: 100%;
+      }
+
+      .title {
+        width: 100%;
+        text-align: center;
+        background-color: #ba0b4f;
+        color: white;
+        font-weight: 600;
+        padding: 3.6rem 0;
+        font-size: 2rem;
+      }
+
+      @media (max-width: 650px) {
+        .wrapper {
+          max-width: unset !important;
+          width: 90% !important;
+          padding: 1rem !important;
+          overflow: hidden !important;
+        }
+        .mid-section {
+          padding: 1rem !important;
+          width: 100% !important;
+        }
+        .details {
+          padding: 1rem !important;
+
+          th,
+          td {
+            border: 1px solid red !important;
+            padding: 8px !important;
+            text-align: left !important;
+          }
+        }
+
+        .details .detail .value {
+          word-break: break-all !important;
+        }
+
+        .title {
+          font-size: 1.5rem;
+          padding: 1.5rem;
+        }
+      }
+    </style>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body style="font-size: 0.9rem; color: #737373">
+    <table
+      role="presentation"
+      width="100%"
+      align="center"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      style="
+        border: 0.1rem solid rgb(233, 233, 233);
+        border-radius: 0.8rem;
+        max-width: 50rem;
+        align-items: center;
+      "
+      class="wrapper"
+    >
+      <tr>
+        <td class="title">Thank you for your order</td>
+      </tr>
+      <tr>
+        <td width="100%">
+          <section class="mid-section" style="padding: 3rem 4rem">
+            <span style="margin-bottom: 2rem; display: block; color: #737373">
+              <span>Hello</span>
+              <span>{{name}},</span>
+            </span>
+
+            <p style="margin-bottom: 1.5rem; color: #737373">
+              Thanks for your order. It’s on-hold until we confirm that payment
+              has been received.
+            </p>
+            <p style="margin-bottom: 0.5rem; color: #737373">
+              Please include your ORDER NO as the payment reference/remark where
+              possible.
+            </p>
+            <p style="margin-bottom: 2rem; color: #737373">
+              See payment details below. Please notify us (email,
+              phone/whatsapp) after making payment (see details below)
+            </p>
+            <p style="margin-bottom: 0.5rem; color: #737373">
+              – Your order won’t be shipped until funds are received.
+            </p>
+            <p style="margin-bottom: 0.5rem; color: #737373">
+              – For any issues/enquiries and to notify us, please email
+            </p>
+            <p style="margin-bottom: 3rem; color: #737373">
+              <a href="">info@regalflowers.com.ng</a> or call/text/whatsapp +234
+              7011992888, +234 7010006665, +234 7010006664
+            </p>
+
+            <p
+              style="
+                color: #ba0b4f;
+                font-weight: 600;
+                font-size: 1.5rem;
+                margin-top: 2rem;
+                margin-bottom: 1rem;
+              "
+            >
+              [Order #{{orderID}}] ({{deliveryDate}})
+            </p>
+            <table
+              class="details"
+              style="
+                width: 100%;
+                margin-bottom: 2rem;
+                padding: 2rem;
+                border-radius: 0.5rem;
+                color: #737373;
+                border: 0.1rem solid #e4e4e4;
+                vertical-align: middle;
+                width: 100%;
+              "
+            >
+              <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+              </tr>
+              {{orderProducts}}
+            </table>
+            <p
+              style="
+                color: #ba0b4f;
+                font-weight: 600;
+                font-size: 1.2rem;
+                margin: 1rem 0;
+              "
+            >
+              Sender's Information
+            </p>
+            <p style="margin-bottom: 1rem">
+              <span style="font-weight: 600">Name:</span>
+              {{senderName}}
+            </p>
+            <p style="margin-bottom: 1rem">
+              <span style="font-weight: 600">Phone Number:</span>
+              {{senderPhone}}
+            </p>
+            <p style="margin-bottom: 1rem">
+              <span style="font-weight: 600">Email:</span>
+              {{senderEmail}}
+            </p>
+            <p style="margin-bottom: 1rem">
+              <span style="font-weight: 600">Delivery Date:</span>
+              {{deliveryDate}}
+            </p>
+            {{pickUp}} {{recipient}} {{optionalMessage}} {{adminNotes}}
+            {{deliveryMessage}} {{purpose}}
+            <p
+              style="
+                color: #ba0b4f;
+                font-weight: 600;
+                font-size: 1.2rem;
+                margin: 1rem 0;
+              "
+            >
+              Payment Details
+            </p>
+            <p style="margin-bottom: 1rem">
+              <span style="font-weight: 600">Sub Total:</span>
+              {{subtotal}}
+            </p>
+            {{deliveryCharge}}
+            <p style="margin-bottom: 1rem">
+              <span style="font-weight: 600">Total:</span>
+              {{total}}
+            </p>
+
+            <p style="">We look forward to fulfilling your order soon.</p>
+          </section>
+
+          <footer
+            style="
+              background-color: rgba(255, 251, 245, 0.73);
+              width: 100%;
+              font-size: 0.8rem;
+            "
+          >
+            <table style="width: 100%">
+              <tr>
+                <td style="text-align: center; width: 100%">
+                  <div style="display: inline-block; margin-top: 0.6rem">
+                    <p>
+                      Please note your Order Number in all correspondence with
+                      us.
+                    </p>
+                    <a href="reg">www.Regalflowers.com.ng</a>
+                    <p>Nigeria’s top online and walk-in flower shop</p>
+                    <a href="info@regalflowers.com.ng"
+                      >info@regalflowers.com.ng</a
+                    >
+                    <p>
+                      +234 (0) 7010006665, +234 (0) 7011992888, +234 (0)
+                      7010006664
+                    </p>
+                    <p style="margin: 16px 0">
+                      LAGOS STORES<br />
+                      Ikoyi Headoffice, Lagos<br />
+                      81b, Lafiaji Way, Dolphin Estate,<br />
+                      Ikoyi, Lagos
+                    </p>
+                    <p style="margin: 0 0 16px">
+                      Victoria Island Branch, Lagos<br />
+                      Silverbird Galleria,<br />
+                      133, Ahmadu Bello Way<br />
+                      Victoria Island, Lagos‎.
+                    </p>
+                    <p style="margin: 0 0 16px">
+                      ABUJA STORE<br />
+                      5, Nairobi Street,<br />
+                      off Aminu Kano Crescent,<br />
+                      Wuse 2, Abuja
+                    </p>
+                  </div>
+                </td>
+              </tr>
+
+              <tr></tr>
+
+              <tr>
+                <td style="text-align: center; width: 100%"></td>
+              </tr>
+            </table>
+          </footer>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -95,7 +95,7 @@ export const getAdminNoteText = (
   note: string,
   currency: AppCurrencyName,
   totalPrice: number
-) => {
+): string => {
   let adminNotes = note;
   const amount = extractAmountFromNote(note);
   const _currency = currencyOptions.find(

@@ -231,6 +231,10 @@ export interface Order {
   orderStatus: OrderStatus;
   deliveryDetails: DeliveryDetails;
   currency: AppCurrencyName;
+  orderID?: number;
+  deliveryAmount?: number;
+  deliveryInstruction: string;
+  despatchLocation?: string;
 }
 
 export type OrderCreate = Omit<Order, "id">;
