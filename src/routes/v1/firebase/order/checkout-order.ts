@@ -236,12 +236,13 @@ checkoutOrder.put(
                   .split("+")
                   .filter(part => !part.includes("delivery"))
                   .join("+") || ""
-              ).trim()} + delivery(${deliveryLocation.amount}) = ${total}`
+              ).trim()} + delivery(${deliveryAmount}) = ${total}`
             : existingOrder.orderDetails,
           amount: total,
           orderStatus: "processing",
           adminNotes,
-          currency
+          currency,
+          deliveryAmount
         } as Partial<Order>);
 
       return new SuccessResponse("Order successfully checked out", null).send(

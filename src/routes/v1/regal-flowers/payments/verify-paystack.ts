@@ -14,7 +14,11 @@ import validator from "../../../../helpers/validator";
 import validation from "./validation";
 import { currencyOptions } from "../../../../helpers/constants";
 import { AppCurrency } from "../../../../database/model/AppConfig";
-import { getAdminNoteText } from "../../../../helpers/formatters";
+import {
+  getAdminNoteText,
+  removeCurrency
+} from "../../../../helpers/formatters";
+import { templateRender } from "../../../../helpers/render";
 
 const db = firestore();
 
@@ -35,10 +39,11 @@ verifyPaystack.post(
       );
       const json = await response.json();
       if (json.status && json.data.status === "success") {
+        const orderId = removeCurrency(req.query.ref as string);
         const { data } = json;
         const snap = await db
           .collection("orders")
-          .doc(req.query.ref as string)
+          .doc(orderId as string)
           .get();
         const order = snap.data() as Order | undefined;
 
@@ -80,11 +85,15 @@ verifyPaystack.post(
 
         await firestore()
           .collection("orders")
-          .doc(req.query.ref as string)
+          .doc(orderId as string)
           .update({
             paymentStatus: "PAID - GO AHEAD (Website - Card)",
             adminNotes
           });
+
+        const template = templateRender(order, adminNotes);
+        console.log(template);
+
         const environment: Environment = /test/i.test(
           process.env.PAYSTACK_SECRET_KEY || ""
         )

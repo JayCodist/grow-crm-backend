@@ -95,7 +95,7 @@ export const getAdminNoteText = (
   note: string,
   currency: AppCurrencyName,
   totalPrice: number
-) => {
+): string => {
   let adminNotes = note;
   const amount = extractAmountFromNote(note);
   const _currency = currencyOptions.find(
@@ -118,4 +118,12 @@ export const getAdminNoteText = (
   }
 
   return adminNotes;
+};
+
+export const removeCurrency = (orderId: string): string => {
+  const currencyCodes = ["NGN", "USD", "GBP"];
+
+  const currencyPattern = new RegExp(currencyCodes.join("|"), "g");
+
+  return orderId.replace(currencyPattern, "");
 };

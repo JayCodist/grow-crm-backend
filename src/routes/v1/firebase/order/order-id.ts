@@ -53,11 +53,12 @@ orderID.get("/:id", async (req, res) => {
       throw new BadRequestError("Some products not found");
     }
 
-    const totalPrice = wpProducts.reduce((price, product, index) => {
-      const cartItem = orderItems[index];
-      const productPrice = deduceProductTruePrice(product, cartItem);
-      return price + productPrice * cartItem.quantity;
-    }, 0);
+    const totalPrice =
+      wpProducts.reduce((price, product, index) => {
+        const cartItem = orderItems[index];
+        const productPrice = deduceProductTruePrice(product, cartItem);
+        return price + productPrice * cartItem.quantity;
+      }, 0) + order.deliveryAmount || 0;
 
     if (totalPrice !== order.amount) {
       const orderProducts = wpProducts.map(prod => {
