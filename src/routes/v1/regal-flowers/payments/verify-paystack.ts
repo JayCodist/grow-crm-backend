@@ -18,7 +18,6 @@ import {
   getAdminNoteText,
   removeCurrency
 } from "../../../../helpers/formatters";
-import { templateRender } from "../../../../helpers/render";
 
 const db = firestore();
 
@@ -90,9 +89,6 @@ verifyPaystack.post(
             paymentStatus: "PAID - GO AHEAD (Website - Card)",
             adminNotes
           });
-
-        const template = templateRender(order, adminNotes);
-        console.log(template);
 
         const environment: Environment = /test/i.test(
           process.env.PAYSTACK_SECRET_KEY || ""
