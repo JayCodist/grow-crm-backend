@@ -264,7 +264,8 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
         recipientAltPhone: "",
         state: "",
         zone: ""
-      }
+      },
+      deliveryInstruction: ""
     };
 
     const response = await db.add({
