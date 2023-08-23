@@ -78,7 +78,7 @@ verifyPaypal.post(
       const json = await response.json();
       if (
         json.status &&
-        (json.status === "COMPLETED" || json.status === "APPROVED") &&
+        json.status === "COMPLETED" &&
         json.purchase_units?.length
       ) {
         const paymentDetails: PapPalPaymentDetails = json.purchase_units[0];

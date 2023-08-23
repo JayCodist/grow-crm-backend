@@ -96,6 +96,8 @@ export interface OrderActor {
   state?: string;
   method?: string;
   category?: OrderActorCategory[];
+  phoneCountryCode?: string;
+  altPhoneCountryCode?: string;
 }
 
 type DeliveryZone =
@@ -231,8 +233,8 @@ export interface Order {
   orderStatus: OrderStatus;
   deliveryDetails: DeliveryDetails;
   currency: AppCurrencyName;
-  orderID?: number;
-  deliveryAmount?: number;
+  orderID: number;
+  deliveryAmount: number;
   deliveryInstruction: string;
   despatchLocation?: string;
 }
