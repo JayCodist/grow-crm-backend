@@ -265,9 +265,9 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
         state: "",
         zone: ""
       },
-      deliveryInstruction: "",
       deliveryAmount: 0,
-      orderID: 0
+      orderID: 0,
+      deliveryInstruction: ""
     };
 
     const response = await db.add({
