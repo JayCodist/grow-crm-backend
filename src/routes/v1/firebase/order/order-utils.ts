@@ -36,7 +36,8 @@ export const handleContactHooks: (
       (user.name && contact.name !== user.name) ||
       (user.email && contact.email !== user.email) ||
       (user.address && !contact.address?.includes(user.address)) ||
-      !contact.category?.includes(contactType)
+      !contact.category?.includes(contactType) ||
+      (user.phoneAlt && contact.phoneAlt !== user.phoneAlt)
     ) {
       await firestore()
         .collection("contacts")
@@ -52,8 +53,23 @@ export const handleContactHooks: (
             new Set([...(contact.address || []), user.address || ""])
           ).filter(Boolean),
           phoneCountryCode: user.phoneCountryCode || "",
-          altPhoneCountryCode: user.altPhoneCountryCode || ""
+          altPhoneCountryCode: user.altPhoneCountryCode || "",
+          phoneAlt: phoneAlt || ""
         });
+      contact = {
+        ...contact,
+        name: user.name || contact.name,
+        email: user.email || contact.email,
+        category: Array.from(
+          new Set([...(contact.category || []), contactType])
+        ),
+        address: Array.from(
+          new Set([...(contact.address || []), user.address || ""])
+        ).filter(Boolean),
+        phoneCountryCode: user.phoneCountryCode || "",
+        altPhoneCountryCode: user.altPhoneCountryCode || "",
+        phoneAlt: phoneAlt || ""
+      };
     }
   } else {
     // Create new contact

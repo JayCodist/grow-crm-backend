@@ -138,11 +138,12 @@ checkoutOrder.put(
             recipients =
               (await UsersRepo.findByEmail(user.email))?.recipients || [];
           }
+
           const recipientPhone = formatPhoneNumber(
             orderData.recipient?.phone || ""
           );
           const existingRecipient = recipients.find(
-            recipient => recipient.phone === recipientPhone
+            recipient => formatPhoneNumber(recipient.phone) === recipientPhone
           );
 
           recipients = existingRecipient
