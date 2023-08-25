@@ -76,11 +76,9 @@ verifyPaypal.post(
         }
       );
       const json = await response.json();
-      if (
-        json.status &&
-        json.status === "COMPLETED" &&
-        json.purchase_units?.length
-      ) {
+      const paymentStatus = json.purchase_units[0].payments.captures[0].status;
+
+      if (json.status === "COMPLETED" && paymentStatus === "COMPLETED") {
         const paymentDetails: PapPalPaymentDetails = json.purchase_units[0];
         const currencyCode = paymentDetails.amount.currency_code;
 
