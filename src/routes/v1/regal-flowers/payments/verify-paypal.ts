@@ -97,7 +97,7 @@ verifyPaypal.post(
             parseFloat(paymentDetails.amount.value) * conversionRate
           );
 
-          if (!order || order.amount >= nairaAmount) {
+          if (!order || order.amount > nairaAmount) {
             throw new InternalError(
               "Payment Verification Failed: The amount paid is less than the order's total amount."
             );
