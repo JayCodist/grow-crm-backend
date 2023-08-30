@@ -41,13 +41,15 @@ updateOrder.put(
   async (req, res) => {
     try {
       const { cartItems, deliveryDate, currency } = req.body as {
-        cartItems: {
-          key: number;
-          design?: string;
-          size?: string;
-          quantity: number;
-          image: OrderItemImage;
-        }[];
+        cartItems:
+          | {
+              key: number;
+              design?: string;
+              size?: string;
+              quantity: number;
+              image: OrderItemImage;
+            }[]
+          | null;
         deliveryDate: string;
         currency: AppCurrencyName;
       };
@@ -60,79 +62,91 @@ updateOrder.put(
         throw new NoDataError("Order not found");
       }
 
-      const _wpProducts = await ProductWPRepo.findByKeys(
-        cartItems.map(item => item.key)
-      );
-      const wpProducts = getWpProducts(cartItems, _wpProducts);
+      if (cartItems) {
+        const _wpProducts = await ProductWPRepo.findByKeys(
+          cartItems.map(item => item.key)
+        );
+        const wpProducts = getWpProducts(cartItems, _wpProducts);
 
-      if (wpProducts.length !== cartItems.length) {
-        throw new BadRequestError("Some products not found");
-      }
+        if (wpProducts.length !== cartItems.length) {
+          throw new BadRequestError("Some products not found");
+        }
 
-      const deliveryAmount =
-        deliveryZoneAmount[
-          existingOrder.deliveryDetails.zone.split("-")[0] as DeliveryZoneAmount
-        ] || 0;
+        const deliveryAmount =
+          deliveryZoneAmount[
+            existingOrder.deliveryDetails.zone.split(
+              "-"
+            )[0] as DeliveryZoneAmount
+          ] || 0;
 
-      const totalPrice =
-        wpProducts.reduce((price, product, index) => {
-          const cartItem = cartItems[index];
-          const productPrice = deduceProductTruePrice(product, cartItem);
-          return price + productPrice * cartItem.quantity;
-        }, 0) + deliveryAmount;
+        const totalPrice =
+          wpProducts.reduce((price, product, index) => {
+            const cartItem = cartItems[index];
+            const productPrice = deduceProductTruePrice(product, cartItem);
+            return price + productPrice * cartItem.quantity;
+          }, 0) + deliveryAmount;
 
-      const fbProducts = await getFirebaseProducts(
-        wpProducts.map(prod => prod.sku).filter(Boolean)
-      );
+        const fbProducts = await getFirebaseProducts(
+          wpProducts.map(prod => prod.sku).filter(Boolean)
+        );
 
-      const orderProducts = fbProducts.map(prod => {
-        const prodIndex = wpProducts.findIndex(_prod => _prod.sku === prod.SKU);
-        const { quantity, size, design, image } = cartItems[prodIndex];
-        return {
-          name: prod.name,
-          SKU: prod.SKU,
-          size,
-          design,
-          quantity,
-          image,
-          price: deduceProductTruePrice(
-            wpProducts[prodIndex],
-            cartItems[prodIndex]
-          ),
-          key: wpProducts[prodIndex].key
-        };
-      });
-
-      let orderDetails = orderProducts
-        .map(product => {
-          const wpProductIndex = wpProducts.findIndex(
-            _prod => _prod.sku === product.SKU
+        const orderProducts = fbProducts.map(prod => {
+          const prodIndex = wpProducts.findIndex(
+            _prod => _prod.sku === prod.SKU
           );
-          const price =
-            wpProductIndex >= 0
-              ? deduceProductTruePrice(
-                  wpProducts[wpProductIndex],
-                  cartItems[wpProductIndex]
-                )
-              : 0;
-          return `${
-            product.quantity > 1 ? `${String(product.quantity)} TIMES ` : ""
-          } ${getFBProductDisplayName(product)} (${price * product.quantity})`;
-        })
-        .join(" + ");
-      orderDetails += ` = ${totalPrice}`;
+          const { quantity, size, design, image } = cartItems[prodIndex];
+          return {
+            name: prod.name,
+            SKU: prod.SKU,
+            size,
+            design,
+            quantity,
+            image,
+            price: deduceProductTruePrice(
+              wpProducts[prodIndex],
+              cartItems[prodIndex]
+            ),
+            key: wpProducts[prodIndex].key
+          };
+        });
 
-      let { adminNotes } = existingOrder;
-      adminNotes = getAdminNoteText(adminNotes, currency, totalPrice);
+        let orderDetails = orderProducts
+          .map(product => {
+            const wpProductIndex = wpProducts.findIndex(
+              _prod => _prod.sku === product.SKU
+            );
+            const price =
+              wpProductIndex >= 0
+                ? deduceProductTruePrice(
+                    wpProducts[wpProductIndex],
+                    cartItems[wpProductIndex]
+                  )
+                : 0;
+            return `${
+              product.quantity > 1 ? `${String(product.quantity)} TIMES ` : ""
+            } ${getFBProductDisplayName(product)} (${
+              price * product.quantity
+            })`;
+          })
+          .join(" + ");
+        orderDetails += ` = ${totalPrice}`;
 
-      await db.doc(req.params.id).update({
-        amount: totalPrice,
-        orderProducts,
-        orderDetails,
-        deliveryDate,
-        adminNotes,
-        currency
-      });
+        let { adminNotes } = existingOrder;
+        adminNotes = getAdminNoteText(adminNotes, currency, totalPrice);
+
+        await db.doc(req.params.id).update({
+          amount: totalPrice,
+          orderProducts,
+          orderDetails,
+          deliveryDate,
+          adminNotes,
+          currency
+        });
+      } else {
+        await db.doc(req.params.id).update({
+          orderProducts: []
+        });
+      }
 
       const response = await db.doc(req.params.id).get();
 
