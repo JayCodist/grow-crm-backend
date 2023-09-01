@@ -18,6 +18,8 @@ import {
   getAdminNoteText,
   removeCurrency
 } from "../../../../helpers/formatters";
+import { templateRender } from "../../../../helpers/render";
+import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
 
 const db = firestore();
 
@@ -87,8 +89,30 @@ verifyPaystack.post(
           .doc(orderId as string)
           .update({
             paymentStatus: "PAID - GO AHEAD (Website - Card)",
-            adminNotes
+            adminNotes,
+            currency: data.currency
           });
+
+        // Send email to admin and client
+        await sendEmailToAddress(
+          ["info@regalflowers.com.ng"],
+          templateRender(
+            { ...order, adminNotes, currency: data.currency },
+            "new-order"
+          ),
+          "New Order",
+          "5055243"
+        );
+
+        await sendEmailToAddress(
+          [order.client.email as string],
+          templateRender(
+            { ...order, adminNotes, currency: data.currency },
+            "order"
+          ),
+          "Thank you for your order",
+          "5055243"
+        );
 
         const environment: Environment = /test/i.test(
           process.env.PAYSTACK_SECRET_KEY || ""

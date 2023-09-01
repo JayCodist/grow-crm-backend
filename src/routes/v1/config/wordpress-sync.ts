@@ -290,10 +290,9 @@ doWordpressSync.post(
         wPTotalSyncs: currentSyncTotal + 1
       });
 
-      new SuccessResponse(
-        "Successfully synchronized Wordpress",
-        productsRaw
-      ).send(res);
+      new SuccessResponse("Successfully synchronized Wordpress", true).send(
+        res
+      );
     } catch (e) {
       await AppConfigRepo.updateConfig({ wPSyncInProgress: false });
       ApiError.handle(e as Error, res);

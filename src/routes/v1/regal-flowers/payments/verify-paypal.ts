@@ -19,6 +19,8 @@ import validation from "./validation";
 import { Order } from "../../../../database/model/Order";
 import { currencyOptions } from "../../../../helpers/constants";
 import { getAdminNoteText } from "../../../../helpers/formatters";
+import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
+import { templateRender } from "../../../../helpers/render";
 
 const db = firestore();
 
@@ -114,8 +116,30 @@ verifyPaypal.post(
             .doc(paymentDetails.reference_id as string)
             .update({
               paymentStatus: "PAID - GO AHEAD (Website - Card)",
-              adminNotes
+              adminNotes,
+              currency: currencyCode
             });
+
+          // Send email to admin and client
+          await sendEmailToAddress(
+            ["info@regalflowers.com.ng"],
+            templateRender(
+              { ...order, adminNotes, currency: currencyCode },
+              "new-order"
+            ),
+            "New Order",
+            "5055243"
+          );
+
+          await sendEmailToAddress(
+            [order.client.email as string],
+            templateRender(
+              { ...order, adminNotes, currency: currencyCode },
+              "order"
+            ),
+            "Thank you for your order",
+            "5055243"
+          );
           const environment: Environment = /sandbox/i.test(
             process.env.PAYPAL_BASE_URL || ""
           )
