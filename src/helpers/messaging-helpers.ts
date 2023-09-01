@@ -10,8 +10,14 @@ import { InternalError } from "../core/ApiError";
 export const sendEmailToAddress: (
   emailAddresses: string[],
   message: string,
-  emailSubject: string
-) => Promise<void> = async (emailAddresses, message, emailSubject) => {
+  emailSubject: string,
+  templateID?: string
+) => Promise<void> = async (
+  emailAddresses,
+  message,
+  emailSubject,
+  templateID
+) => {
   try {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -20,6 +26,7 @@ export const sendEmailToAddress: (
     urlencoded.append("address", emailAddresses.join(","));
     urlencoded.append("message", message);
     urlencoded.append("subject", emailSubject);
+    urlencoded.append("templateID", templateID || "");
 
     const requestOptions: RequestInit = {
       method: "POST",

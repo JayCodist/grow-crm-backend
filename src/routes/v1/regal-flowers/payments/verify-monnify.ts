@@ -17,6 +17,8 @@ import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
 import { getAdminNoteText } from "../../../../helpers/formatters";
+import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
+import { templateRender } from "../../../../helpers/render";
 
 const db = firestore();
 
@@ -88,6 +90,22 @@ verifyMonnify.post(
             paymentStatus: "PAID - GO AHEAD (Website - Card)",
             adminNotes
           });
+
+        // Send email to admin and client
+        await sendEmailToAddress(
+          ["info@regalflowers.com.ng"],
+          templateRender({ ...order, adminNotes }, "new-order"),
+          "New Order",
+          "5055243"
+        );
+
+        await sendEmailToAddress(
+          [order.client.email as string],
+          templateRender({ ...order, adminNotes }, "order"),
+          "Thank you for your order",
+          "5055243"
+        );
+
         const environment: Environment = /sandbox/i.test(
           process.env.MONNIFY_BASE_URL || ""
         )
