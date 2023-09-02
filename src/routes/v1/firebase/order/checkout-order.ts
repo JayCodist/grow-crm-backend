@@ -185,13 +185,19 @@ checkoutOrder.put(
               ];
           await UsersRepo.update({ id: user.id, recipients });
         }
-      } else if (user) {
+      }
+
+      const shouldUpdateUser =
+        user?.name !== userData.name ||
+        user?.phone !== formatPhoneNumber(userData.phone);
+
+      if (user && shouldUpdateUser) {
         await UsersRepo.update({
           id: user.id,
-          email: userData.email,
           phone: formatPhoneNumber(userData.phone || ""),
           phoneAlt: formatPhoneNumber(userData.phoneAlt || ""),
-          phoneCountryCode: userData.phoneCountryCode
+          phoneCountryCode: userData.phoneCountryCode,
+          name: userData.name
         });
       }
 
