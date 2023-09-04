@@ -115,7 +115,7 @@ verifyPaypal.post(
             .collection("orders")
             .doc(paymentDetails.reference_id as string)
             .update({
-              paymentStatus: "PAID - GO AHEAD (Website - Card)",
+              paymentStatus: "PAID - GO AHEAD (Paypal)",
               adminNotes,
               currency: currencyCode
             });
