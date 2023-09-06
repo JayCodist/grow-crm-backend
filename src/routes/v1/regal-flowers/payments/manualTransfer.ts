@@ -52,9 +52,9 @@ manualTransfer.post(
         .collection("orders")
         .doc(req.params.id)
         .update({
-          paymentStatus: "PAID - GO AHEAD (Bank Transfer)",
+          paymentStatus: "WEBSITE PAID - GO AHEAD (but not seen yet)",
           currency,
-          transferDetails: `Website: Paid  ${
+          paymentDetails: `Website: Paid  ${
             _currency.sign
           }${amount.toLocaleString()}  with ${accountName} to ${
             _currency.name

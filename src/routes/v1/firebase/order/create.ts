@@ -209,7 +209,7 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
       orderProducts,
       orderDetails,
       client,
-      paymentStatus: "Not Paid (Website - Bank Transfer)",
+      paymentStatus: "Website Not Paid (finalized discussion)",
       cost: 0,
       deliveryDate: deliveryDate || "",
       admin: "regalflowersnigeria@gmail.com",
