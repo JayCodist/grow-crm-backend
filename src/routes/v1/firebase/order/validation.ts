@@ -86,6 +86,21 @@ const validation = {
       phoneCountryCode: Joi.string().default("").allow("")
     }),
     deliveryDate: Joi.string().required()
+  }),
+  updatePaymentMethodDetails: Joi.object().keys({
+    currency: Joi.string().required().valid("NGN", "USD", "GBP"),
+    paymentMethod: Joi.string()
+      .required()
+      .valid(
+        "paystack",
+        "googlePay",
+        "payPal",
+        "monnify",
+        "manualTransfer",
+        "gtbTransfer",
+        "natwestTransfer",
+        "bitcoinTransfer"
+      )
   })
 };
 
