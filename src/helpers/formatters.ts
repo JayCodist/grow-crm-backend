@@ -119,11 +119,3 @@ export const getAdminNoteText = (
 
   return adminNotes;
 };
-
-export const removeCurrency = (orderId: string): string => {
-  const currencyCodes = ["NGN", "USD", "GBP"];
-
-  const currencyPattern = new RegExp(currencyCodes.join("|"), "g");
-
-  return orderId.replace(currencyPattern, "");
-};
