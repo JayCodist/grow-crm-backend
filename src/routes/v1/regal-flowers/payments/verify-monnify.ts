@@ -115,7 +115,7 @@ verifyMonnify.post(
         return new SuccessResponse("Payment is successful", true).send(res);
       }
 
-      throw new PaymentFailureError(json.data.message);
+      throw new PaymentFailureError(json.responseMessage);
     } catch (err) {
       return ApiError.handle(err as Error, res);
     }

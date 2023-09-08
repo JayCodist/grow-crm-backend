@@ -39,7 +39,9 @@ type PaymentStatus =
   | "PAID - GO AHEAD (cash - Lekki)"
   | "PAID - GO AHEAD (Payoneer)"
   | "PAID - GO AHEAD (CashApp and other alternatives)"
-  | "PAID - GO AHEAD (POS - on delivery)";
+  | "PAID - GO AHEAD (POS - on delivery)"
+  | "Website Not Paid (finalized discussion)"
+  | "WEBSITE PAID - GO AHEAD (but not seen yet)";
 
 type Channel =
   | "Phone"
