@@ -14,10 +14,7 @@ import validator from "../../../../helpers/validator";
 import validation from "./validation";
 import { currencyOptions } from "../../../../helpers/constants";
 import { AppCurrency } from "../../../../database/model/AppConfig";
-import {
-  getAdminNoteText,
-  removeCurrency
-} from "../../../../helpers/formatters";
+import { getAdminNoteText } from "../../../../helpers/formatters";
 import { templateRender } from "../../../../helpers/render";
 import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
 
@@ -40,7 +37,7 @@ verifyPaystack.post(
       );
       const json = await response.json();
       if (json.status && json.data.status === "success") {
-        const orderId = removeCurrency(req.query.ref as string);
+        const orderId = (req.query.ref as string).split("-")[0];
         const { data } = json;
         const snap = await db
           .collection("orders")
