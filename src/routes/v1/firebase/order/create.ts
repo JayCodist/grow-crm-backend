@@ -60,7 +60,9 @@ export const allDesignOptions: DesignOption[] = [
 ];
 
 export const getFBProductDisplayName = (product: any) =>
-  product.displayNameAdmin || product.name.split("-").slice(1).join("-").trim();
+  product.displayNameAdmin ||
+  product.name.split("-").slice(1).join("-").trim() ||
+  product.name;
 
 export const deduceProductTruePrice = (
   product: ProductWP,
