@@ -239,6 +239,7 @@ export interface Order {
   deliveryAmount: number;
   deliveryInstruction: string;
   despatchLocation?: string;
+  fullOrderId: string;
 }
 
 export type OrderCreate = Omit<Order, "id">;

@@ -269,7 +269,8 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
       },
       deliveryAmount: 0,
       orderID: 0,
-      deliveryInstruction: ""
+      deliveryInstruction: "",
+      fullOrderId: ""
     };
 
     const response = await db.add({
