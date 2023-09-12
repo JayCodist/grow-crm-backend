@@ -97,7 +97,7 @@ verifyPaystack.post(
             { ...order, adminNotes, currency: data.currency },
             "new-order"
           ),
-          "New Order",
+          `New Order ${order.fullOrderId}`,
           "5055243"
         );
 
@@ -107,7 +107,7 @@ verifyPaystack.post(
             { ...order, adminNotes, currency: data.currency },
             "order"
           ),
-          "Thank you for your order",
+          `Thank you for your order ${order.fullOrderId}`,
           "5055243"
         );
 

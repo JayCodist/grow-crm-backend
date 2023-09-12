@@ -92,9 +92,13 @@ checkoutOrder.put(
         currency: AppCurrencyName;
       };
 
-      const existingOrder = (
-        await firestore().collection("orders").doc(req.params.id).get()
-      ).data() as Order | null;
+      const response = await Promise.all([
+        firestore().collection("orders").doc(req.params.id).get(),
+        firestore().collection("business").get()
+      ]);
+
+      const existingOrder = response[0].data() as Order | null;
+      const business = response[1].docs.map(doc => doc.data());
 
       if (!existingOrder) {
         throw new NoDataError("Order not found");
@@ -226,6 +230,10 @@ checkoutOrder.put(
           )
         : false;
 
+      const businessLetter = business.find(
+        bus => bus.name === existingOrder?.business
+      )?.letter;
+
       await db
         .collection("orders")
         .doc(req.params.id)
@@ -249,7 +257,8 @@ checkoutOrder.put(
           orderStatus: "processing",
           adminNotes,
           currency,
-          deliveryAmount
+          deliveryAmount,
+          fullOrderId: `${businessLetter}${existingOrder?.deliveryZone}${existingOrder.orderID}`
         } as Partial<Order>);
 
       return new SuccessResponse("Order successfully checked out", null).send(
