@@ -258,7 +258,7 @@ checkoutOrder.put(
           adminNotes,
           currency,
           deliveryAmount,
-          fullOrderId: `${businessLetter}${existingOrder?.deliveryZone}${existingOrder.orderID}`
+          fullOrderId: `${businessLetter}${existingOrder?.deliveryZone}${existingOrder.orderID}W`
         } as Partial<Order>);
 
       return new SuccessResponse("Order successfully checked out", null).send(
