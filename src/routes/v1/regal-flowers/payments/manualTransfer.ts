@@ -65,14 +65,14 @@ manualTransfer.post(
       await sendEmailToAddress(
         ["info@regalflowers.com.ng"],
         templateRender({ ...order }, "new-order"),
-        `New Order ${order.fullOrderId}`,
+        `New Order (${order.fullOrderId})`,
         "5055243"
       );
 
       await sendEmailToAddress(
         [order.client.email as string],
         templateRender({ ...order }, "order"),
-        `Thank you for your order ${order.fullOrderId}`,
+        `Thank you for your order (${order.fullOrderId})`,
         "5055243"
       );
 
