@@ -127,7 +127,7 @@ verifyPaypal.post(
               { ...order, adminNotes, currency: currencyCode },
               "new-order"
             ),
-            `New Order ${order.fullOrderId}`,
+            `New Order (${order.fullOrderId})`,
             "5055243"
           );
 
@@ -137,7 +137,7 @@ verifyPaypal.post(
               { ...order, adminNotes, currency: currencyCode },
               "order"
             ),
-            `Thank you for your order ${order.fullOrderId}`,
+            `Thank you for your order (${order.fullOrderId})`,
             "5055243"
           );
           const environment: Environment = /sandbox/i.test(

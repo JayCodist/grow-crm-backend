@@ -23,7 +23,7 @@ export const templateRender = (order: Order, path: string): string => {
 
   const filledTemplate = template
     .replace("{{name}}", order.client.name as string)
-    .replace("{{orderID}}", `${order.orderID}`)
+    .replace("{{orderID}}", `${order.fullOrderId}`)
     .replace("{{deliveryDate}}", order.deliveryDate as string)
     .replace(
       "{{orderProducts}}",
