@@ -21,6 +21,7 @@ export interface PaginatedFetchParams {
   pageSize?: number;
   sortLogic?: SortLogic;
   filter?: Record<string, any>;
+  search?: string;
 }
 
 const defaultSortLogic: SortLogic = { name: "asc", price: "desc" };
@@ -35,11 +36,14 @@ export default class ProductWPRepo {
     filter = defaultFilter,
     pageNumber = defaultPageAttr.pageNumber,
     pageSize = defaultPageAttr.pageSize,
-    sortLogic = defaultSortLogic
+    sortLogic = defaultSortLogic,
+    search = ""
   }: PaginatedFetchParams): Promise<{ data: ProductWP[]; count: number }> {
     return new Promise((resolve, reject) => {
       wPCollectionIsReady().then(() =>
-        ProductWPModel.find(filter)
+        ProductWPModel.find(
+          search ? { ...filter, _nameSearch: search } : filter
+        )
           .sort(sortLogic)
           .skip((pageNumber - 1) * pageSize)
           .limit(pageSize)

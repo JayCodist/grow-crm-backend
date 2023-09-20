@@ -14,7 +14,8 @@ const validation = {
     design: Joi.string().allow(""),
     packages: Joi.string().allow(""),
     delivery: Joi.string().allow(""),
-    flowerName: Joi.string().allow("")
+    flowerName: Joi.string().allow(""),
+    search: Joi.string().allow("")
   }),
   create: Joi.object().keys({
     name: Joi.string().required(),
