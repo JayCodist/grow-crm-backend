@@ -32,7 +32,8 @@ productWP.use(
         design,
         packages,
         delivery,
-        flowerName
+        flowerName,
+        search
       } = req.query;
 
       const categoryArr = String(categories || "")
@@ -100,7 +101,8 @@ productWP.use(
           ...packagesProps,
           ...deliveryProps,
           ...flowerTypeProps
-        }
+        },
+        search: String(search || "")
       });
 
       const data = response.data.filter(product => product.inStock);
