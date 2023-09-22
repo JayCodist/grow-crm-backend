@@ -23,7 +23,7 @@ import { DesignOption, allDesignOptions } from "../firebase/order/create";
 export type WPBusiness = "regalFlowers" | "floralHub";
 
 const backendUrlMap: Record<WPBusiness, string> = {
-  regalFlowers: "https://www.regalflowers.com.ng/wc-api/v3",
+  regalFlowers: "https://www.regalflower.com/wc-api/v3",
   floralHub: "https://www.floralhub.com.ng/wc-api/v3"
 };
 
@@ -290,10 +290,7 @@ doWordpressSync.post(
         wPTotalSyncs: currentSyncTotal + 1
       });
 
-      new SuccessResponse(
-        "Successfully synchronized Wordpress",
-        productsRaw
-      ).send(res);
+      new SuccessResponse("Successfully synchronized Wordpress", []).send(res);
     } catch (e) {
       await AppConfigRepo.updateConfig({ wPSyncInProgress: false });
       ApiError.handle(e as Error, res);
