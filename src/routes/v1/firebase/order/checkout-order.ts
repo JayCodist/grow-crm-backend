@@ -92,9 +92,13 @@ checkoutOrder.put(
         currency: AppCurrencyName;
       };
 
-      const existingOrder = (
-        await firestore().collection("orders").doc(req.params.id).get()
-      ).data() as Order | null;
+      const response = await Promise.all([
+        firestore().collection("orders").doc(req.params.id).get(),
+        firestore().collection("business").get()
+      ]);
+
+      const existingOrder = response[0].data() as Order | null;
+      const business = response[1].docs.map(doc => doc.data());
 
       if (!existingOrder) {
         throw new NoDataError("Order not found");
@@ -138,11 +142,12 @@ checkoutOrder.put(
             recipients =
               (await UsersRepo.findByEmail(user.email))?.recipients || [];
           }
+
           const recipientPhone = formatPhoneNumber(
             orderData.recipient?.phone || ""
           );
           const existingRecipient = recipients.find(
-            recipient => recipient.phone === recipientPhone
+            recipient => formatPhoneNumber(recipient.phone) === recipientPhone
           );
 
           recipients = existingRecipient
@@ -184,13 +189,19 @@ checkoutOrder.put(
               ];
           await UsersRepo.update({ id: user.id, recipients });
         }
-      } else if (user) {
+      }
+
+      const shouldUpdateUser =
+        user?.name !== userData.name ||
+        user?.phone !== formatPhoneNumber(userData.phone);
+
+      if (user && shouldUpdateUser) {
         await UsersRepo.update({
           id: user.id,
-          email: userData.email,
           phone: formatPhoneNumber(userData.phone || ""),
           phoneAlt: formatPhoneNumber(userData.phoneAlt || ""),
-          phoneCountryCode: userData.phoneCountryCode
+          phoneCountryCode: userData.phoneCountryCode,
+          name: userData.name
         });
       }
 
@@ -219,6 +230,10 @@ checkoutOrder.put(
           )
         : false;
 
+      const businessLetter = business.find(
+        bus => bus.name === existingOrder?.business
+      )?.letter;
+
       await db
         .collection("orders")
         .doc(req.params.id)
@@ -242,7 +257,8 @@ checkoutOrder.put(
           orderStatus: "processing",
           adminNotes,
           currency,
-          deliveryAmount
+          deliveryAmount,
+          fullOrderId: `${businessLetter}${existingOrder?.deliveryZone}${existingOrder.orderID}W`
         } as Partial<Order>);
 
       return new SuccessResponse("Order successfully checked out", null).send(

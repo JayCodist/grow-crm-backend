@@ -39,7 +39,9 @@ type PaymentStatus =
   | "PAID - GO AHEAD (cash - Lekki)"
   | "PAID - GO AHEAD (Payoneer)"
   | "PAID - GO AHEAD (CashApp and other alternatives)"
-  | "PAID - GO AHEAD (POS - on delivery)";
+  | "PAID - GO AHEAD (POS - on delivery)"
+  | "Website Not Paid (finalized discussion)"
+  | "WEBSITE PAID - GO AHEAD (but not seen yet)";
 
 type Channel =
   | "Phone"
@@ -96,6 +98,8 @@ export interface OrderActor {
   state?: string;
   method?: string;
   category?: OrderActorCategory[];
+  phoneCountryCode?: string;
+  altPhoneCountryCode?: string;
 }
 
 type DeliveryZone =
@@ -231,10 +235,11 @@ export interface Order {
   orderStatus: OrderStatus;
   deliveryDetails: DeliveryDetails;
   currency: AppCurrencyName;
-  orderID?: number;
-  deliveryAmount?: number;
+  orderID: number;
+  deliveryAmount: number;
   deliveryInstruction: string;
   despatchLocation?: string;
+  fullOrderId: string;
 }
 
 export type OrderCreate = Omit<Order, "id">;

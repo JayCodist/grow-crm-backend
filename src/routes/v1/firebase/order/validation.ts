@@ -13,18 +13,20 @@ const validation = {
     deliveryDate: Joi.string().allow("")
   }),
   updateOrder: Joi.object({
-    cartItems: Joi.array().items(
-      Joi.object({
-        key: Joi.number().required(),
-        design: Joi.string().allow(""),
-        size: Joi.string().allow(""),
-        quantity: Joi.number().required().positive().integer().invalid(0),
-        image: Joi.object({
-          alt: Joi.string().required(),
-          src: Joi.string().required()
-        }).allow(null)
-      })
-    ),
+    cartItems: Joi.array()
+      .items(
+        Joi.object({
+          key: Joi.number().required(),
+          design: Joi.string().allow(""),
+          size: Joi.string().allow(""),
+          quantity: Joi.number().required().positive().integer().invalid(0),
+          image: Joi.object({
+            alt: Joi.string().required(),
+            src: Joi.string().required()
+          }).allow(null)
+        })
+      )
+      .allow(null),
     deliveryDate: Joi.string().allow(""),
     currency: Joi.string().required().valid("NGN", "USD", "GBP")
   }),
@@ -84,6 +86,21 @@ const validation = {
       phoneCountryCode: Joi.string().default("").allow("")
     }),
     deliveryDate: Joi.string().required()
+  }),
+  updatePaymentMethodDetails: Joi.object().keys({
+    currency: Joi.string().required().valid("NGN", "USD", "GBP"),
+    paymentMethod: Joi.string()
+      .required()
+      .valid(
+        "paystack",
+        "googlePay",
+        "payPal",
+        "monnify",
+        "manualTransfer",
+        "gtbTransfer",
+        "natwestTransfer",
+        "bitcoinTransfer"
+      )
   })
 };
 

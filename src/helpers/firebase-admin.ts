@@ -6,5 +6,6 @@ firebaseAdmin.initializeApp({
   credential: applicationDefault(),
   databaseURL: process.env.FIREBASE_DB_HOST
 });
+firebaseAdmin.firestore().settings({ ignoreUndefinedProperties: true });
 
 export default firebaseAdmin;

@@ -19,6 +19,7 @@ import wordpressProductRoutes from "./wordpress/product-wp";
 import residentTypes from "./firebase/residentType/residentType";
 import { updateOrder } from "./firebase/order/update";
 import { saveSendersInfo } from "./firebase/order/save-senders-info";
+import updatePaymentMethodDetails from "./firebase/order/update-payment-details";
 
 const router = express.Router();
 
@@ -38,6 +39,10 @@ router.use("/firebase/order", createOrder);
 router.use("/firebase/order", updateOrder);
 router.use("/firebase/order/checkout-order", checkoutOrder);
 router.use("/firebase/order/save-sender-info", saveSendersInfo);
+router.use(
+  "/firebase/order/update-payment-details",
+  updatePaymentMethodDetails
+);
 
 // Deprecated
 // router.use("/firebase/order", updateOrder);

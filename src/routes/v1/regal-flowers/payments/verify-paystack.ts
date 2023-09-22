@@ -14,11 +14,9 @@ import validator from "../../../../helpers/validator";
 import validation from "./validation";
 import { currencyOptions } from "../../../../helpers/constants";
 import { AppCurrency } from "../../../../database/model/AppConfig";
-import {
-  getAdminNoteText,
-  removeCurrency
-} from "../../../../helpers/formatters";
+import { getAdminNoteText } from "../../../../helpers/formatters";
 import { templateRender } from "../../../../helpers/render";
+import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
 
 const db = firestore();
 
@@ -39,7 +37,7 @@ verifyPaystack.post(
       );
       const json = await response.json();
       if (json.status && json.data.status === "success") {
-        const orderId = removeCurrency(req.query.ref as string);
+        const orderId = (req.query.ref as string).split("-")[0];
         const { data } = json;
         const snap = await db
           .collection("orders")
@@ -88,11 +86,30 @@ verifyPaystack.post(
           .doc(orderId as string)
           .update({
             paymentStatus: "PAID - GO AHEAD (Website - Card)",
-            adminNotes
+            adminNotes,
+            currency: data.currency
           });
 
-        const template = templateRender(order, adminNotes);
-        console.log(template);
+        // Send email to admin and client
+        await sendEmailToAddress(
+          ["info@regalflowers.com.ng"],
+          templateRender(
+            { ...order, adminNotes, currency: data.currency },
+            "new-order"
+          ),
+          `New Order (${order.fullOrderId})`,
+          "5055243"
+        );
+
+        await sendEmailToAddress(
+          [order.client.email as string],
+          templateRender(
+            { ...order, adminNotes, currency: data.currency },
+            "order"
+          ),
+          `Thank you for your order (${order.fullOrderId})`,
+          "5055243"
+        );
 
         const environment: Environment = /test/i.test(
           process.env.PAYSTACK_SECRET_KEY || ""

@@ -60,7 +60,9 @@ export const allDesignOptions: DesignOption[] = [
 ];
 
 export const getFBProductDisplayName = (product: any) =>
-  product.displayNameAdmin || product.name.split("-").slice(1).join("-").trim();
+  product.displayNameAdmin ||
+  product.name.split("-").slice(1).join("-").trim() ||
+  product.name;
 
 export const deduceProductTruePrice = (
   product: ProductWP,
@@ -209,7 +211,7 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
       orderProducts,
       orderDetails,
       client,
-      paymentStatus: "Not Paid (Website - Bank Transfer)",
+      paymentStatus: "Website Not Paid (finalized discussion)",
       cost: 0,
       deliveryDate: deliveryDate || "",
       admin: "regalflowersnigeria@gmail.com",
@@ -265,7 +267,10 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
         state: "",
         zone: ""
       },
-      deliveryInstruction: ""
+      deliveryAmount: 0,
+      orderID: 0,
+      deliveryInstruction: "",
+      fullOrderId: ""
     };
 
     const response = await db.add({

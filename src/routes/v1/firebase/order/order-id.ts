@@ -121,7 +121,7 @@ orderID.get("/:id", async (req, res) => {
 
     const data = {
       ...order,
-      fullOrderId: `${businessLetter}${order?.deliveryZone}${order?.orderID}`,
+      fullOrderId: `${businessLetter}${order?.deliveryZone}${order?.orderID}W`,
       id: req.params.id,
       adminNotes
     };

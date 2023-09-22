@@ -19,6 +19,8 @@ import validation from "./validation";
 import { Order } from "../../../../database/model/Order";
 import { currencyOptions } from "../../../../helpers/constants";
 import { getAdminNoteText } from "../../../../helpers/formatters";
+import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
+import { templateRender } from "../../../../helpers/render";
 
 const db = firestore();
 
@@ -76,11 +78,9 @@ verifyPaypal.post(
         }
       );
       const json = await response.json();
-      if (
-        json.status &&
-        (json.status === "COMPLETED" || json.status === "APPROVED") &&
-        json.purchase_units?.length
-      ) {
+      const paymentStatus = json.purchase_units[0].payments.captures[0].status;
+
+      if (json.status === "COMPLETED" && paymentStatus === "COMPLETED") {
         const paymentDetails: PapPalPaymentDetails = json.purchase_units[0];
         const currencyCode = paymentDetails.amount.currency_code;
 
@@ -99,7 +99,7 @@ verifyPaypal.post(
             parseFloat(paymentDetails.amount.value) * conversionRate
           );
 
-          if (!order || order.amount >= nairaAmount) {
+          if (!order || order.amount > nairaAmount) {
             throw new InternalError(
               "Payment Verification Failed: The amount paid is less than the order's total amount."
             );
@@ -115,9 +115,31 @@ verifyPaypal.post(
             .collection("orders")
             .doc(paymentDetails.reference_id as string)
             .update({
-              paymentStatus: "PAID - GO AHEAD (Website - Card)",
-              adminNotes
+              paymentStatus: "PAID - GO AHEAD (Paypal)",
+              adminNotes,
+              currency: currencyCode
             });
+
+          // Send email to admin and client
+          await sendEmailToAddress(
+            ["info@regalflowers.com.ng"],
+            templateRender(
+              { ...order, adminNotes, currency: currencyCode },
+              "new-order"
+            ),
+            `New Order (${order.fullOrderId})`,
+            "5055243"
+          );
+
+          await sendEmailToAddress(
+            [order.client.email as string],
+            templateRender(
+              { ...order, adminNotes, currency: currencyCode },
+              "order"
+            ),
+            `Thank you for your order (${order.fullOrderId})`,
+            "5055243"
+          );
           const environment: Environment = /sandbox/i.test(
             process.env.PAYPAL_BASE_URL || ""
           )
