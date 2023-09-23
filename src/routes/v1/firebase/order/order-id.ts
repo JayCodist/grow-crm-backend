@@ -89,7 +89,9 @@ orderID.get("/:id", async (req, res) => {
           } ${getFBProductDisplayName(product)} (${price * product.quantity})`;
         })
         .join(" + ");
-      orderDetails += ` = ${totalPrice}`;
+      orderDetails += `${
+        order.deliveryAmount ? `+ delivery (${order.deliveryAmount})` : ""
+      } = ${totalPrice}`;
 
       const adminNotes = getAdminNoteText(
         order.adminNotes,
