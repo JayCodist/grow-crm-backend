@@ -4,7 +4,11 @@ import validator from "../../../../helpers/validator";
 import { ApiError, InternalError } from "../../../../core/ApiError";
 import { Order } from "../../../../database/model/Order";
 import validation from "./validation";
-import { currencyOptions } from "../../../../helpers/constants";
+import {
+  PaymentMethod,
+  currencyOptions,
+  paymentMethodMap
+} from "../../../../helpers/constants";
 import {
   AppCurrency,
   AppCurrencyName
@@ -15,27 +19,6 @@ import { SuccessResponse } from "../../../../core/ApiResponse";
 const db = firestore();
 
 const updatePaymentMethodDetails = express.Router();
-
-export type PaymentMethod =
-  | "paystack"
-  | "googlePay"
-  | "payPal"
-  | "monnify"
-  | "manualTransfer"
-  | "gtbTransfer"
-  | "natwestTransfer"
-  | "bitcoinTransfer";
-
-const paymentMethodMap: Record<PaymentMethod, string> = {
-  paystack: "Paystack",
-  googlePay: "Google Pay",
-  payPal: "PayPal",
-  monnify: "Monnify",
-  manualTransfer: "Manual Transfer",
-  gtbTransfer: "GTB Transfer",
-  natwestTransfer: "Natwest Transfer",
-  bitcoinTransfer: "Bitcoin Transfer"
-};
 
 updatePaymentMethodDetails.put(
   "/:id",
@@ -65,7 +48,8 @@ updatePaymentMethodDetails.put(
           paymentDetails: `Website: Not Paid ${getPriceDisplay(
             order.amount,
             _currency
-          )} ${paymentMethodMap[paymentMethod]}`
+          )} ${paymentMethodMap[paymentMethod]}`,
+          paymentMethod
         });
 
       return new SuccessResponse("Payment method updated", true).send(res);
