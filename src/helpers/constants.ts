@@ -43,3 +43,24 @@ export const pickupLocations: Record<string, string> = {
   Lagos: `<span style="font-weight: 600">Lagos Pickup - </span>81b, Lafiaji Way, Dolphin Estate, Ikoyi, Lagos`,
   Abuja: `<span style="font-weight: 600">Abuja Pickup - </span>5, Nairobi Street, off Aminu Kano Crescent, Wuse 2, Abuja`
 };
+
+export type PaymentMethod =
+  | "paystack"
+  | "googlePay"
+  | "payPal"
+  | "monnify"
+  | "manualTransfer"
+  | "gtbTransfer"
+  | "natwestTransfer"
+  | "bitcoinTransfer";
+
+export const paymentMethodMap: Record<PaymentMethod, string> = {
+  paystack: "Paystack",
+  googlePay: "Google Pay",
+  payPal: "PayPal",
+  monnify: "Monnify",
+  manualTransfer: "Manual Transfer",
+  gtbTransfer: "GTB Transfer",
+  natwestTransfer: "Natwest Transfer",
+  bitcoinTransfer: "Bitcoin Transfer"
+};
