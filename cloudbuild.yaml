@@ -27,6 +27,7 @@ steps:
       - "PAYPAL_CLIENT_SECRET=${_PAYPAL_CLIENT_SECRET}"
       - "PAYPAL_BASE_URL=${_PAYPAL_BASE_URL}"
       - "API_LAYER_KEY=${_API_LAYER_KEY}"
+      - "FIREBASE_STORAGE_BUCKET=${_FIREBASE_STORAGE_BUCKET}"
   - name: "gcr.io/cloud-builders/gcloud"
     args:
       [
