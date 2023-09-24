@@ -135,7 +135,9 @@ updateOrder.put(
             })`;
           })
           .join(" + ");
-        orderDetails += ` = ${totalPrice}`;
+        orderDetails += `${
+          deliveryAmount ? `+ delivery (${deliveryAmount})` : ""
+        } = ${totalPrice}`;
 
         let { adminNotes } = existingOrder;
         adminNotes = getAdminNoteText(adminNotes, currency, totalPrice);
