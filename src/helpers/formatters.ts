@@ -119,3 +119,7 @@ export const getAdminNoteText = (
 
   return adminNotes;
 };
+
+export const getProductSlug = (permalink: string) =>
+  permalink.split("/product").pop()?.replaceAll("/", "").replace(/\?.*$/, "") ||
+  "";
