@@ -14,11 +14,12 @@ import {
   ProductWPModel
 } from "../../../database/model/ProductWP";
 import AppConfigRepo from "../../../database/repository/AppConfigRepo";
-import { slugify } from "../../../helpers/formatters";
+import { getProductSlug, slugify } from "../../../helpers/formatters";
 import { getSearchArray } from "../../../helpers/search-helpers";
 import validator from "../../../helpers/validator";
 import validation from "./validation";
 import { DesignOption, allDesignOptions } from "../firebase/order/create";
+import { getCloudLinkForImage } from "../../../helpers/storage-helpers";
 
 export type WPBusiness = "regalFlowers" | "floralHub";
 
@@ -181,9 +182,15 @@ doWordpressSync.post(
   validator(validation.doWordPressSync, "query"),
   async (req, res) => {
     try {
-      const { business } = req.query as unknown as {
+      const { business, imageUpdateSlugs } = req.query as unknown as {
         business: "regalFlowers" | "floralHub";
+        imageUpdateSlugs?: string;
       };
+      const slugMapForDeepUpdate: Record<string, boolean> =
+        imageUpdateSlugs
+          ?.split(",")
+          .map(slug => slug.trim())
+          .reduce((map, slug) => ({ ...map, [slug]: true }), {}) || {};
       const [{ product_categories: categories }] = await fetchWPContent(
         `${backendUrlMap[business]}/products/categories?${wCAuthString}&filter[limit]=10000`
       );
@@ -192,7 +199,25 @@ doWordpressSync.post(
         `${backendUrlMap[business]}/products?${wCAuthString}&filter[limit]=10000`
       );
 
-      const products = productsRaw.map(rawProd => {
+      const uploadedImagesArr: string[][] = [];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const product of productsRaw) {
+        const publicUrls = [];
+        const shouldSyncProductImages =
+          slugMapForDeepUpdate[getProductSlug(product.permalink || "")];
+        // eslint-disable-next-line no-restricted-syntax
+        for (const image of product.images || []) {
+          // eslint-disable-next-line no-await-in-loop
+          const publicUrl = await getCloudLinkForImage(
+            image.src,
+            shouldSyncProductImages
+          );
+          publicUrls.push(publicUrl);
+        }
+        uploadedImagesArr.push(publicUrls);
+      }
+
+      const products = productsRaw.map((rawProd, productIndex) => {
         const relatedVIPRef =
           Number(
             rawProd.attributes
@@ -212,12 +237,7 @@ doWordpressSync.post(
               .trim() || ""
           ),
           class: /^vip/i.test(prodName) ? "vip" : "regular",
-          slug:
-            rawProd.permalink
-              ?.split("/product")
-              .pop()
-              ?.replaceAll("/", "")
-              .replace(/\?.*$/, "") || "",
+          slug: getProductSlug(rawProd.permalink || ""),
           sku: rawProd.sku,
           price: Number(rawProd.sale_price || rawProd.price) || 0,
           type: rawProd.type,
@@ -227,8 +247,8 @@ doWordpressSync.post(
           addonSlug: rawProd.addonSlug,
           tags: getTagsMap(rawProd),
           images:
-            rawProd.images?.map((image: any) => ({
-              src: image.src,
+            rawProd.images?.map((image: any, imageIndex: number) => ({
+              src: uploadedImagesArr[productIndex][imageIndex],
               alt: image.alt || image.title || ""
             })) || [],
           featured: rawProd.featured,
