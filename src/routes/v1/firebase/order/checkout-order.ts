@@ -248,6 +248,7 @@ checkoutOrder.put(
           orderDetails: deliveryLocation
             ? `${(
                 existingOrder.orderDetails
+                  .split("=")[0]
                   .split("+")
                   .filter(part => !part.includes("delivery"))
                   .join("+") || ""
