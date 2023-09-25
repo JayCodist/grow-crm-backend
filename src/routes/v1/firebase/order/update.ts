@@ -136,7 +136,7 @@ updateOrder.put(
           })
           .join(" + ");
         orderDetails += `${
-          deliveryAmount ? `+ delivery (${deliveryAmount})` : ""
+          deliveryAmount ? ` + delivery (${deliveryAmount})` : ""
         } = ${totalPrice}`;
 
         let { adminNotes } = existingOrder;

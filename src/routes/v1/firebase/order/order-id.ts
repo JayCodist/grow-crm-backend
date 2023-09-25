@@ -90,7 +90,7 @@ orderID.get("/:id", async (req, res) => {
         })
         .join(" + ");
       orderDetails += `${
-        order.deliveryAmount ? `+ delivery (${order.deliveryAmount})` : ""
+        order.deliveryAmount ? ` + delivery (${order.deliveryAmount})` : ""
       } = ${totalPrice}`;
 
       const adminNotes = getAdminNoteText(
