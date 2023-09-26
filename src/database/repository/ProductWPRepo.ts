@@ -36,14 +36,11 @@ export default class ProductWPRepo {
     filter = defaultFilter,
     pageNumber = defaultPageAttr.pageNumber,
     pageSize = defaultPageAttr.pageSize,
-    sortLogic = defaultSortLogic,
-    search = ""
+    sortLogic = defaultSortLogic
   }: PaginatedFetchParams): Promise<{ data: ProductWP[]; count: number }> {
     return new Promise((resolve, reject) => {
       wPCollectionIsReady().then(() =>
-        ProductWPModel.find(
-          search ? { ...filter, _nameSearch: search } : filter
-        )
+        ProductWPModel.find(filter)
           .sort(sortLogic)
           .skip((pageNumber - 1) * pageSize)
           .limit(pageSize)

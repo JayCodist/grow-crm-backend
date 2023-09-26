@@ -5,10 +5,9 @@ import CategoryWPRepo from "../../../../database/repository/CategoryWPRepo";
 import validator from "../../../../helpers/validator";
 
 import validation from "./validation";
+import { getSearchKey } from "../../../../helpers/formatters";
 
 const categoryWP = express.Router();
-
-const getSearchKey = (str: string) => `_${str}Search`;
 
 categoryWP.get(
   "/paginate",

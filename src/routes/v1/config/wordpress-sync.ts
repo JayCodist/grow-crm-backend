@@ -228,7 +228,10 @@ doWordpressSync.post(
         const product: ProductWPCreate = {
           key: rawProd.id,
           name: prodName,
-          _nameSearch: getSearchArray(prodName),
+          _nameSearch: getSearchArray(
+            `${he.decode(rawProd.title.trim() || "N/A")}`
+          ),
+          _categorySearch: getSearchArray(`${rawProd.categories.join(" ")}`),
           subtitle: he.decode(
             rawProd.title
               .split("-")[1]
