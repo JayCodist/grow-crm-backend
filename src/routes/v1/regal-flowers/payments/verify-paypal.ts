@@ -21,6 +21,8 @@ import { currencyOptions } from "../../../../helpers/constants";
 import { getAdminNoteText } from "../../../../helpers/formatters";
 import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
 import { templateRender } from "../../../../helpers/render";
+import { getPriceDisplay } from "../../../../helpers/type-conversion";
+import { AppCurrency } from "../../../../database/model/AppConfig";
 
 const db = firestore();
 
@@ -92,11 +94,12 @@ verifyPaypal.post(
 
           const order = snap.data() as Order | undefined;
 
-          const conversionRate = currencyOptions.find(
+          const currency = currencyOptions.find(
             currency => currency.name === currencyCode
-          )?.conversionRate as number;
+          ) as AppCurrency;
           const nairaAmount = Math.round(
-            parseFloat(paymentDetails.amount.value) * conversionRate
+            parseFloat(paymentDetails.amount.value) *
+              (currency?.conversionRate as number)
           );
 
           if (!order || order.amount > nairaAmount) {
@@ -117,7 +120,11 @@ verifyPaypal.post(
             .update({
               paymentStatus: "PAID - GO AHEAD (Paypal)",
               adminNotes,
-              currency: currencyCode
+              currency: currencyCode,
+              paymentDetails: `Website: Paid  ${getPriceDisplay(
+                order.amount,
+                currency
+              )} to Paypal`
             });
 
           // Send email to admin and client
