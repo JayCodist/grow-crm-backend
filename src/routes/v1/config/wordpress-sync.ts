@@ -190,6 +190,7 @@ doWordpressSync.post(
         imageUpdateSlugs
           ?.split(",")
           .map(slug => slug.trim())
+          .filter(Boolean)
           .reduce((map, slug) => ({ ...map, [slug]: true }), {}) || {};
       const [{ product_categories: categories }] = await fetchWPContent(
         `${backendUrlMap[business]}/products/categories?${wCAuthString}&filter[limit]=10000`
