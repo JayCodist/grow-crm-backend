@@ -143,7 +143,8 @@ const getVariants: (
         variantName
           ?.replace(/-/g, " ")
           .replace(/vip/i, "VIP")
-          .replace(/^./, (char: string) => char.toUpperCase()) || "N/A",
+          .replace(/^./, (char: string) => char.toUpperCase())
+          .replace(/2$/, "") || "N/A",
       design: variantDesign
     };
   });
@@ -169,7 +170,8 @@ const getVariants: (
         variantName
           ?.replace(/-/g, " ")
           .replace(/vip/i, "VIP")
-          .replace(/^./, (char: string) => char.toUpperCase()) || "N/A",
+          .replace(/^./, (char: string) => char.toUpperCase())
+          .replace(/2$/, "") || "N/A",
       design: variantDesign
     };
   });
