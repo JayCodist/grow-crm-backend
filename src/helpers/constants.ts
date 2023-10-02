@@ -12,19 +12,23 @@ export type DeliveryZoneAmount =
   | "freeAbuja"
   | "highAbujaVals"
   | "freeAbujaVals"
-  | "highAbuja";
+  | "highAbuja"
+  | "mediumAbujaVals"
+  | "mediumLagosVals";
 
 export const deliveryZoneAmount: Record<DeliveryZoneAmount, number> = {
   highLagos: 10000,
   freeLagos: 0,
-  highLagosVals: 15000,
+  highLagosVals: 30000,
   freeLagosVals: 0,
   mediumLagos: 4500,
   mediumAbuja: 3500,
   freeAbuja: 0,
-  highAbujaVals: 15000,
+  highAbujaVals: 30000,
   freeAbujaVals: 0,
-  highAbuja: 6000
+  highAbuja: 6000,
+  mediumAbujaVals: 20000,
+  mediumLagosVals: 20000
 };
 
 export const defaultCurrency: AppCurrency = {
