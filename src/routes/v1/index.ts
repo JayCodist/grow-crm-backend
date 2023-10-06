@@ -20,6 +20,7 @@ import residentTypes from "./firebase/residentType/residentType";
 import { updateOrder } from "./firebase/order/update";
 import { saveSendersInfo } from "./firebase/order/save-senders-info";
 import updatePaymentMethodDetails from "./firebase/order/update-payment-details";
+import categoryWPSlug from "./wordpress/category-wp/category-slug";
 
 const router = express.Router();
 
@@ -67,6 +68,7 @@ router.use("/contacts", getRecord);
 router.use("/wordpress/product", wordpressProductRoutes);
 
 router.use("/wordpress/category", categoryWP);
+router.use("/wordpress/category/single", categoryWPSlug);
 
 router.use("/payments", paymentRoutes);
 

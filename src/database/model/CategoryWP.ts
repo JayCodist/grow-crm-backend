@@ -4,13 +4,22 @@ import Logger from "../../core/Logger";
 const DOCUMENT_NAME = "CategoryWP";
 const COLLECTION_NAME = "categoryWP";
 
-export const categoryWPProjection = ["key", "createdAt", "name", "slug"];
+export const categoryWPProjection = [
+  "key",
+  "createdAt",
+  "name",
+  "slug",
+  "description",
+  "image"
+];
 
 export default interface CategoryWP {
   id: string;
   name: string;
   slug: string;
   createdAt: string;
+  description: string;
+  image: string;
 }
 
 export interface CategoryWPCreate extends Omit<CategoryWP, "id"> {
@@ -25,7 +34,9 @@ const schema = new Schema(
     key: String,
     name: String,
     slug: String,
-    _nameSearch: { type: [String], index: true }
+    _nameSearch: { type: [String], index: true },
+    description: String,
+    image: String
   },
   { _id: false }
 ).index({
