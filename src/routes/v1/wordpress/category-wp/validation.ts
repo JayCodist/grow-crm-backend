@@ -8,6 +8,9 @@ const validation = {
     searchField: Joi.string().allow(""),
     searchValue: Joi.string().allow(""),
     sortType: Joi.string().valid("asc", "desc")
+  }),
+  slug: Joi.object().keys({
+    slug: Joi.string().required()
   })
 };
 
