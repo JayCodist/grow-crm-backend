@@ -28,6 +28,7 @@ steps:
       - "PAYPAL_BASE_URL=${_PAYPAL_BASE_URL}"
       - "API_LAYER_KEY=${_API_LAYER_KEY}"
       - "FIREBASE_STORAGE_BUCKET=${_FIREBASE_STORAGE_BUCKET}"
+      - "TINIFY_KEY=${_TINIFY_KEY}"
   - name: "gcr.io/cloud-builders/gcloud"
     args:
       [

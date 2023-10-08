@@ -1,5 +1,7 @@
-import fetch from "node-fetch";
+import tinify from "tinify";
 import firebaseAdmin from "./firebase-admin";
+
+tinify.key = process.env.TINIFY_KEY as string;
 
 export const getCloudLinkForImage: (
   url: string,
@@ -10,9 +12,13 @@ export const getCloudLinkForImage: (
     .replaceAll("/", "-");
   const file = firebaseAdmin.storage().bucket().file(`img${uniqueLink}`);
   if (syncToCloud) {
-    const response = await fetch(url);
-    const buffer = await response.buffer();
-    await file.save(buffer);
+    const source = tinify.fromUrl(url);
+    const buffer = await source.toBuffer();
+    await file.save(Buffer.from(buffer), {
+      metadata: {
+        cacheControl: "public, max-age=31536000"
+      }
+    });
   }
 
   return file.publicUrl();
