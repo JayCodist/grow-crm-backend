@@ -34,6 +34,7 @@
     "mongoose": "^6.0.7",
     "node-fetch": "^2.6.7",
     "node-mailjet": "^3.3.4",
+    "tinify": "^1.7.1",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.5"
   },
