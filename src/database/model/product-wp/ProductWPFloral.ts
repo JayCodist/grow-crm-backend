@@ -1,123 +1,11 @@
 import { Document, model, Schema } from "mongoose";
 import Logger from "../../../core/Logger";
+import { ProductWPCreate } from "./model.interface";
 
 const DOCUMENT_NAME = "ProductWPFloral";
 const COLLECTION_NAME = "productWPFloral";
 
-export const productWPProjection = [
-  "key",
-  "temporaryNote",
-  "name",
-  "price",
-  "description",
-  "longDescription",
-  "images",
-  "slug",
-  "subtitle",
-  "categories",
-  "sku",
-  "tags",
-  "featured",
-  "variants",
-  "addonsGroups",
-  "designOptions",
-  "type",
-  "addonSlug",
-  "class",
-  "designNote",
-  "budgetNote",
-  "inStock"
-];
-
-export const productWPProjectionMinimal = [
-  "key",
-  "name",
-  "price",
-  "images",
-  "slug",
-  "subtitle",
-  "sku",
-  "class"
-];
-
-interface Addon {
-  name: string;
-  price: number;
-  image: string;
-}
-
-interface AddonGroup {
-  name: string;
-  image: string;
-  description: string;
-  addons: Addon[];
-  slug: string;
-}
-
-interface ProductImage {
-  alt: string;
-  src: string;
-}
-
-export interface ProductVariant {
-  name: string;
-  price: number;
-  sku: string;
-  class: "regular" | "vip";
-}
-
-export type DesignOptionName =
-  | "wrappedBouquet"
-  | "inVase"
-  | "inLargeVase"
-  | "box";
-
-export type DesignOptionsMap = Partial<
-  Record<DesignOptionName, "default" | "option">
->;
-
-export interface MinimalProductWP {
-  key: number;
-  name: string;
-  subtitle: string;
-  sku: string;
-  slug: string;
-  price: number;
-  images: ProductImage;
-}
-
-export interface ProductWP {
-  key: number;
-  name: string;
-  subtitle: string;
-  temporaryNotes: string[];
-  slug: string;
-  categories: string[];
-  type: "simple" | "variable";
-  class: "regular" | "vip";
-  featured: boolean;
-  sku: string;
-  price: number;
-  images: ProductImage[];
-  variants: ProductVariant[];
-  addonsGroups: AddonGroup[];
-  addonSlug: string;
-  description: string;
-  longDescription: string;
-  designOptions: DesignOptionsMap;
-  tags: string[];
-  budgetNote: string;
-  designNote: string;
-  relatedVIPRef: number | null;
-  relatedProducts?: MinimalProductWP[];
-  inStock: boolean;
-}
-
-export interface ProductWPCreate extends ProductWP {
-  _nameSearch: string[];
-}
-
-interface ProductWPDocument extends ProductWPCreate {}
+interface ProductWPFloralDocument extends ProductWPCreate {}
 
 const schema = new Schema({
   key: { type: Number, index: true },
@@ -192,13 +80,13 @@ const schema = new Schema({
   inStock: Boolean
 });
 
-export const ProductWPModel = model<ProductWPDocument & Document>(
+export const ProductWPFloralModel = model<ProductWPFloralDocument & Document>(
   DOCUMENT_NAME,
   schema,
   COLLECTION_NAME
 );
 
-ProductWPModel.on("index", error => {
+ProductWPFloralModel.on("index", error => {
   if (error) {
     Logger.error(error);
   } else {

@@ -6,20 +6,21 @@ import { wCAuthString } from "../../../config";
 import { ApiError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
 import { CategoryWPRegalModel } from "../../../database/model/category-wp/CategoryWPRegal";
-import {
-  DesignOptionName,
-  DesignOptionsMap,
-  ProductVariant,
-  ProductWPCreate,
-  ProductWPModel
-} from "../../../database/model/product-wp/ProductWPRegal";
 import AppConfigRepo from "../../../database/repository/AppConfigRepo";
 import { getProductSlug, slugify } from "../../../helpers/formatters";
 import { getSearchArray } from "../../../helpers/search-helpers";
 import validator from "../../../helpers/validator";
 import validation from "./validation";
-import { DesignOption, allDesignOptions } from "../firebase/order/create";
 import { getCloudLinkForImage } from "../../../helpers/storage-helpers";
+import {
+  DesignOption,
+  DesignOptionName,
+  DesignOptionsMap,
+  ProductVariant,
+  ProductWPCreate,
+  allDesignOptions
+} from "../../../database/model/product-wp/model.interface";
+import { ProductWPRegalModel } from "../../../database/model/product-wp/ProductWPRegal";
 
 export type WPBusiness = "regalFlowers" | "floralHub";
 
@@ -287,7 +288,7 @@ doWordpressSync.post(
       await AppConfigRepo.updateConfig({ wPSyncInProgress: true });
       try {
         await Promise.all([
-          ProductWPModel.collection.drop(),
+          ProductWPRegalModel.collection.drop(),
           CategoryWPRegalModel.collection.drop()
         ]);
       } catch (err) {
@@ -302,7 +303,7 @@ doWordpressSync.post(
         })),
         { ordered: false }
       );
-      await ProductWPModel.insertMany(
+      await ProductWPRegalModel.insertMany(
         products.filter(prod => prod.price),
         { ordered: false }
       );
