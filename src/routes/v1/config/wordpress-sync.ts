@@ -5,14 +5,14 @@ import fetch, { Response } from "node-fetch";
 import { wCAuthString } from "../../../config";
 import { ApiError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
-import { CategoryWPModel } from "../../../database/model/CategoryWP";
+import { CategoryWPModel } from "../../../database/model/CategoryWPRegal";
 import {
   DesignOptionName,
   DesignOptionsMap,
   ProductVariant,
   ProductWPCreate,
   ProductWPModel
-} from "../../../database/model/ProductWP";
+} from "../../../database/model/ProductWPRegal";
 import AppConfigRepo from "../../../database/repository/AppConfigRepo";
 import { getProductSlug, slugify } from "../../../helpers/formatters";
 import { getSearchArray } from "../../../helpers/search-helpers";

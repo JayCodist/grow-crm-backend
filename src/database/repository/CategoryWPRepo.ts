@@ -3,7 +3,7 @@ import CategoryWP, {
   CategoryWPModel,
   categoryWPProjection,
   CategoryWPCreate
-} from "../model/CategoryWP";
+} from "../model/CategoryWPRegal";
 import { PartialLoose } from "../../helpers/type-helpers";
 import { PaginatedFetchParams } from "./ClientAccessLogRepo";
 import { InternalError } from "../../core/ApiError";
