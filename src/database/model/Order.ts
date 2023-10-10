@@ -1,3 +1,4 @@
+import { PaymentMethod } from "../../helpers/constants";
 import { AppCurrencyName } from "./AppConfig";
 
 interface OrderItem {
@@ -240,6 +241,7 @@ export interface Order {
   deliveryInstruction: string;
   despatchLocation?: string;
   fullOrderId: string;
+  paymentMethod: PaymentMethod | null;
 }
 
 export type OrderCreate = Omit<Order, "id">;

@@ -143,7 +143,8 @@ const getVariants: (
         variantName
           ?.replace(/-/g, " ")
           .replace(/vip/i, "VIP")
-          .replace(/^./, (char: string) => char.toUpperCase()) || "N/A",
+          .replace(/^./, (char: string) => char.toUpperCase())
+          .replace(/2$/, "") || "N/A",
       design: variantDesign
     };
   });
@@ -169,7 +170,8 @@ const getVariants: (
         variantName
           ?.replace(/-/g, " ")
           .replace(/vip/i, "VIP")
-          .replace(/^./, (char: string) => char.toUpperCase()) || "N/A",
+          .replace(/^./, (char: string) => char.toUpperCase())
+          .replace(/2$/, "") || "N/A",
       design: variantDesign
     };
   });
@@ -229,7 +231,10 @@ doWordpressSync.post(
         const product: ProductWPCreate = {
           key: rawProd.id,
           name: prodName,
-          _nameSearch: getSearchArray(prodName),
+          _nameSearch: getSearchArray(
+            `${he.decode(rawProd.title.trim() || "N/A")}`
+          ),
+          _categorySearch: getSearchArray(`${rawProd.categories.join(" ")}`),
           subtitle: he.decode(
             rawProd.title
               .split("-")[1]

@@ -90,4 +90,17 @@ export default class CategoryWPRepo {
   public static findById(id: string): Promise<CategoryWP | null> {
     return CategoryWPModel.findOne({ _id: id }).lean<CategoryWP>().exec();
   }
+
+  public static async findBySlug(slug: string): Promise<CategoryWP | null> {
+    const category = await CategoryWPModel.findOne({ slug })
+      .select(categoryWPProjection.join(" "))
+      .lean<CategoryWP>()
+      .exec();
+
+    if (!category) {
+      return null;
+    }
+
+    return category;
+  }
 }

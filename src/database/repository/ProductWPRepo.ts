@@ -21,6 +21,7 @@ export interface PaginatedFetchParams {
   pageSize?: number;
   sortLogic?: SortLogic;
   filter?: Record<string, any>;
+  search?: string;
 }
 
 const defaultSortLogic: SortLogic = { name: "asc", price: "desc" };

@@ -123,3 +123,4 @@ export const getAdminNoteText = (
 export const getProductSlug = (permalink: string) =>
   permalink.split("/product").pop()?.replaceAll("/", "").replace(/\?.*$/, "") ||
   "";
+export const getSearchKey = (str: string) => `_${str}Search`;

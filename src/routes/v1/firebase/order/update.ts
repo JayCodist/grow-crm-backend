@@ -21,12 +21,18 @@ import {
   getFirebaseProducts,
   getWpProducts
 } from "./create";
-import { AppCurrencyName } from "../../../../database/model/AppConfig";
+import {
+  AppCurrency,
+  AppCurrencyName
+} from "../../../../database/model/AppConfig";
 import { getAdminNoteText } from "../../../../helpers/formatters";
 import {
   DeliveryZoneAmount,
-  deliveryZoneAmount
+  currencyOptions,
+  deliveryZoneAmount,
+  paymentMethodMap
 } from "../../../../helpers/constants";
+import { getPriceDisplay } from "../../../../helpers/type-conversion";
 
 export const updateOrder = express.Router();
 
@@ -129,10 +135,16 @@ updateOrder.put(
             })`;
           })
           .join(" + ");
-        orderDetails += ` = ${totalPrice}`;
+        orderDetails += `${
+          deliveryAmount ? ` + delivery (${deliveryAmount})` : ""
+        } = ${totalPrice}`;
 
         let { adminNotes } = existingOrder;
         adminNotes = getAdminNoteText(adminNotes, currency, totalPrice);
+
+        const _currency = currencyOptions.find(
+          _currency => _currency.name === currency
+        ) as AppCurrency;
 
         await db.doc(req.params.id).update({
           amount: totalPrice,
@@ -140,7 +152,12 @@ updateOrder.put(
           orderDetails,
           deliveryDate,
           adminNotes,
-          currency
+          currency,
+          paymentDetails: existingOrder.paymentMethod
+            ? `Website: Not Paid ${getPriceDisplay(totalPrice, _currency)} ${
+                paymentMethodMap[existingOrder.paymentMethod]
+              }`
+            : ""
         });
       } else {
         await db.doc(req.params.id).update({

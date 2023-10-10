@@ -17,6 +17,7 @@ import { AppCurrency } from "../../../../database/model/AppConfig";
 import { getAdminNoteText } from "../../../../helpers/formatters";
 import { templateRender } from "../../../../helpers/render";
 import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
+import { getPriceDisplay } from "../../../../helpers/type-conversion";
 
 const db = firestore();
 
@@ -51,11 +52,11 @@ verifyPaystack.post(
           );
         }
 
-        if (data.currency === "USD") {
-          const currency = currencyOptions.find(
-            currency => currency.name === "USD"
-          ) as AppCurrency;
+        const currency = currencyOptions.find(
+          currency => currency.name === data.currency
+        ) as AppCurrency;
 
+        if (data.currency === "USD") {
           const nairaAmount = Math.round(
             (parseFloat(data.amount) / 100) * currency?.conversionRate || 1
           );
@@ -87,7 +88,11 @@ verifyPaystack.post(
           .update({
             paymentStatus: "PAID - GO AHEAD (Website - Card)",
             adminNotes,
-            currency: data.currency
+            currency: data.currency,
+            paymentDetails: `Website: Paid ${getPriceDisplay(
+              order.amount,
+              currency
+            )}  to paystack`
           });
 
         // Send email to admin and client
