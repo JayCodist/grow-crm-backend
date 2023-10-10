@@ -9,7 +9,7 @@ import {
   it
 } from "./helpers";
 import { ApiResponse } from "../src/core/ApiResponse";
-import { ProductWPModel } from "../src/database/model/ProductWPRegal";
+import { ProductWPRegalModel } from "../src/database/model/product-wp/ProductWPRegal";
 
 const endpoint = "/v1/product-wp";
 
@@ -47,11 +47,11 @@ const performFetchTest: (
 
 describe("ProductWP", () => {
   before(done => {
-    ProductWPModel.deleteMany({}, () => done());
+    ProductWPRegalModel.deleteMany({}, () => done());
   });
 
   after(done => {
-    ProductWPModel.deleteMany({}, () => done());
+    ProductWPRegalModel.deleteMany({}, () => done());
   });
   /*
    * Test the /GET route

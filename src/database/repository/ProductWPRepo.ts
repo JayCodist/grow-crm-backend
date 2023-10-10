@@ -7,12 +7,12 @@ import {
 } from "../../helpers/formatters";
 import { wPCollectionIsReady } from "../../helpers/search-helpers";
 import { PartialLoose } from "../../helpers/type-helpers";
+import { ProductWPRegalModel } from "../model/product-wp/ProductWPRegal";
 import {
   ProductWP,
-  ProductWPModel,
   productWPProjection,
   productWPProjectionMinimal
-} from "../model/ProductWPRegal";
+} from "../model/product-wp/model.interface";
 
 type SortLogic = PartialLoose<ProductWP, "asc" | "desc">;
 
@@ -40,7 +40,7 @@ export default class ProductWPRepo {
   }: PaginatedFetchParams): Promise<{ data: ProductWP[]; count: number }> {
     return new Promise((resolve, reject) => {
       wPCollectionIsReady().then(() =>
-        ProductWPModel.find(filter)
+        ProductWPRegalModel.find(filter)
           .sort(sortLogic)
           .skip((pageNumber - 1) * pageSize)
           .limit(pageSize)
@@ -50,11 +50,11 @@ export default class ProductWPRepo {
             if (err) {
               reject(new InternalError(err.message));
             } else {
-              const filterQuery = ProductWPModel.find(filter);
+              const filterQuery = ProductWPRegalModel.find(filter);
               const countQuery =
                 filter === defaultFilter
                   ? filterQuery.estimatedDocumentCount()
-                  : ProductWPModel.countDocuments(filter);
+                  : ProductWPRegalModel.countDocuments(filter);
               countQuery.exec((countErr, count) => {
                 if (countErr) {
                   reject(new InternalError(countErr.message));
@@ -75,7 +75,7 @@ export default class ProductWPRepo {
     slug: string,
     relatedProductsCount = 0
   ): Promise<ProductWP | null> {
-    const product = await ProductWPModel.findOne({ slug })
+    const product = await ProductWPRegalModel.findOne({ slug })
       .select(productWPProjection.join(" "))
       .lean<ProductWP>()
       .exec();
@@ -83,7 +83,9 @@ export default class ProductWPRepo {
       return null;
     }
     const relatedProducts = relatedProductsCount
-      ? await ProductWPModel.find({ categories: { $in: product.categories } })
+      ? await ProductWPRegalModel.find({
+          categories: { $in: product.categories }
+        })
           .limit(relatedProductsCount + 1)
           .select(productWPProjectionMinimal.join(" "))
           .lean<ProductWP[]>()
@@ -104,14 +106,14 @@ export default class ProductWPRepo {
   }
 
   public static findBySlugs(slugs: string[]): Promise<ProductWP[]> {
-    return ProductWPModel.find({ slug: { $in: slugs } })
+    return ProductWPRegalModel.find({ slug: { $in: slugs } })
       .select(productWPProjection.join(" "))
       .lean<ProductWP[]>()
       .exec();
   }
 
   public static findByKeys(keys: number[]): Promise<ProductWP[]> {
-    return ProductWPModel.find({ key: { $in: keys } })
+    return ProductWPRegalModel.find({ key: { $in: keys } })
       .select(productWPProjection.join(" "))
       .lean<ProductWP[]>()
       .exec();
@@ -123,7 +125,7 @@ export default class ProductWPRepo {
   }> {
     return new Promise((resolve, reject) => {
       wPCollectionIsReady().then(() => {
-        ProductWPModel.find({}, productWPProjection)
+        ProductWPRegalModel.find({}, productWPProjection)
           .lean()
           .exec((err, products: ProductWP[]) => {
             if (err) {

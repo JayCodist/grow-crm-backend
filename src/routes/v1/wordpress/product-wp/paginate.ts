@@ -5,7 +5,7 @@ import ProductWPRepo from "../../../../database/repository/ProductWPRepo";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
 import { getSearchKey } from "../../../../helpers/formatters";
-import { ProductWP } from "../../../../database/model/ProductWP";
+import { ProductWP } from "../../../../database/model/product-wp/model.interface";
 
 const productWP = express.Router();
 
