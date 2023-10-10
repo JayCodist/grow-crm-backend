@@ -1,5 +1,5 @@
 import { Schema, model, Document } from "mongoose";
-import Logger from "../../core/Logger";
+import Logger from "../../../core/Logger";
 
 const DOCUMENT_NAME = "CategoryWP";
 const COLLECTION_NAME = "categoryWP";
