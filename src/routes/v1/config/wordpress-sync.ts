@@ -5,7 +5,7 @@ import fetch, { Response } from "node-fetch";
 import { wCAuthString } from "../../../config";
 import { ApiError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
-import { CategoryWPModel } from "../../../database/model/CategoryWP";
+import { CategoryWPModel } from "../../../database/model/CategoryWPRegal";
 import {
   DesignOptionName,
   DesignOptionsMap,
