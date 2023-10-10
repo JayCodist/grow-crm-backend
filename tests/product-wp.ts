@@ -9,7 +9,7 @@ import {
   it
 } from "./helpers";
 import { ApiResponse } from "../src/core/ApiResponse";
-import { ProductWPModel } from "../src/database/model/ProductWP";
+import { ProductWPModel } from "../src/database/model/ProductWPRegal";
 
 const endpoint = "/v1/product-wp";
 
