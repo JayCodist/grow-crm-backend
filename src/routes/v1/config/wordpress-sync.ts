@@ -5,7 +5,7 @@ import fetch, { Response } from "node-fetch";
 import { wCAuthString } from "../../../config";
 import { ApiError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
-import { CategoryWPModel } from "../../../database/model/product-wp/CategoryWPRegal";
+import { CategoryWPRegalModel } from "../../../database/model/category-wp/CategoryWPRegal";
 import {
   DesignOptionName,
   DesignOptionsMap,
@@ -288,13 +288,13 @@ doWordpressSync.post(
       try {
         await Promise.all([
           ProductWPModel.collection.drop(),
-          CategoryWPModel.collection.drop()
+          CategoryWPRegalModel.collection.drop()
         ]);
       } catch (err) {
         console.error("Unable to drop collections: ", err);
       }
 
-      await CategoryWPModel.insertMany(
+      await CategoryWPRegalModel.insertMany(
         categories.map(category => ({
           ...category,
           slug: slugify(category.name),

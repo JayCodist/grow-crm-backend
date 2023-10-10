@@ -1,9 +1,4 @@
 import dayjs from "dayjs";
-import CategoryWP, {
-  CategoryWPModel,
-  categoryWPProjection,
-  CategoryWPCreate
-} from "../model/product-wp/CategoryWPRegal";
 import { PartialLoose } from "../../helpers/type-helpers";
 import { PaginatedFetchParams } from "./ClientAccessLogRepo";
 import { InternalError } from "../../core/ApiError";
@@ -12,6 +7,11 @@ import {
   getSearchArray,
   wPCollectionIsReady
 } from "../../helpers/search-helpers";
+import CategoryWP, {
+  CategoryWPCreate,
+  categoryWPProjection
+} from "../model/category-wp/model.interface";
+import { CategoryWPRegalModel } from "../model/category-wp/CategoryWPRegal";
 
 type SortLogic = PartialLoose<CategoryWP, "asc" | "desc">;
 const defaultSortLogic: SortLogic = { createdAt: "asc" };
@@ -31,7 +31,7 @@ export default class CategoryWPRepo {
   }: PaginatedFetchParams): Promise<{ data: CategoryWP[]; count: number }> {
     return new Promise((resolve, reject) => {
       wPCollectionIsReady().then(() =>
-        CategoryWPModel.find(filter)
+        CategoryWPRegalModel.find(filter)
           .sort(sortLogic)
           .skip((pageNumber - 1) * pageSize)
           .limit(pageSize)
@@ -41,11 +41,11 @@ export default class CategoryWPRepo {
             if (err) {
               reject(new InternalError(err.message));
             } else {
-              const filterQuery = CategoryWPModel.find(filter);
+              const filterQuery = CategoryWPRegalModel.find(filter);
               const countQuery =
                 filter === defaultFilter
                   ? filterQuery.estimatedDocumentCount()
-                  : CategoryWPModel.countDocuments(filter);
+                  : CategoryWPRegalModel.countDocuments(filter);
               countQuery.exec((countErr, count) => {
                 if (countErr) {
                   reject(new InternalError(countErr.message));
@@ -68,31 +68,35 @@ export default class CategoryWPRepo {
       createdAt: input.createdAt || dayjs().format(),
       _nameSearch: getSearchArray(input.name)
     };
-    const { createdAt } = await CategoryWPModel.create(data);
+    const { createdAt } = await CategoryWPRegalModel.create(data);
     return { ...input, createdAt };
   }
 
   public static async update(updateParams: PartialLoose<CategoryWP>) {
     const { id, ...update } = updateParams;
-    const categoryWP = await CategoryWPModel.findByIdAndUpdate(id, update, {
-      new: true
-    });
+    const categoryWP = await CategoryWPRegalModel.findByIdAndUpdate(
+      id,
+      update,
+      {
+        new: true
+      }
+    );
 
     return categoryWP;
   }
 
   public static async delete(id: string) {
-    const categoryWP = await CategoryWPModel.findByIdAndDelete(id);
+    const categoryWP = await CategoryWPRegalModel.findByIdAndDelete(id);
 
     return categoryWP;
   }
 
   public static findById(id: string): Promise<CategoryWP | null> {
-    return CategoryWPModel.findOne({ _id: id }).lean<CategoryWP>().exec();
+    return CategoryWPRegalModel.findOne({ _id: id }).lean<CategoryWP>().exec();
   }
 
   public static async findBySlug(slug: string): Promise<CategoryWP | null> {
-    const category = await CategoryWPModel.findOne({ slug })
+    const category = await CategoryWPRegalModel.findOne({ slug })
       .select(categoryWPProjection.join(" "))
       .lean<CategoryWP>()
       .exec();

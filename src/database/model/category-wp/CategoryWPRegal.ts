@@ -1,32 +1,11 @@
 import { Schema, model, Document } from "mongoose";
 import Logger from "../../../core/Logger";
+import { CategoryWPCreate } from "./model.interface";
 
 const DOCUMENT_NAME = "CategoryWP";
 const COLLECTION_NAME = "categoryWP";
 
-export const categoryWPProjection = [
-  "key",
-  "createdAt",
-  "name",
-  "slug",
-  "description",
-  "image"
-];
-
-export default interface CategoryWP {
-  id: string;
-  name: string;
-  slug: string;
-  createdAt: string;
-  description: string;
-  image: string;
-}
-
-export interface CategoryWPCreate extends Omit<CategoryWP, "id"> {
-  _nameSearch: string[];
-}
-
-interface CategoryWPDocument extends Document, CategoryWPCreate {}
+interface CategoryWPRegalDocument extends Document, CategoryWPCreate {}
 
 const schema = new Schema(
   {
@@ -43,13 +22,13 @@ const schema = new Schema(
   createdAt: 1
 });
 
-export const CategoryWPModel = model<CategoryWPDocument>(
+export const CategoryWPRegalModel = model<CategoryWPRegalDocument>(
   DOCUMENT_NAME,
   schema,
   COLLECTION_NAME
 );
 
-CategoryWPModel.on("index", error => {
+CategoryWPRegalModel.on("index", error => {
   if (error) {
     Logger.error(error);
   } else {
