@@ -12,7 +12,7 @@ import {
   ProductVariant,
   ProductWPCreate,
   ProductWPModel
-} from "../../../database/model/ProductWPRegal";
+} from "../../../database/model/product-wp/ProductWPRegal";
 import AppConfigRepo from "../../../database/repository/AppConfigRepo";
 import { getProductSlug, slugify } from "../../../helpers/formatters";
 import { getSearchArray } from "../../../helpers/search-helpers";

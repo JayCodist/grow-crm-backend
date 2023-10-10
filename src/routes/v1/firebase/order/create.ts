@@ -6,7 +6,7 @@ import {
 } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
 import { OrderCreate } from "../../../../database/model/Order";
-import { ProductWP } from "../../../../database/model/ProductWPRegal";
+import { ProductWP } from "../../../../database/model/product-wp/ProductWPRegal";
 import ProductWPRepo from "../../../../database/repository/ProductWPRepo";
 import firebaseAdmin from "../../../../helpers/firebase-admin";
 import { handleFormDataParsing } from "../../../../helpers/request-modifiers";

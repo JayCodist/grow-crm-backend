@@ -12,7 +12,7 @@ import {
   ProductWPModel,
   productWPProjection,
   productWPProjectionMinimal
-} from "../model/ProductWPRegal";
+} from "../model/product-wp/ProductWPRegal";
 
 type SortLogic = PartialLoose<ProductWP, "asc" | "desc">;
 

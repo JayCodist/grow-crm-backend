@@ -1,8 +1,8 @@
 import { Document, model, Schema } from "mongoose";
-import Logger from "../../core/Logger";
+import Logger from "../../../core/Logger";
 
-const DOCUMENT_NAME = "ProductWP";
-const COLLECTION_NAME = "productWP";
+const DOCUMENT_NAME = "ProductWPFloral";
+const COLLECTION_NAME = "productWPFloral";
 
 export const productWPProjection = [
   "key",
@@ -115,7 +115,6 @@ export interface ProductWP {
 
 export interface ProductWPCreate extends ProductWP {
   _nameSearch: string[];
-  _categorySearch: string[];
 }
 
 interface ProductWPDocument extends ProductWPCreate {}
@@ -124,7 +123,6 @@ const schema = new Schema({
   key: { type: Number, index: true },
   name: String,
   _nameSearch: { type: [String], index: true },
-  _categorySearch: { type: [String], index: true },
   subtitle: String,
   temporaryNotes: [String],
   slug: { type: String, index: true },

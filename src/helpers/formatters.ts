@@ -1,7 +1,10 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { BadTokenError } from "../core/ApiError";
-import { MinimalProductWP, ProductWP } from "../database/model/ProductWPRegal";
+import {
+  MinimalProductWP,
+  ProductWP
+} from "../database/model/product-wp/ProductWPRegal";
 import User, { LoginResponse } from "../database/model/User";
 import { AppCurrency, AppCurrencyName } from "../database/model/AppConfig";
 import { getPriceDisplay } from "./type-conversion";
