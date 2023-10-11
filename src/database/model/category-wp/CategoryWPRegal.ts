@@ -18,7 +18,9 @@ const schema = new Schema(
     image: String,
     shortDescription: String,
     altImage: String,
-    title: String
+    title: String,
+    topHeading: String,
+    bottomHeading: String
   },
   { _id: false }
 ).index({

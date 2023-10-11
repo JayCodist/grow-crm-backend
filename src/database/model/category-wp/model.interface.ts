@@ -7,6 +7,8 @@ export default interface CategoryWP {
   altImage: string;
   title: string;
   key: string;
+  topHeading: string;
+  bottomHeading: string;
 }
 
 export interface CategoryWPCreate extends Omit<CategoryWP, "id"> {
@@ -22,5 +24,7 @@ export const categoryWPProjection = [
   "image",
   "shortDescription",
   "altImage",
-  "title"
+  "title",
+  "topHeading",
+  "bottomHeading"
 ];
