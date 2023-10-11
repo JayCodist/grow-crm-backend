@@ -281,7 +281,8 @@ doWordpressSync.post(
               : []
           ),
           addonsGroups: [],
-          inStock: rawProd.in_stock
+          inStock: rawProd.in_stock,
+          pageDescription: ""
         };
         return product;
       });
@@ -299,7 +300,13 @@ doWordpressSync.post(
         categories.map(category => ({
           ...category,
           slug: slugify(category.name),
-          _nameSearch: getSearchArray(category.name)
+          _nameSearch: getSearchArray(category.name),
+          key: category.id,
+          shortDescription: "",
+          altImage: "",
+          title: "",
+          topHeading: "",
+          bottomHeading: ""
         })),
         { ordered: false }
       );
@@ -307,6 +314,52 @@ doWordpressSync.post(
         products.filter(prod => prod.price),
         { ordered: false }
       );
+
+      const productCategory = await fetchWPContent(
+        "https://www.regalflower.com/wp-json/wp/v2/product_cat?per_page=100"
+      );
+
+      (productCategory[0] as unknown as any[]).forEach(
+        async (category: any) => {
+          await CategoryWPRegalModel.updateOne(
+            { key: category.id.toString() },
+            {
+              $set: {
+                shortDescription: category.custom_category_description,
+                altImage: category.alt_text_for_images,
+                title: category.title_tag,
+                topHeading: category.custom_top_heading_h1,
+                bottomHeading: category.custom_bottom_heading_h2
+              }
+            }
+          );
+        }
+      );
+
+      const [productPage1, productPage2] = await Promise.all([
+        fetchWPContent(
+          "https://www.regalflower.com/wp-json/wp/v2/product?per_page=100&page=1"
+        ),
+        fetchWPContent(
+          "https://www.regalflower.com/wp-json/wp/v2/product?per_page=100&page=2&offset=100"
+        )
+      ]);
+
+      [
+        ...(productPage1[0] as unknown as any[]),
+        ...(productPage2[0] as unknown as any[])
+      ].forEach(async (product: any) => {
+        const categoryKey = product.id.toString();
+
+        await ProductWPRegalModel.updateOne(
+          { key: categoryKey },
+          {
+            $set: {
+              pageDescription: product.custom_product_description
+            }
+          }
+        );
+      });
 
       const currentSyncTotal =
         (await AppConfigRepo.getConfig())?.wPTotalSyncs || 0;
