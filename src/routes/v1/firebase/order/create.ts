@@ -6,7 +6,6 @@ import {
 } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
 import { OrderCreate } from "../../../../database/model/Order";
-import { ProductWP } from "../../../../database/model/ProductWP";
 import ProductWPRepo from "../../../../database/repository/ProductWPRepo";
 import firebaseAdmin from "../../../../helpers/firebase-admin";
 import { handleFormDataParsing } from "../../../../helpers/request-modifiers";
@@ -14,50 +13,14 @@ import { handleContactHooks } from "./order-utils";
 import { AppCurrencyName } from "../../../../database/model/AppConfig";
 import { currencyOptions } from "../../../../helpers/constants";
 import { getPriceDisplay } from "../../../../helpers/type-conversion";
+import {
+  ProductWP,
+  allDesignOptions
+} from "../../../../database/model/product-wp/model.interface";
 
 const createOrder = express.Router();
 const { firestore } = firebaseAdmin;
 const db = firestore().collection("orders");
-
-export type DesignOptionName =
-  | "wrappedBouquet"
-  | "inVase"
-  | "inLargeVase"
-  | "box";
-
-export interface DesignOption {
-  name: DesignOptionName;
-  price: number;
-  title: string;
-  default?: boolean;
-}
-
-export const allDesignOptions: DesignOption[] = [
-  {
-    name: "wrappedBouquet",
-    title: "Wrapped Bouquet",
-    price: 0,
-    default: true
-  },
-  {
-    name: "inVase",
-    title: "In Vase",
-    price: 15000,
-    default: false
-  },
-  {
-    name: "inLargeVase",
-    title: "In Large Vase",
-    price: 30000,
-    default: false
-  },
-  {
-    name: "box",
-    title: "Box",
-    price: 0,
-    default: false
-  }
-];
 
 export const getFBProductDisplayName = (product: any) =>
   product.displayNameAdmin ||

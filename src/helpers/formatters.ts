@@ -1,11 +1,14 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { BadTokenError } from "../core/ApiError";
-import { MinimalProductWP, ProductWP } from "../database/model/ProductWP";
 import User, { LoginResponse } from "../database/model/User";
 import { AppCurrency, AppCurrencyName } from "../database/model/AppConfig";
 import { getPriceDisplay } from "./type-conversion";
 import { currencyOptions } from "./constants";
+import {
+  MinimalProductWP,
+  ProductWP
+} from "../database/model/product-wp/model.interface";
 
 export const formatResponseRecord: (record: any) => any = record => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

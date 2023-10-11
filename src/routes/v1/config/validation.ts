@@ -6,7 +6,8 @@ const validation = {
     os: Joi.string().required().valid("android", "ios")
   }),
   doWordPressSync: Joi.object().keys({
-    business: Joi.string().required().valid("regalFlowers", "floralHub")
+    business: Joi.string().required().valid("regalFlowers", "floralHub"),
+    imageUpdateSlugs: Joi.string()
   })
 };
 

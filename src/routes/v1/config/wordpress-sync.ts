@@ -5,21 +5,22 @@ import fetch, { Response } from "node-fetch";
 import { wCAuthString } from "../../../config";
 import { ApiError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
-import { CategoryWPModel } from "../../../database/model/CategoryWP";
-import {
-  DesignOptionName,
-  DesignOptionsMap,
-  ProductVariant,
-  ProductWPCreate,
-  ProductWPModel
-} from "../../../database/model/ProductWP";
+import { CategoryWPRegalModel } from "../../../database/model/category-wp/CategoryWPRegal";
 import AppConfigRepo from "../../../database/repository/AppConfigRepo";
 import { getProductSlug, slugify } from "../../../helpers/formatters";
 import { getSearchArray } from "../../../helpers/search-helpers";
 import validator from "../../../helpers/validator";
 import validation from "./validation";
-import { DesignOption, allDesignOptions } from "../firebase/order/create";
 import { getCloudLinkForImage } from "../../../helpers/storage-helpers";
+import {
+  DesignOption,
+  DesignOptionName,
+  DesignOptionsMap,
+  ProductVariant,
+  ProductWPCreate,
+  allDesignOptions
+} from "../../../database/model/product-wp/model.interface";
+import { ProductWPRegalModel } from "../../../database/model/product-wp/ProductWPRegal";
 
 export type WPBusiness = "regalFlowers" | "floralHub";
 
@@ -192,6 +193,7 @@ doWordpressSync.post(
         imageUpdateSlugs
           ?.split(",")
           .map(slug => slug.trim())
+          .filter(Boolean)
           .reduce((map, slug) => ({ ...map, [slug]: true }), {}) || {};
       const [{ product_categories: categories }] = await fetchWPContent(
         `${backendUrlMap[business]}/products/categories?${wCAuthString}&filter[limit]=10000`
@@ -287,14 +289,14 @@ doWordpressSync.post(
       await AppConfigRepo.updateConfig({ wPSyncInProgress: true });
       try {
         await Promise.all([
-          ProductWPModel.collection.drop(),
-          CategoryWPModel.collection.drop()
+          ProductWPRegalModel.collection.drop(),
+          CategoryWPRegalModel.collection.drop()
         ]);
       } catch (err) {
         console.error("Unable to drop collections: ", err);
       }
 
-      await CategoryWPModel.insertMany(
+      await CategoryWPRegalModel.insertMany(
         categories.map(category => ({
           ...category,
           slug: slugify(category.name),
@@ -306,7 +308,7 @@ doWordpressSync.post(
         })),
         { ordered: false }
       );
-      await ProductWPModel.insertMany(
+      await ProductWPRegalModel.insertMany(
         products.filter(prod => prod.price),
         { ordered: false }
       );
@@ -323,7 +325,7 @@ doWordpressSync.post(
           const categoryAltImage = category.alt_text_for_images;
           const categoryTitle = category.title_tag;
 
-          await CategoryWPModel.updateOne(
+          await CategoryWPRegalModel.updateOne(
             { key: categoryKey },
             {
               $set: {
@@ -351,7 +353,7 @@ doWordpressSync.post(
       ].forEach(async (product: any) => {
         const categoryKey = product.id.toString();
 
-        await ProductWPModel.updateOne(
+        await ProductWPRegalModel.updateOne(
           { key: categoryKey },
           {
             $set: {
