@@ -15,7 +15,10 @@ const schema = new Schema(
     slug: String,
     _nameSearch: { type: [String], index: true },
     description: String,
-    image: String
+    image: String,
+    shortDescription: String,
+    altImage: String,
+    title: String
   },
   { _id: false }
 ).index({

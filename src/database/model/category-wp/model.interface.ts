@@ -3,6 +3,10 @@ export default interface CategoryWP {
   name: string;
   slug: string;
   createdAt: string;
+  shortDescription: string;
+  altImage: string;
+  title: string;
+  key: string;
 }
 
 export interface CategoryWPCreate extends Omit<CategoryWP, "id"> {
@@ -15,5 +19,8 @@ export const categoryWPProjection = [
   "name",
   "slug",
   "description",
-  "image"
+  "image",
+  "shortDescription",
+  "altImage",
+  "title"
 ];

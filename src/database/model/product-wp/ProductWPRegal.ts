@@ -78,7 +78,8 @@ const schema = new Schema({
   timeStamp: String,
   designNote: String,
   budgetNote: String,
-  inStock: Boolean
+  inStock: Boolean,
+  pageDescription: String
 });
 
 export const ProductWPRegalModel = model<ProductWPRegalDocument & Document>(
