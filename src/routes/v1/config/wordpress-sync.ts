@@ -304,7 +304,9 @@ doWordpressSync.post(
           key: category.id,
           shortDescription: "",
           altImage: "",
-          title: ""
+          title: "",
+          topHeading: "",
+          bottomHeading: ""
         })),
         { ordered: false }
       );
@@ -319,19 +321,15 @@ doWordpressSync.post(
 
       (productCategory[0] as unknown as any[]).forEach(
         async (category: any) => {
-          const categoryKey = category.id.toString();
-          const categoryCustomDescription =
-            category.custom_category_description;
-          const categoryAltImage = category.alt_text_for_images;
-          const categoryTitle = category.title_tag;
-
           await CategoryWPRegalModel.updateOne(
-            { key: categoryKey },
+            { key: category.id.toString() },
             {
               $set: {
-                shortDescription: categoryCustomDescription,
-                altImage: categoryAltImage,
-                title: categoryTitle
+                shortDescription: category.custom_category_description,
+                altImage: category.alt_text_for_images,
+                title: category.title_tag,
+                topHeading: category.custom_top_heading_h1,
+                bottomHeading: category.custom_bottom_heading_h2
               }
             }
           );
