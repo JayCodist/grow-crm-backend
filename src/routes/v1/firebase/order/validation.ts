@@ -11,7 +11,8 @@ const validation = {
         quantity: Joi.number().required().positive().integer().invalid(0)
       })
     ),
-    deliveryDate: Joi.string().allow("")
+    deliveryDate: Joi.string().allow(""),
+    currency: Joi.string().required().valid("NGN", "USD", "GBP")
   }),
   updateOrder: Joi.object({
     cartItems: Joi.array()

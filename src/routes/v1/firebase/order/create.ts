@@ -23,6 +23,8 @@ import {
   ProductWP,
   allDesignOptions
 } from "../../../../database/model/product-wp/model.interface";
+import validation from "./validation";
+import validator from "../../../../helpers/validator";
 
 const createOrder = express.Router();
 const { firestore } = firebaseAdmin;
@@ -105,164 +107,171 @@ export const getWpProducts: (
   return _wpProducts;
 };
 
-createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
-  try {
-    const { user } = req;
-    const client = user?.phone ? await handleContactHooks(user, "client") : {};
+createOrder.post(
+  "/create",
+  handleFormDataParsing(),
+  validator(validation.createOrder, "body"),
+  async (req, res) => {
+    try {
+      const { user } = req;
+      const client = user?.phone
+        ? await handleContactHooks(user, "client")
+        : {};
 
-    const { cartItems, deliveryDate, currency, business } = req.body as {
-      cartItems: CartItem[];
-      deliveryDate: string;
-      currency: AppCurrencyName;
-      business: Business;
-    };
-    const _wpProducts = await ProductWPRepo.findByKeys(
-      cartItems.map(item => item.key)
-    );
-    const wpProducts = getWpProducts(cartItems, _wpProducts);
-
-    if (wpProducts.length !== cartItems.length) {
-      throw new BadRequestError("Some products not found");
-    }
-
-    const totalPrice = wpProducts.reduce((price, product, index) => {
-      const cartItem = cartItems[index];
-      const productPrice = deduceProductTruePrice(product, cartItem);
-      return price + productPrice * cartItem.quantity;
-    }, 0);
-
-    const fbProducts = await getFirebaseProducts(
-      wpProducts.map(prod => prod.sku).filter(Boolean)
-    );
-
-    const orderProducts = fbProducts.map(prod => {
-      const prodIndex = wpProducts.findIndex(_prod => _prod.sku === prod.SKU);
-      const { quantity, size, design, image } = cartItems[prodIndex];
-
-      return {
-        name: prod.name,
-        SKU: prod.SKU,
-        size,
-        design,
-        quantity,
-        image,
-        key: wpProducts[prodIndex].key,
-        price: deduceProductTruePrice(
-          wpProducts[prodIndex],
-          cartItems[prodIndex]
-        )
+      const { cartItems, deliveryDate, currency, business } = req.body as {
+        cartItems: CartItem[];
+        deliveryDate: string;
+        currency: AppCurrencyName;
+        business: Business;
       };
-    });
+      const _wpProducts = await ProductWPRepo.findByKeys(
+        cartItems.map(item => item.key)
+      );
+      const wpProducts = getWpProducts(cartItems, _wpProducts);
 
-    let orderDetails = orderProducts
-      .map(product => {
-        const wpProductIndex = wpProducts.findIndex(
-          _prod => _prod.sku === product.SKU
-        );
-        const price =
-          wpProductIndex >= 0
-            ? deduceProductTruePrice(
-                wpProducts[wpProductIndex],
-                cartItems[wpProductIndex]
-              )
-            : 0;
-        return `${
-          product.quantity > 1 ? `${String(product.quantity)} TIMES ` : ""
-        } ${getFBProductDisplayName(product)} (${price * product.quantity})`;
-      })
-      .join(" + ");
-    orderDetails += ` = ${totalPrice}`;
+      if (wpProducts.length !== cartItems.length) {
+        throw new BadRequestError("Some products not found");
+      }
 
-    const _currency =
-      currencyOptions.find(_currency => _currency.name === currency) || "";
+      const totalPrice = wpProducts.reduce((price, product, index) => {
+        const cartItem = cartItems[index];
+        const productPrice = deduceProductTruePrice(product, cartItem);
+        return price + productPrice * cartItem.quantity;
+      }, 0);
 
-    const payload: OrderCreate = {
-      amount: totalPrice,
-      orderProducts,
-      orderDetails,
-      client,
-      paymentStatus: "Website Not Paid (finalized discussion)",
-      cost: 0,
-      deliveryDate: deliveryDate || "",
-      admin: adminEmailBusinessMap[business],
-      adminNotes: `${
-        _currency && _currency.name !== "NGN"
-          ? getPriceDisplay(totalPrice, _currency)
-          : ""
-      }`,
-      currency: currency || "NGN",
-      anonymousClient: false,
-      arrangementTime: "",
-      business: businessTitleMap[business],
-      channel: channelBusinessMap[business],
-      contactDepsArray: [client.id].filter(Boolean) as string[],
-      costBreakdown: "",
-      deliveryMessage: "",
-      deliveryNotePrinted: false,
-      deliveryStatus: "Not Arranged",
-      deliveryZone: "WEB",
-      despatchFrom: "Unselected",
-      driver: {},
-      editingAdminsRevised: [],
-      feedback: {},
-      isClientRecipient: false,
-      isDuplicatedOrder: false,
-      lastDeliveryNotePrintedAdmin: "",
-      lastDeliveryNotePrintedTime: "",
-      lastDeliveryStatusAdmin: "",
-      lastDeliveryStatusTime: "",
-      lastMessagePrintedAdmin: "",
-      lastMessagePrintedTime: "",
-      lastPaymentStatusAdmin: "",
-      lastPaymentStatusTime: "",
-      line: "NA",
-      messagePrinted: false,
-      profit: 0,
-      purpose: "Unknown",
-      recipient: {},
-      recipientAddress: "",
-      receivedByName: "",
-      receivedByPhone: "",
-      sendReminders: false,
-      upsellProfit: 0,
-      websiteOrderID: "",
-      driverAlerted: false,
-      orderStatus: "created",
-      deliveryDetails: {
-        recidenceType: "",
+      const fbProducts = await getFirebaseProducts(
+        wpProducts.map(prod => prod.sku).filter(Boolean)
+      );
+
+      const orderProducts = fbProducts.map(prod => {
+        const prodIndex = wpProducts.findIndex(_prod => _prod.sku === prod.SKU);
+        const { quantity, size, design, image } = cartItems[prodIndex];
+
+        return {
+          name: prod.name,
+          SKU: prod.SKU,
+          size,
+          design,
+          quantity,
+          image,
+          key: wpProducts[prodIndex].key,
+          price: deduceProductTruePrice(
+            wpProducts[prodIndex],
+            cartItems[prodIndex]
+          )
+        };
+      });
+
+      let orderDetails = orderProducts
+        .map(product => {
+          const wpProductIndex = wpProducts.findIndex(
+            _prod => _prod.sku === product.SKU
+          );
+          const price =
+            wpProductIndex >= 0
+              ? deduceProductTruePrice(
+                  wpProducts[wpProductIndex],
+                  cartItems[wpProductIndex]
+                )
+              : 0;
+          return `${
+            product.quantity > 1 ? `${String(product.quantity)} TIMES ` : ""
+          } ${getFBProductDisplayName(product)} (${price * product.quantity})`;
+        })
+        .join(" + ");
+      orderDetails += ` = ${totalPrice}`;
+
+      const _currency =
+        currencyOptions.find(_currency => _currency.name === currency) || "";
+
+      const payload: OrderCreate = {
+        amount: totalPrice,
+        orderProducts,
+        orderDetails,
+        client,
+        paymentStatus: "Website Not Paid (finalized discussion)",
+        cost: 0,
+        deliveryDate: deliveryDate || "",
+        admin: adminEmailBusinessMap[business],
+        adminNotes: `${
+          _currency && _currency.name !== "NGN"
+            ? getPriceDisplay(totalPrice, _currency)
+            : ""
+        }`,
+        currency: currency || "NGN",
+        anonymousClient: false,
+        arrangementTime: "",
+        business: businessTitleMap[business],
+        channel: channelBusinessMap[business],
+        contactDepsArray: [client.id].filter(Boolean) as string[],
+        costBreakdown: "",
+        deliveryMessage: "",
+        deliveryNotePrinted: false,
+        deliveryStatus: "Not Arranged",
+        deliveryZone: "WEB",
+        despatchFrom: "Unselected",
+        driver: {},
+        editingAdminsRevised: [],
+        feedback: {},
+        isClientRecipient: false,
+        isDuplicatedOrder: false,
+        lastDeliveryNotePrintedAdmin: "",
+        lastDeliveryNotePrintedTime: "",
+        lastDeliveryStatusAdmin: "",
+        lastDeliveryStatusTime: "",
+        lastMessagePrintedAdmin: "",
+        lastMessagePrintedTime: "",
+        lastPaymentStatusAdmin: "",
+        lastPaymentStatusTime: "",
+        line: "NA",
+        messagePrinted: false,
+        profit: 0,
+        purpose: "Unknown",
+        recipient: {},
         recipientAddress: "",
-        recipientName: "",
-        recipientPhone: "",
-        recipientAltPhone: "",
-        state: "",
-        zone: ""
-      },
-      deliveryAmount: 0,
-      orderID: 0,
-      deliveryInstruction: "",
-      fullOrderId: "",
-      paymentMethod: null
-    };
+        receivedByName: "",
+        receivedByPhone: "",
+        sendReminders: false,
+        upsellProfit: 0,
+        websiteOrderID: "",
+        driverAlerted: false,
+        orderStatus: "created",
+        deliveryDetails: {
+          recidenceType: "",
+          recipientAddress: "",
+          recipientName: "",
+          recipientPhone: "",
+          recipientAltPhone: "",
+          state: "",
+          zone: ""
+        },
+        deliveryAmount: 0,
+        orderID: 0,
+        deliveryInstruction: "",
+        fullOrderId: "",
+        paymentMethod: null
+      };
 
-    const response = await db.add({
-      ...payload,
-      timestamp: firestore.FieldValue.serverTimestamp()
-    });
+      const response = await db.add({
+        ...payload,
+        timestamp: firestore.FieldValue.serverTimestamp()
+      });
 
-    if (!response) {
-      throw new NoDataError("Order not created");
+      if (!response) {
+        throw new NoDataError("Order not created");
+      }
+
+      const createdOrder = await db.doc(response.id).get();
+
+      const createdOrderResponse = { ...createdOrder.data(), id: response.id };
+
+      return new SuccessResponse("success", {
+        ...createdOrderResponse
+      }).send(res);
+    } catch (error) {
+      return ApiError.handle(error as Error, res);
     }
-
-    const createdOrder = await db.doc(response.id).get();
-
-    const createdOrderResponse = { ...createdOrder.data(), id: response.id };
-
-    return new SuccessResponse("success", {
-      ...createdOrderResponse
-    }).send(res);
-  } catch (error) {
-    return ApiError.handle(error as Error, res);
   }
-});
+);
 
 export default createOrder;
