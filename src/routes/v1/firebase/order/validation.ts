@@ -2,6 +2,7 @@ import Joi from "@hapi/joi";
 
 const validation = {
   createOrder: Joi.object({
+    business: Joi.string().required().valid("regalFlowers", "floralHub"),
     cartItems: Joi.array().items(
       Joi.object({
         key: Joi.number().required(),
@@ -38,6 +39,7 @@ const validation = {
       amount: Joi.number().greater(-1),
       label: Joi.string().allow("")
     }).allow(null),
+
     orderData: Joi.object({
       deliveryInstruction: Joi.string().default("").allow(""),
       deliveryDate: Joi.string().required(),

@@ -5,7 +5,13 @@ import {
   NoDataError
 } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
-import { OrderCreate } from "../../../../database/model/Order";
+import {
+  Business,
+  OrderCreate,
+  adminEmailBusinessMap,
+  businessTitleMap,
+  channelBusinessMap
+} from "../../../../database/model/Order";
 import ProductWPRepo from "../../../../database/repository/ProductWPRepo";
 import firebaseAdmin from "../../../../helpers/firebase-admin";
 import { handleFormDataParsing } from "../../../../helpers/request-modifiers";
@@ -104,10 +110,11 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
     const { user } = req;
     const client = user?.phone ? await handleContactHooks(user, "client") : {};
 
-    const { cartItems, deliveryDate, currency } = req.body as {
+    const { cartItems, deliveryDate, currency, business } = req.body as {
       cartItems: CartItem[];
       deliveryDate: string;
       currency: AppCurrencyName;
+      business: Business;
     };
     const _wpProducts = await ProductWPRepo.findByKeys(
       cartItems.map(item => item.key)
@@ -177,7 +184,7 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
       paymentStatus: "Website Not Paid (finalized discussion)",
       cost: 0,
       deliveryDate: deliveryDate || "",
-      admin: "regalflowersnigeria@gmail.com",
+      admin: adminEmailBusinessMap[business],
       adminNotes: `${
         _currency && _currency.name !== "NGN"
           ? getPriceDisplay(totalPrice, _currency)
@@ -186,8 +193,8 @@ createOrder.post("/create", handleFormDataParsing(), async (req, res) => {
       currency: currency || "NGN",
       anonymousClient: false,
       arrangementTime: "",
-      business: "Regal Flowers",
-      channel: "Regal Website",
+      business: businessTitleMap[business],
+      channel: channelBusinessMap[business],
       contactDepsArray: [client.id].filter(Boolean) as string[],
       costBreakdown: "",
       deliveryMessage: "",

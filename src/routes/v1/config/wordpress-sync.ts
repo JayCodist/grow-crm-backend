@@ -21,10 +21,9 @@ import {
   allDesignOptions
 } from "../../../database/model/product-wp/model.interface";
 import { ProductWPRegalModel } from "../../../database/model/product-wp/ProductWPRegal";
+import { Business } from "../../../database/model/Order";
 
-export type WPBusiness = "regalFlowers" | "floralHub";
-
-const backendUrlMap: Record<WPBusiness, string> = {
+const backendUrlMap: Record<Business, string> = {
   regalFlowers: "https://www.regalflower.com/wc-api/v3",
   floralHub: "https://www.floralhub.com.ng/wc-api/v3"
 };
@@ -186,7 +185,7 @@ doWordpressSync.post(
   async (req, res) => {
     try {
       const { business, imageUpdateSlugs } = req.query as unknown as {
-        business: "regalFlowers" | "floralHub";
+        business: Business;
         imageUpdateSlugs?: string;
       };
       const slugMapForDeepUpdate: Record<string, boolean> =
