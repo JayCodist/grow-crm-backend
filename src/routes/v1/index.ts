@@ -21,6 +21,7 @@ import { updateOrder } from "./firebase/order/update";
 import { saveSendersInfo } from "./firebase/order/save-senders-info";
 import updatePaymentMethodDetails from "./firebase/order/update-payment-details";
 import categoryWPSlug from "./wordpress/category-wp/category-slug";
+import floralhubRoutes from "./floral-hub";
 
 const router = express.Router();
 
@@ -73,5 +74,7 @@ router.use("/wordpress/category/single", categoryWPSlug);
 router.use("/payments", paymentRoutes);
 
 router.use("/regal", regalFlowersRoutes);
+
+router.use("/floralhub", floralhubRoutes);
 
 export default router;
