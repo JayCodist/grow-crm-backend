@@ -125,7 +125,8 @@ createOrder.post(
         business: Business;
       };
       const _wpProducts = await ProductWPRepo.findByKeys(
-        cartItems.map(item => item.key)
+        cartItems.map(item => item.key),
+        business
       );
       const wpProducts = getWpProducts(cartItems, _wpProducts);
 

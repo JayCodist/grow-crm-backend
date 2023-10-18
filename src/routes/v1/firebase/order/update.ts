@@ -5,7 +5,7 @@ import {
 } from "../../../../helpers/request-modifiers";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
-import { Order } from "../../../../database/model/Order";
+import { Business, Order } from "../../../../database/model/Order";
 import {
   ApiError,
   BadRequestError,
@@ -46,7 +46,7 @@ updateOrder.put(
   handleAuthValidation(true),
   async (req, res) => {
     try {
-      const { cartItems, deliveryDate, currency } = req.body as {
+      const { cartItems, deliveryDate, currency, business } = req.body as {
         cartItems:
           | {
               key: number;
@@ -58,6 +58,7 @@ updateOrder.put(
           | null;
         deliveryDate: string;
         currency: AppCurrencyName;
+        business: Business;
       };
 
       const existingOrder = (
@@ -70,7 +71,8 @@ updateOrder.put(
 
       if (cartItems) {
         const _wpProducts = await ProductWPRepo.findByKeys(
-          cartItems.map(item => item.key)
+          cartItems.map(item => item.key),
+          business
         );
         const wpProducts = getWpProducts(cartItems, _wpProducts);
 

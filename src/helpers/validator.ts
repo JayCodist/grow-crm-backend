@@ -30,4 +30,8 @@ const validator = (schema: Joi.ObjectSchema, source: ValidationSource) => {
   };
 };
 
+export const businessValidation = {
+  business: Joi.string().required().valid("regalFlowers", "floralHub")
+};
+
 export default validator;
