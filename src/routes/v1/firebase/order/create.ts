@@ -15,7 +15,7 @@ import {
 import ProductWPRepo from "../../../../database/repository/ProductWPRepo";
 import firebaseAdmin from "../../../../helpers/firebase-admin";
 import { handleFormDataParsing } from "../../../../helpers/request-modifiers";
-import { handleContactHooks } from "./order-utils";
+import { handleContactHooks } from "./utils";
 import { AppCurrencyName } from "../../../../database/model/AppConfig";
 import { currencyOptions } from "../../../../helpers/constants";
 import { getPriceDisplay } from "../../../../helpers/type-conversion";

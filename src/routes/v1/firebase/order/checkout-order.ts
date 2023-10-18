@@ -22,7 +22,7 @@ import {
   handleFormDataParsing
 } from "../../../../helpers/request-modifiers";
 import validator from "../../../../helpers/validator";
-import { handleContactHooks } from "./order-utils";
+import { handleContactHooks } from "./utils";
 import validation from "./validation";
 import {
   DeliveryZoneAmount,

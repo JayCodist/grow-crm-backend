@@ -7,7 +7,7 @@ import {
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
 import { UserCreate } from "../../../../database/model/User";
-import { handleContactHooks } from "./order-utils";
+import { handleContactHooks } from "./utils";
 import { ApiError } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
 

@@ -12,9 +12,12 @@ export interface AppCurrency {
 }
 
 export default interface AppConfig {
-  wPSyncInProgress: boolean;
-  wPTotalSyncs: number;
-  lastWPSyncDate: string;
+  wPSyncInProgressRegal: boolean;
+  wPSyncInProgressFloral: boolean;
+  wPTotalSyncsRegal: number;
+  wPTotalSyncsFloral: number;
+  lastWPSyncDateRegal: string;
+  lastWPSyncDateFloral: string;
   currenciesLastSyncDate: string;
   currencies: AppCurrency[];
 }
@@ -23,9 +26,12 @@ interface AppConfigDocument extends Document {}
 
 const schema = new Schema(
   {
-    wPSyncInProgress: Boolean,
-    wPTotalSyncs: Number,
-    lastWPSyncDate: String,
+    wPSyncInProgressRegal: Boolean,
+    wPSyncInProgresFloral: Boolean,
+    wPTotalSyncsRegal: Number,
+    wPTotalSyncsFloral: Number,
+    lastWPSyncDateRegal: String,
+    lastWPSyncDateFloral: String,
     currencies: [
       {
         name: String,
