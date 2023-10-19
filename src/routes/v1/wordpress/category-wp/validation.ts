@@ -12,7 +12,6 @@ const validation = {
     ...businessValidation
   }),
   slug: Joi.object().keys({
-    slug: Joi.string().required(),
     ...businessValidation
   })
 };

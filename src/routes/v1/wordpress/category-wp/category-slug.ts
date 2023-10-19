@@ -17,11 +17,13 @@ categoryWPSlug.get(
   validator(validation.slug, "params"),
   async (req, res) => {
     try {
-      const { slug, business } = req.params as {
-        slug: string;
+      const { business } = req.query as {
         business: Business;
       };
-      const response = await CategoryWPRepo.findBySlug(slug, business);
+      const response = await CategoryWPRepo.findBySlug(
+        req.params.slug,
+        business
+      );
 
       if (!response) {
         new BadRequestResponse("Category not found").send(res);
