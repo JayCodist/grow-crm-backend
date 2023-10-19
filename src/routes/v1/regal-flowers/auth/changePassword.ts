@@ -8,6 +8,7 @@ import {
 } from "../../../../helpers/request-modifiers";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
+import { Business } from "../../../../database/model/Order";
 
 const changePassword = express.Router();
 
@@ -18,13 +19,16 @@ changePassword.use(
   handleAuthValidation(),
   async (req, res) => {
     try {
-      const { password } = req.body;
-      const user = await UsersRepo.findById(req.user?.id as string);
+      const { password, business } = req.body as {
+        password: string;
+        business: Business;
+      };
+      const user = await UsersRepo.findById(req.user?.id as string, business);
       if (!user) {
         throw new AuthFailureError("User not found");
       }
 
-      await UsersRepo.update({ password, id: user.id });
+      await UsersRepo.update({ password, id: user.id }, business);
       new SuccessResponse("Password changed successfully", user).send(res);
     } catch (error) {
       ApiError.handle(error as Error, res);

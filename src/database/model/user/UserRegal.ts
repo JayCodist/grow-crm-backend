@@ -2,8 +2,8 @@ import { Schema, model, Document } from "mongoose";
 import Logger from "../../../core/Logger";
 import User from "./model.interface";
 
-const DOCUMENT_NAME = "UserFloral";
-const COLLECTION_NAME = "usersFloral";
+const DOCUMENT_NAME = "User";
+const COLLECTION_NAME = "users";
 
 const schema = new Schema({
   name: String,
@@ -36,13 +36,13 @@ const schema = new Schema({
   createdAt: 1
 });
 
-export const UserFloralModel = model<Document & User>(
+export const UserRegalModel = model<Document & User>(
   DOCUMENT_NAME,
   schema,
   COLLECTION_NAME
 );
 
-UserFloralModel.on("index", error => {
+UserRegalModel.on("index", error => {
   if (error) {
     Logger.error(error);
   } else {

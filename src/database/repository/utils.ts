@@ -7,6 +7,9 @@ import { ProductWP } from "../model/product-wp/model.interface";
 import CategoryWP from "../model/category-wp/model.interface";
 import { CategoryWPRegalModel } from "../model/category-wp/CategoryWPRegal";
 import { CategoryWPFloralModel } from "../model/category-wp/CategoryWPFloral";
+import User from "../model/user/model.interface";
+import { UserRegalModel } from "../model/user/UserRegal";
+import { UserFloralModel } from "../model/user/UserFloral";
 
 export const appConfigSyncProgressFieldMap: Record<Business, keyof AppConfig> =
   {
@@ -32,4 +35,9 @@ export const ProductModelMap: Record<Business, Model<ProductWP>> = {
 export const CategoryModelMap: Record<Business, Model<CategoryWP>> = {
   regalFlowers: CategoryWPRegalModel as Model<CategoryWP>,
   floralHub: CategoryWPFloralModel as Model<CategoryWP>
+};
+
+export const UserModelMap: Record<Business, Model<User>> = {
+  regalFlowers: UserRegalModel,
+  floralHub: UserFloralModel
 };

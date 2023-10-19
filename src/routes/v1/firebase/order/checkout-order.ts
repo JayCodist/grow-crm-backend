@@ -7,6 +7,7 @@ import {
 } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
 import {
+  Business,
   DeliveryLocationOption,
   Order
 } from "../../../../database/model/Order";
@@ -85,7 +86,8 @@ checkoutOrder.put(
         orderData,
         userData,
         deliveryLocation,
-        currency
+        currency,
+        business
       } = req.body as {
         shouldCreateAccount: boolean;
         shouldSaveAddress: boolean;
@@ -93,6 +95,7 @@ checkoutOrder.put(
         userData: UserCreate;
         deliveryLocation: DeliveryLocationOption | null;
         currency: AppCurrencyName;
+        business: Business;
       };
 
       const response = await Promise.all([
@@ -101,7 +104,7 @@ checkoutOrder.put(
       ]);
 
       const existingOrder = response[0].data() as Order | null;
-      const business = response[1].docs.map(doc => doc.data());
+      const businesses = response[1].docs.map(doc => doc.data());
 
       if (!existingOrder) {
         throw new NoDataError("Order not found");
@@ -132,7 +135,7 @@ checkoutOrder.put(
             "You have to provide email and password to create new account"
           );
         }
-        user = await UsersRepo.signup(userData);
+        user = await UsersRepo.signup(userData, business);
       }
       if (shouldSaveAddress) {
         if (!user) {
@@ -143,7 +146,8 @@ checkoutOrder.put(
           let { recipients } = user;
           if (!recipients) {
             recipients =
-              (await UsersRepo.findByEmail(user.email))?.recipients || [];
+              (await UsersRepo.findByEmail(user.email, business))?.recipients ||
+              [];
           }
 
           const recipientPhone = formatPhoneNumber(
@@ -190,7 +194,7 @@ checkoutOrder.put(
                   altPhoneCountryCode: orderData.recipient.altPhoneCountryCode
                 }
               ];
-          await UsersRepo.update({ id: user.id, recipients });
+          await UsersRepo.update({ id: user.id, recipients }, business);
         }
       }
 
@@ -199,13 +203,16 @@ checkoutOrder.put(
         user?.phone !== formatPhoneNumber(userData.phone);
 
       if (user && shouldUpdateUser) {
-        await UsersRepo.update({
-          id: user.id,
-          phone: formatPhoneNumber(userData.phone || ""),
-          phoneAlt: formatPhoneNumber(userData.phoneAlt || ""),
-          phoneCountryCode: userData.phoneCountryCode,
-          name: userData.name
-        });
+        await UsersRepo.update(
+          {
+            id: user.id,
+            phone: formatPhoneNumber(userData.phone || ""),
+            phoneAlt: formatPhoneNumber(userData.phoneAlt || ""),
+            phoneCountryCode: userData.phoneCountryCode,
+            name: userData.name
+          },
+          business
+        );
       }
 
       const client = await handleContactHooks(userData, "client");
@@ -233,8 +240,8 @@ checkoutOrder.put(
           )
         : false;
 
-      const businessLetter = business.find(
-        bus => bus.name === existingOrder?.business
+      const businessLetter = businesses.find(
+        business => business.name === existingOrder?.business
       )?.letter;
 
       await db

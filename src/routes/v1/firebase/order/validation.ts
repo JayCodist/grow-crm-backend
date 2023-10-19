@@ -40,6 +40,7 @@ const validation = {
   checkoutOrder: Joi.object({
     shouldCreateAccount: Joi.boolean().required(),
     shouldSaveAddress: Joi.boolean().required(),
+    ...businessValidation,
     deliveryLocation: Joi.object({
       name: Joi.string().required(),
       amount: Joi.number().greater(-1),
