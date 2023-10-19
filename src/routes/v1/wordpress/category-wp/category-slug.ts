@@ -14,7 +14,7 @@ const categoryWPSlug = express.Router();
 
 categoryWPSlug.get(
   "/:slug",
-  validator(validation.slug, "params"),
+  validator(validation.slug, "query"),
   async (req, res) => {
     try {
       const { business } = req.query as {
