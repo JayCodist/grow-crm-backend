@@ -8,6 +8,7 @@ import CategoryWPRepo from "../../../../database/repository/CategoryWPRepo";
 import validator from "../../../../helpers/validator";
 
 import validation from "./validation";
+import { Business } from "../../../../database/model/Order";
 
 const categoryWPSlug = express.Router();
 
@@ -16,7 +17,11 @@ categoryWPSlug.get(
   validator(validation.slug, "params"),
   async (req, res) => {
     try {
-      const response = await CategoryWPRepo.findBySlug(req.params.slug);
+      const { slug, business } = req.params as {
+        slug: string;
+        business: Business;
+      };
+      const response = await CategoryWPRepo.findBySlug(slug, business);
 
       if (!response) {
         new BadRequestResponse("Category not found").send(res);
