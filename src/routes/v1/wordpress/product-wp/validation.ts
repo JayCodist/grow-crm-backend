@@ -70,7 +70,8 @@ const validation = {
     timeStamp: Joi.string().allow("")
   }),
   slug: Joi.object().keys({
-    ...businessValidation
+    ...businessValidation,
+    relatedProductsCount: Joi.number().min(0)
   }),
   related: Joi.object().keys({
     slug: Joi.string().required()
