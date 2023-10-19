@@ -7,6 +7,7 @@ import {
 import ProductWPRepo from "../../../../database/repository/ProductWPRepo";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
+import { Business } from "../../../../database/model/Order";
 
 const productWPSlug = express.Router();
 
@@ -15,9 +16,13 @@ productWPSlug.get(
   validator(validation.slug, "params"),
   async (req, res) => {
     try {
-      const { relatedProductsCount } = req.query;
+      const { relatedProductsCount, business } = req.query as {
+        business: Business;
+        relatedProductsCount: string;
+      };
       const response = await ProductWPRepo.findBySlug(
         req.params.slug,
+        business,
         Number(relatedProductsCount) || 0
       );
 

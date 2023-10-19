@@ -7,6 +7,7 @@ import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
 import { handleFormDataParsing } from "../../../../helpers/request-modifiers";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
+import { Business } from "../../../../database/model/Order";
 
 const requestOTP = express.Router();
 
@@ -16,8 +17,11 @@ requestOTP.use(
   validator(validation.requestOTP, "body"),
   async (req, res) => {
     try {
-      const { email } = req.body;
-      const user = await UsersRepo.findByEmail(email);
+      const { email, business } = req.body as {
+        email: string;
+        business: Business;
+      };
+      const user = await UsersRepo.findByEmail(email, business);
       if (!user) {
         throw new AuthFailureError("Email does not belong to existing user");
       }

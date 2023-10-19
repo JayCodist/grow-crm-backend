@@ -63,6 +63,25 @@ type Channel =
   | "Facebook"
   | "Other";
 
+export type Business = "regalFlowers" | "floralHub";
+
+export type BusinessTitle = "Regal Flowers" | "Floral Hub";
+
+export const businessTitleMap: Record<Business, BusinessTitle> = {
+  regalFlowers: "Regal Flowers",
+  floralHub: "Floral Hub"
+};
+
+export const adminEmailBusinessMap: Record<Business, string> = {
+  regalFlowers: "regalflowersnigeria@gmail.com",
+  floralHub: "floralwebsite@gmail.com.ng"
+};
+
+export const channelBusinessMap: Record<Business, Channel> = {
+  regalFlowers: "Regal Website",
+  floralHub: "FloralHub Website"
+};
+
 type DeliveryStatus =
   | "Not Arranged"
   | "Arranged"
@@ -197,7 +216,7 @@ export interface Order {
   amount: number;
   anonymousClient: boolean;
   arrangementTime: string;
-  business: "Regal Flowers" | "Floral Hub";
+  business: BusinessTitle;
   channel: Channel;
   contactDepsArray: Array<string>;
   costBreakdown: string;

@@ -5,7 +5,7 @@ import { CategoryWPCreate } from "./model.interface";
 const DOCUMENT_NAME = "CategoryWPFloral";
 const COLLECTION_NAME = "categoryWPFloral";
 
-interface CategoryWPFloralDocument extends Document, CategoryWPCreate {}
+interface CategoryWPDocument extends CategoryWPCreate {}
 
 const schema = new Schema(
   {
@@ -20,13 +20,13 @@ const schema = new Schema(
   createdAt: 1
 });
 
-export const CategoryWPModelFloral = model<CategoryWPFloralDocument>(
+export const CategoryWPFloralModel = model<CategoryWPDocument & Document>(
   DOCUMENT_NAME,
   schema,
   COLLECTION_NAME
 );
 
-CategoryWPModelFloral.on("index", error => {
+CategoryWPFloralModel.on("index", error => {
   if (error) {
     Logger.error(error);
   } else {

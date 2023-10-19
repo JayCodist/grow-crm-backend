@@ -1,7 +1,9 @@
 import Joi from "@hapi/joi";
+import { businessValidation } from "../../../../helpers/validator";
 
 const validation = {
   createOrder: Joi.object({
+    ...businessValidation,
     cartItems: Joi.array().items(
       Joi.object({
         key: Joi.number().required(),
@@ -10,9 +12,14 @@ const validation = {
         quantity: Joi.number().required().positive().integer().invalid(0)
       })
     ),
-    deliveryDate: Joi.string().allow("")
+    deliveryDate: Joi.string().allow(""),
+    currency: Joi.string().required().valid("NGN", "USD", "GBP")
+  }),
+  getById: Joi.object({
+    ...businessValidation
   }),
   updateOrder: Joi.object({
+    ...businessValidation,
     cartItems: Joi.array()
       .items(
         Joi.object({
@@ -33,11 +40,13 @@ const validation = {
   checkoutOrder: Joi.object({
     shouldCreateAccount: Joi.boolean().required(),
     shouldSaveAddress: Joi.boolean().required(),
+    ...businessValidation,
     deliveryLocation: Joi.object({
       name: Joi.string().required(),
       amount: Joi.number().greater(-1),
       label: Joi.string().allow("")
     }).allow(null),
+
     orderData: Joi.object({
       deliveryInstruction: Joi.string().default("").allow(""),
       deliveryDate: Joi.string().required(),

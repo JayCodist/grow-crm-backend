@@ -11,6 +11,9 @@ import AppConfigRepo from "../../../database/repository/AppConfigRepo";
 import UsersRepo from "../../../database/repository/UserRepo";
 import { handleAuthValidation } from "../../../helpers/request-modifiers";
 import { currencyOptions } from "../../../helpers/constants";
+import validator from "../../../helpers/validator";
+import validation from "./auth/validation";
+import { Business } from "../../../database/model/Order";
 
 export const getCurrencies: (
   symbols?: string[]
@@ -37,33 +40,43 @@ export const getCurrencies: (
 
 const handshake = express.Router();
 
-handshake.get("/", handleAuthValidation(true), async (req, res) => {
-  try {
-    const config = await AppConfigRepo.getConfig();
-    let currencies: AppCurrency[] = config?.currencies || [];
-    if (
-      !config?.currenciesLastSyncDate ||
-      dayjs(config.currenciesLastSyncDate).isBefore(
-        dayjs().subtract(12, "hour")
-      )
-    ) {
-      currencies = currencyOptions;
-      await AppConfigRepo.updateConfig({
-        ...config,
-        currencies,
-        currenciesLastSyncDate: dayjs().format()
-      });
+handshake.get(
+  "/",
+  validator(validation.handshake, "query"),
+  handleAuthValidation(true),
+  async (req, res) => {
+    try {
+      const config = await AppConfigRepo.getConfig();
+      let currencies: AppCurrency[] = config?.currencies || [];
+      if (
+        !config?.currenciesLastSyncDate ||
+        dayjs(config.currenciesLastSyncDate).isBefore(
+          dayjs().subtract(12, "hour")
+        )
+      ) {
+        currencies = currencyOptions;
+        await AppConfigRepo.updateConfig({
+          ...config,
+          currencies,
+          currenciesLastSyncDate: dayjs().format()
+        });
+      }
+
+      const user = req.user
+        ? await UsersRepo.findByEmail(
+            req.user.email,
+            req.query.business as Business
+          )
+        : null;
+
+      return new SuccessResponse("success", {
+        currencies: currencyOptions,
+        user
+      }).send(res);
+    } catch (err) {
+      return ApiError.handle(err as Error, res);
     }
-
-    const user = req.user ? await UsersRepo.findByEmail(req.user.email) : null;
-
-    return new SuccessResponse("success", {
-      currencies: currencyOptions,
-      user
-    }).send(res);
-  } catch (err) {
-    return ApiError.handle(err as Error, res);
   }
-});
+);
 
 export default handshake;

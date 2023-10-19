@@ -21,10 +21,14 @@ import {
   allDesignOptions
 } from "../../../database/model/product-wp/model.interface";
 import { ProductWPRegalModel } from "../../../database/model/product-wp/ProductWPRegal";
+import { Business } from "../../../database/model/Order";
+import {
+  appConfigSyncDateFieldMap,
+  appConfigSyncProgressFieldMap,
+  appConfigTotalSyncsFieldMap
+} from "../../../database/repository/utils";
 
-export type WPBusiness = "regalFlowers" | "floralHub";
-
-const backendUrlMap: Record<WPBusiness, string> = {
+const backendUrlMap: Record<Business, string> = {
   regalFlowers: "https://www.regalflower.com/wc-api/v3",
   floralHub: "https://www.floralhub.com.ng/wc-api/v3"
 };
@@ -184,11 +188,11 @@ doWordpressSync.post(
   "/",
   validator(validation.doWordPressSync, "query"),
   async (req, res) => {
+    const { business, imageUpdateSlugs } = req.query as unknown as {
+      business: Business;
+      imageUpdateSlugs?: string;
+    };
     try {
-      const { business, imageUpdateSlugs } = req.query as unknown as {
-        business: "regalFlowers" | "floralHub";
-        imageUpdateSlugs?: string;
-      };
       const slugMapForDeepUpdate: Record<string, boolean> =
         imageUpdateSlugs
           ?.split(",")
@@ -286,7 +290,9 @@ doWordpressSync.post(
         };
         return product;
       });
-      await AppConfigRepo.updateConfig({ wPSyncInProgress: true });
+      await AppConfigRepo.updateConfig({
+        [appConfigSyncProgressFieldMap[business]]: true
+      });
       try {
         await Promise.all([
           ProductWPRegalModel.collection.drop(),
@@ -314,6 +320,16 @@ doWordpressSync.post(
         products.filter(prod => prod.price),
         { ordered: false }
       );
+
+      const currentSyncTotal = ((await AppConfigRepo.getConfig())?.[
+        appConfigTotalSyncsFieldMap[business]
+      ] || 0) as number;
+
+      await AppConfigRepo.updateConfig({
+        [appConfigSyncProgressFieldMap[business]]: false,
+        [appConfigSyncDateFieldMap[business]]: dayjs().format(),
+        [appConfigTotalSyncsFieldMap[business]]: currentSyncTotal + 1
+      });
 
       const productCategory = await fetchWPContent(
         "https://www.regalflower.com/wp-json/wp/v2/product_cat?per_page=100"
@@ -361,18 +377,11 @@ doWordpressSync.post(
         );
       });
 
-      const currentSyncTotal =
-        (await AppConfigRepo.getConfig())?.wPTotalSyncs || 0;
-
-      await AppConfigRepo.updateConfig({
-        wPSyncInProgress: false,
-        lastWPSyncDate: dayjs().format(),
-        wPTotalSyncs: currentSyncTotal + 1
-      });
-
       new SuccessResponse("Successfully synchronized Wordpress", []).send(res);
     } catch (e) {
-      await AppConfigRepo.updateConfig({ wPSyncInProgress: false });
+      await AppConfigRepo.updateConfig({
+        [appConfigSyncProgressFieldMap[business]]: false
+      });
       ApiError.handle(e as Error, res);
     }
   }

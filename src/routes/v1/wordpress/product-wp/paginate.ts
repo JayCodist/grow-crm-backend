@@ -6,6 +6,7 @@ import validator from "../../../../helpers/validator";
 import validation from "./validation";
 import { getSearchKey } from "../../../../helpers/formatters";
 import { ProductWP } from "../../../../database/model/product-wp/model.interface";
+import { Business } from "../../../../database/model/Order";
 
 const productWP = express.Router();
 
@@ -36,8 +37,9 @@ productWP.use(
         delivery,
         flowerName,
         searchValue,
-        searchField
-      } = req.query;
+        searchField,
+        business
+      } = req.query as Record<string, any> & { business: Business };
 
       let response: { data: ProductWP[]; count: number };
       let responses: any;
@@ -60,7 +62,8 @@ productWP.use(
             filter: {
               [getSearchKey(String(searchField))]:
                 String(searchValue).toLowerCase()
-            }
+            },
+            business
           }),
           ProductWPRepo.getPaginatedProducts({
             pageSize: Number(pageSize) || undefined,
@@ -69,7 +72,8 @@ productWP.use(
             filter: {
               [getSearchKey(String("category"))]:
                 String(searchValue).toLowerCase()
-            }
+            },
+            business
           })
         ]);
 
@@ -156,7 +160,8 @@ productWP.use(
             ...packagesProps,
             ...deliveryProps,
             ...flowerTypeProps
-          }
+          },
+          business
         });
       }
 

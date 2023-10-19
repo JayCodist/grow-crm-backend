@@ -1,5 +1,3 @@
-// type SortLogic =
-
 import { InternalError } from "../../core/ApiError";
 import {
   formatResponseRecord,
@@ -7,16 +5,18 @@ import {
 } from "../../helpers/formatters";
 import { wPCollectionIsReady } from "../../helpers/search-helpers";
 import { PartialLoose } from "../../helpers/type-helpers";
-import { ProductWPRegalModel } from "../model/product-wp/ProductWPRegal";
+import { Business } from "../model/Order";
 import {
   ProductWP,
   productWPProjection,
   productWPProjectionMinimal
 } from "../model/product-wp/model.interface";
+import { ProductModelMap } from "./utils";
 
 type SortLogic = PartialLoose<ProductWP, "asc" | "desc">;
 
 export interface PaginatedFetchParams {
+  business: Business;
   pageNumber?: number;
   pageSize?: number;
   sortLogic?: SortLogic;
@@ -36,11 +36,13 @@ export default class ProductWPRepo {
     filter = defaultFilter,
     pageNumber = defaultPageAttr.pageNumber,
     pageSize = defaultPageAttr.pageSize,
-    sortLogic = defaultSortLogic
+    sortLogic = defaultSortLogic,
+    business
   }: PaginatedFetchParams): Promise<{ data: ProductWP[]; count: number }> {
     return new Promise((resolve, reject) => {
-      wPCollectionIsReady().then(() =>
-        ProductWPRegalModel.find(filter)
+      wPCollectionIsReady(business).then(() =>
+        ProductModelMap[business]
+          .find(filter)
           .sort(sortLogic)
           .skip((pageNumber - 1) * pageSize)
           .limit(pageSize)
@@ -50,11 +52,11 @@ export default class ProductWPRepo {
             if (err) {
               reject(new InternalError(err.message));
             } else {
-              const filterQuery = ProductWPRegalModel.find(filter);
+              const filterQuery = ProductModelMap[business].find(filter);
               const countQuery =
                 filter === defaultFilter
                   ? filterQuery.estimatedDocumentCount()
-                  : ProductWPRegalModel.countDocuments(filter);
+                  : ProductModelMap[business].countDocuments(filter);
               countQuery.exec((countErr, count) => {
                 if (countErr) {
                   reject(new InternalError(countErr.message));
@@ -73,9 +75,11 @@ export default class ProductWPRepo {
 
   public static async findBySlug(
     slug: string,
+    business: Business,
     relatedProductsCount = 0
   ): Promise<ProductWP | null> {
-    const product = await ProductWPRegalModel.findOne({ slug })
+    const product = await ProductModelMap[business]
+      .findOne({ slug })
       .select(productWPProjection.join(" "))
       .lean<ProductWP>()
       .exec();
@@ -83,9 +87,10 @@ export default class ProductWPRepo {
       return null;
     }
     const relatedProducts = relatedProductsCount
-      ? await ProductWPRegalModel.find({
-          categories: { $in: product.categories }
-        })
+      ? await ProductModelMap[business]
+          .find({
+            categories: { $in: product.categories }
+          })
           .limit(relatedProductsCount + 1)
           .select(productWPProjectionMinimal.join(" "))
           .lean<ProductWP[]>()
@@ -105,27 +110,36 @@ export default class ProductWPRepo {
     };
   }
 
-  public static findBySlugs(slugs: string[]): Promise<ProductWP[]> {
-    return ProductWPRegalModel.find({ slug: { $in: slugs } })
+  public static findBySlugs(
+    slugs: string[],
+    business: Business
+  ): Promise<ProductWP[]> {
+    return ProductModelMap[business]
+      .find({ slug: { $in: slugs } })
       .select(productWPProjection.join(" "))
       .lean<ProductWP[]>()
       .exec();
   }
 
-  public static findByKeys(keys: number[]): Promise<ProductWP[]> {
-    return ProductWPRegalModel.find({ key: { $in: keys } })
+  public static findByKeys(
+    keys: number[],
+    business: Business
+  ): Promise<ProductWP[]> {
+    return ProductModelMap[business]
+      .find({ key: { $in: keys } })
       .select(productWPProjection.join(" "))
       .lean<ProductWP[]>()
       .exec();
   }
 
-  public static async getAllProducts(): Promise<{
+  public static async getAllProducts(business: Business): Promise<{
     data: ProductWP[];
     count: number;
   }> {
     return new Promise((resolve, reject) => {
-      wPCollectionIsReady().then(() => {
-        ProductWPRegalModel.find({}, productWPProjection)
+      wPCollectionIsReady(business).then(() => {
+        ProductModelMap[business]
+          .find({}, productWPProjection)
           .lean()
           .exec((err, products: ProductWP[]) => {
             if (err) {

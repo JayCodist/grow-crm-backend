@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { BadTokenError } from "../core/ApiError";
-import User, { LoginResponse } from "../database/model/User";
+import User, { LoginResponse } from "../database/model/user/model.interface";
 import { AppCurrency, AppCurrencyName } from "../database/model/AppConfig";
 import { getPriceDisplay } from "./type-conversion";
 import { currencyOptions } from "./constants";
