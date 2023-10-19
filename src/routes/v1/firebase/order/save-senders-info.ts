@@ -6,7 +6,7 @@ import {
 } from "../../../../helpers/request-modifiers";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
-import { UserCreate } from "../../../../database/model/User";
+import { UserCreate } from "../../../../database/model/user/UserRegal";
 import { handleContactHooks } from "./utils";
 import { ApiError } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";

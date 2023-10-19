@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import bcrypt from "bcrypt";
-import User, { LoginResponse, UserCreate, UserModel } from "../model/User";
+import User, { LoginResponse, UserCreate, UserModel } from "../model/user/UserRegal";
 import { PartialLoose } from "../../helpers/type-helpers";
 import { AuthFailureError, BadRequestError } from "../../core/ApiError";
 import {

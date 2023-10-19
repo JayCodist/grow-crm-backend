@@ -10,7 +10,7 @@ import {
   DeliveryLocationOption,
   Order
 } from "../../../../database/model/Order";
-import User, { Recipient, UserCreate } from "../../../../database/model/User";
+import User, { Recipient, UserCreate } from "../../../../database/model/user/UserRegal";
 import UsersRepo from "../../../../database/repository/UserRepo";
 import firebaseAdmin from "../../../../helpers/firebase-admin";
 import {

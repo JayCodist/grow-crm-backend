@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import formidable from "formidable";
 import { BadTokenError } from "../core/ApiError";
-import User from "../database/model/User";
+import User from "../database/model/user/UserRegal";
 import { decodeToken } from "./formatters";
 
 export const handleFormDataParsing = () => {
