@@ -1,6 +1,5 @@
 import dayjs from "dayjs";
 import bcrypt from "bcrypt";
-import User, { LoginResponse, UserCreate, UserModel } from "../model/user/UserRegal";
 import { PartialLoose } from "../../helpers/type-helpers";
 import { AuthFailureError, BadRequestError } from "../../core/ApiError";
 import {
@@ -8,6 +7,8 @@ import {
   getLoginResponse,
   hashPassword
 } from "../../helpers/formatters";
+import User, { LoginResponse, UserCreate } from "../model/user/model.interface";
+import { UserRegalModel } from "../model/user/UserFloral";
 
 export default class UsersRepo {
   public static async signup(userData: UserCreate) {
@@ -20,7 +21,7 @@ export default class UsersRepo {
     email: string,
     password: string
   ): Promise<LoginResponse> {
-    const user = await UserModel.findOne({ email }).lean<User>().exec();
+    const user = await UserRegalModel.findOne({ email }).lean<User>().exec();
     if (!user) {
       throw new AuthFailureError("Credentials entered are not valid");
     }
@@ -32,7 +33,7 @@ export default class UsersRepo {
   }
 
   public static async createUser(input: UserCreate): Promise<User> {
-    const existingUser = await UserModel.findOne({ email: input.email })
+    const existingUser = await UserRegalModel.findOne({ email: input.email })
       .lean<User>()
       .exec();
     if (existingUser) {
@@ -50,7 +51,7 @@ export default class UsersRepo {
       state: input.state || "",
       dob: input.dob || ""
     };
-    const { _id } = await UserModel.create(data);
+    const { _id } = await UserRegalModel.create(data);
     return { ...data, id: _id } as User;
   }
 
@@ -61,7 +62,7 @@ export default class UsersRepo {
     const passwordProps = update.password
       ? { password: await hashPassword(update.password) }
       : {};
-    const user = await UserModel.findByIdAndUpdate(
+    const user = await UserRegalModel.findByIdAndUpdate(
       id,
       { ...update, ...passwordProps },
       {
@@ -73,20 +74,20 @@ export default class UsersRepo {
   }
 
   public static async delete(id: string) {
-    const response = await UserModel.findByIdAndDelete(id);
+    const response = await UserRegalModel.findByIdAndDelete(id);
 
     return response;
   }
 
   public static async findById(id: string): Promise<LoginResponse | null> {
-    const doc = await UserModel.findOne({ _id: id }).lean<User>().exec();
+    const doc = await UserRegalModel.findOne({ _id: id }).lean<User>().exec();
     return doc ? getLoginResponse(doc) : null;
   }
 
   public static async findByEmail(
     email: string
   ): Promise<LoginResponse | null> {
-    const doc = await UserModel.findOne({ email }).lean<User>().exec();
+    const doc = await UserRegalModel.findOne({ email }).lean<User>().exec();
     return doc ? getLoginResponse(doc) : null;
   }
 }
