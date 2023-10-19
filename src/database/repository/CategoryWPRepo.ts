@@ -1,6 +1,5 @@
 import dayjs from "dayjs";
 import { PartialLoose } from "../../helpers/type-helpers";
-import { PaginatedFetchParams } from "./ClientAccessLogRepo";
 import { InternalError } from "../../core/ApiError";
 import { formatResponseRecord } from "../../helpers/formatters";
 import {
@@ -11,7 +10,8 @@ import CategoryWP, {
   CategoryWPCreate,
   categoryWPProjection
 } from "../model/category-wp/model.interface";
-import { CategoryWPRegalModel } from "../model/category-wp/CategoryWPRegal";
+import { Business } from "../model/Order";
+import { CategoryModelMap } from "./utils";
 
 type SortLogic = PartialLoose<CategoryWP, "asc" | "desc">;
 const defaultSortLogic: SortLogic = { createdAt: "asc" };
@@ -22,16 +22,26 @@ const defaultPageAttr = {
 
 const defaultFilter = {};
 
+export interface PaginatedFetchParams {
+  pageNumber?: number;
+  pageSize?: number;
+  sortLogic?: SortLogic;
+  filter?: Record<string, any>;
+  business: Business;
+}
+
 export default class CategoryWPRepo {
   public static getPaginatedCategoryWPs({
     filter = defaultFilter,
     pageNumber = defaultPageAttr.pageNumber,
     pageSize = defaultPageAttr.pageSize,
-    sortLogic = defaultSortLogic
+    sortLogic = defaultSortLogic,
+    business
   }: PaginatedFetchParams): Promise<{ data: CategoryWP[]; count: number }> {
     return new Promise((resolve, reject) => {
-      wPCollectionIsReady().then(() =>
-        CategoryWPRegalModel.find(filter)
+      wPCollectionIsReady(business).then(() =>
+        CategoryModelMap[business]
+          .find(filter)
           .sort(sortLogic)
           .skip((pageNumber - 1) * pageSize)
           .limit(pageSize)
@@ -41,11 +51,11 @@ export default class CategoryWPRepo {
             if (err) {
               reject(new InternalError(err.message));
             } else {
-              const filterQuery = CategoryWPRegalModel.find(filter);
+              const filterQuery = CategoryModelMap[business].find(filter);
               const countQuery =
                 filter === defaultFilter
                   ? filterQuery.estimatedDocumentCount()
-                  : CategoryWPRegalModel.countDocuments(filter);
+                  : CategoryModelMap[business].countDocuments(filter);
               countQuery.exec((countErr, count) => {
                 if (countErr) {
                   reject(new InternalError(countErr.message));
@@ -62,19 +72,25 @@ export default class CategoryWPRepo {
     });
   }
 
-  public static async create(input: CategoryWP): Promise<CategoryWP> {
+  public static async create(
+    input: CategoryWP,
+    business: Business
+  ): Promise<CategoryWP> {
     const data: CategoryWPCreate = {
       ...input,
       createdAt: input.createdAt || dayjs().format(),
       _nameSearch: getSearchArray(input.name)
     };
-    const { createdAt } = await CategoryWPRegalModel.create(data);
+    const { createdAt } = await CategoryModelMap[business].create(data);
     return { ...input, createdAt };
   }
 
-  public static async update(updateParams: PartialLoose<CategoryWP>) {
+  public static async update(
+    updateParams: PartialLoose<CategoryWP>,
+    business: Business
+  ) {
     const { id, ...update } = updateParams;
-    const categoryWP = await CategoryWPRegalModel.findByIdAndUpdate(
+    const categoryWP = await CategoryModelMap[business].findByIdAndUpdate(
       id,
       update,
       {
@@ -85,18 +101,28 @@ export default class CategoryWPRepo {
     return categoryWP;
   }
 
-  public static async delete(id: string) {
-    const categoryWP = await CategoryWPRegalModel.findByIdAndDelete(id);
+  public static async delete(id: string, business: Business) {
+    const categoryWP = await CategoryModelMap[business].findByIdAndDelete(id);
 
     return categoryWP;
   }
 
-  public static findById(id: string): Promise<CategoryWP | null> {
-    return CategoryWPRegalModel.findOne({ _id: id }).lean<CategoryWP>().exec();
+  public static findById(
+    id: string,
+    business: Business
+  ): Promise<CategoryWP | null> {
+    return CategoryModelMap[business]
+      .findOne({ _id: id })
+      .lean<CategoryWP>()
+      .exec();
   }
 
-  public static async findBySlug(slug: string): Promise<CategoryWP | null> {
-    const category = await CategoryWPRegalModel.findOne({ slug })
+  public static async findBySlug(
+    slug: string,
+    business: Business
+  ): Promise<CategoryWP | null> {
+    const category = await CategoryModelMap[business]
+      .findOne({ slug })
       .select(categoryWPProjection.join(" "))
       .lean<CategoryWP>()
       .exec();

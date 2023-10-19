@@ -5,7 +5,7 @@ import { CategoryWPCreate } from "./model.interface";
 const DOCUMENT_NAME = "CategoryWP";
 const COLLECTION_NAME = "categoryWP";
 
-interface CategoryWPRegalDocument extends Document, CategoryWPCreate {}
+interface CategoryWPDocument extends CategoryWPCreate {}
 
 const schema = new Schema(
   {
@@ -27,7 +27,7 @@ const schema = new Schema(
   createdAt: 1
 });
 
-export const CategoryWPRegalModel = model<CategoryWPRegalDocument>(
+export const CategoryWPRegalModel = model<CategoryWPDocument & Document>(
   DOCUMENT_NAME,
   schema,
   COLLECTION_NAME
