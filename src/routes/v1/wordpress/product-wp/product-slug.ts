@@ -13,7 +13,7 @@ const productWPSlug = express.Router();
 
 productWPSlug.get(
   "/:slug",
-  validator(validation.slug, "params"),
+  validator(validation.slug, "query"),
   async (req, res) => {
     try {
       const { relatedProductsCount, business } = req.query as {
