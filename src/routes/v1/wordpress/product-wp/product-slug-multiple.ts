@@ -7,6 +7,7 @@ import {
 import ProductWPRepo from "../../../../database/repository/ProductWPRepo";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
+import { Business } from "../../../../database/model/Order";
 
 const productWPSlugMultiple = express.Router();
 
@@ -15,10 +16,13 @@ productWPSlugMultiple.use(
   validator(validation.slugMultiple, "query"),
   async (req, res) => {
     try {
-      const slugs = (req.query.slugs as string)
-        .split(",")
-        .map(slug => slug.trim().toLowerCase());
-      const response = await ProductWPRepo.findBySlugs(slugs);
+      const { slugs: _slugs, business } = req.query as {
+        slugs: string;
+        business: Business;
+      };
+
+      const slugs = _slugs.split(",").map(slug => slug.trim().toLowerCase());
+      const response = await ProductWPRepo.findBySlugs(slugs, business);
 
       const data = response.filter(product => product.inStock);
 

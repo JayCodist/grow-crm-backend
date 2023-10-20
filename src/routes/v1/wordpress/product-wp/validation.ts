@@ -1,4 +1,5 @@
 import Joi from "@hapi/joi";
+import { businessValidation } from "../../../../helpers/validator";
 
 const validation = {
   paginate: Joi.object().keys({
@@ -16,7 +17,11 @@ const validation = {
     delivery: Joi.string().allow(""),
     flowerName: Joi.string().allow(""),
     searchValue: Joi.string().allow(""),
-    searchField: Joi.string().allow("")
+    searchField: Joi.string().allow(""),
+    ...businessValidation
+  }),
+  getAll: Joi.object({
+    ...businessValidation
   }),
   create: Joi.object().keys({
     name: Joi.string().required(),
@@ -65,13 +70,15 @@ const validation = {
     timeStamp: Joi.string().allow("")
   }),
   slug: Joi.object().keys({
-    slug: Joi.string().required()
+    ...businessValidation,
+    relatedProductsCount: Joi.number().min(0)
   }),
   related: Joi.object().keys({
     slug: Joi.string().required()
   }),
   slugMultiple: Joi.object().keys({
-    slugs: Joi.string().required()
+    slugs: Joi.string().required(),
+    ...businessValidation
   })
 };
 

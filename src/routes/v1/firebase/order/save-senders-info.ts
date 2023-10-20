@@ -6,8 +6,8 @@ import {
 } from "../../../../helpers/request-modifiers";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
-import { UserCreate } from "../../../../database/model/User";
-import { handleContactHooks } from "./order-utils";
+import { UserCreate } from "../../../../database/model/user/model.interface";
+import { handleContactHooks } from "./utils";
 import { ApiError } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
 

@@ -1,4 +1,6 @@
+import { Business } from "../database/model/Order";
 import AppConfigRepo from "../database/repository/AppConfigRepo";
+import { appConfigSyncProgressFieldMap } from "../database/repository/utils";
 
 export const getSearchArray: (str: string) => string[] = _str => {
   const str = _str.toLowerCase();
@@ -29,15 +31,22 @@ export const waitOut = (milliseconds: number) => {
 /**
  * Implements incremental backoff-retry if sync is ongoing
  */
-export const wPCollectionIsReady = async () => {
-  const config = await AppConfigRepo.getConfig();
-  if (config?.wPSyncInProgress) {
+export const wPCollectionIsReady = async (business: Business) => {
+  let config = await AppConfigRepo.getConfig();
+
+  if (config?.[appConfigSyncProgressFieldMap[business]]) {
     /**
      * Wait till sync is complete
      */
-    for (let waitTime = 1000; config?.wPSyncInProgress; waitTime += 1000) {
+    for (
+      let waitTime = 500;
+      config?.[appConfigSyncProgressFieldMap[business]];
+      waitTime += 500
+    ) {
       // eslint-disable-next-line no-await-in-loop
       await waitOut(waitTime);
+      // eslint-disable-next-line no-await-in-loop
+      config = await AppConfigRepo.getConfig();
     }
   }
 };

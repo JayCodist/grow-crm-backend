@@ -5,7 +5,7 @@ import { environment } from "./config";
 import "./database"; // initialize database
 import { NotFoundError, ApiError, InternalError } from "./core/ApiError";
 import routesV1 from "./routes/v1";
-import User from "./database/model/User";
+import User from "./database/model/user/model.interface";
 
 declare global {
   namespace Express {

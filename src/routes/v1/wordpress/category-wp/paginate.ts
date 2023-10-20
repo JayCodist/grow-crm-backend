@@ -6,6 +6,7 @@ import validator from "../../../../helpers/validator";
 
 import validation from "./validation";
 import { getSearchKey } from "../../../../helpers/formatters";
+import { Business } from "../../../../database/model/Order";
 
 const categoryWP = express.Router();
 
@@ -20,8 +21,9 @@ categoryWP.get(
         sortField,
         sortType,
         searchField,
-        searchValue
-      } = req.query;
+        searchValue,
+        business
+      } = req.query as Record<string, any> & { business: Business };
 
       const data = await CategoryWPRepo.getPaginatedCategoryWPs({
         sortLogic:
@@ -38,7 +40,8 @@ categoryWP.get(
                 [getSearchKey(String(searchField))]:
                   String(searchValue).toLowerCase()
               }
-            : undefined
+            : undefined,
+        business
       });
 
       new SuccessResponse("success", data).send(res);
