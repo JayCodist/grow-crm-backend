@@ -21,5 +21,5 @@ export const logDirectory = "./logs";
 
 export const wCAuthStringMap: Record<Business, string> = {
   regalFlowers: `consumer_key=${process.env.WC_CONSUMER_KEY}&consumer_secret=${process.env.WC_CONSUMER_SECRET}`,
-  floralHub: `consumer_key=${process.env.WC_CONSUMER_KEY}&consumer_secret=${process.env.WC_CONSUMER_SECRET}`
+  floralHub: `consumer_key=${process.env.WC_CONSUMER_KEY_FLORAL}&consumer_secret=${process.env.WC_CONSUMER_SECRET_FLORAL}`
 };
