@@ -1,3 +1,5 @@
+import { Business } from "./database/model/Order";
+
 require("dotenv").config();
 
 export type Environment = "production" | "development" | "test";
@@ -17,4 +19,7 @@ export const db = {
 
 export const logDirectory = "./logs";
 
-export const wCAuthString = `consumer_key=${process.env.WC_CONSUMER_KEY}&consumer_secret=${process.env.WC_CONSUMER_SECRET}`;
+export const wCAuthStringMap: Record<Business, string> = {
+  regalFlowers: `consumer_key=${process.env.WC_CONSUMER_KEY}&consumer_secret=${process.env.WC_CONSUMER_SECRET}`,
+  floralHub: `consumer_key=${process.env.WC_CONSUMER_KEY}&consumer_secret=${process.env.WC_CONSUMER_SECRET}`
+};

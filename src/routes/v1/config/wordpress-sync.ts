@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import express from "express";
 import he from "he";
 import fetch, { Response } from "node-fetch";
-import { wCAuthString } from "../../../config";
+import { wCAuthStringMap } from "../../../config";
 import { ApiError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
 import { CategoryWPRegalModel } from "../../../database/model/category-wp/CategoryWPRegal";
@@ -200,11 +200,11 @@ doWordpressSync.post(
           .filter(Boolean)
           .reduce((map, slug) => ({ ...map, [slug]: true }), {}) || {};
       const [{ product_categories: categories }] = await fetchWPContent(
-        `${backendUrlMap[business]}/products/categories?${wCAuthString}&filter[limit]=10000`
+        `${backendUrlMap[business]}/products/categories?${wCAuthStringMap[business]}&filter[limit]=10000`
       );
 
       const [{ products: productsRaw }] = await fetchWPContent(
-        `${backendUrlMap[business]}/products?${wCAuthString}&filter[limit]=10000`
+        `${backendUrlMap[business]}/products?${wCAuthStringMap[business]}&filter[limit]=10000`
       );
 
       const uploadedImagesArr: string[][] = [];
