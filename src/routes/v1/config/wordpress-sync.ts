@@ -5,7 +5,6 @@ import fetch, { Response } from "node-fetch";
 import { wCAuthStringMap } from "../../../config";
 import { ApiError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
-import { CategoryWPRegalModel } from "../../../database/model/category-wp/CategoryWPRegal";
 import AppConfigRepo from "../../../database/repository/AppConfigRepo";
 import { getProductSlug, slugify } from "../../../helpers/formatters";
 import { getSearchArray } from "../../../helpers/search-helpers";
@@ -20,9 +19,10 @@ import {
   ProductWPCreate,
   allDesignOptions
 } from "../../../database/model/product-wp/model.interface";
-import { ProductWPRegalModel } from "../../../database/model/product-wp/ProductWPRegal";
 import { Business } from "../../../database/model/Order";
 import {
+  CategoryModelMap,
+  ProductModelMap,
   appConfigSyncDateFieldMap,
   appConfigSyncProgressFieldMap,
   appConfigTotalSyncsFieldMap
@@ -224,6 +224,9 @@ doWordpressSync.post(
           publicUrls.push(publicUrl);
         }
         uploadedImagesArr.push(publicUrls);
+        console.log(
+          `Done with ${uploadedImagesArr.length} out of ${productsRaw.length}`
+        );
       }
 
       const products = productsRaw.map((rawProd, productIndex) => {
@@ -296,14 +299,14 @@ doWordpressSync.post(
       });
       try {
         await Promise.all([
-          ProductWPRegalModel.collection.drop(),
-          CategoryWPRegalModel.collection.drop()
+          ProductModelMap[business].collection.drop(),
+          CategoryModelMap[business].collection.drop()
         ]);
       } catch (err) {
         console.error("Unable to drop collections: ", err);
       }
 
-      await CategoryWPRegalModel.insertMany(
+      await CategoryModelMap[business].insertMany(
         categories.map(category => ({
           ...category,
           slug: slugify(category.name),
@@ -317,7 +320,7 @@ doWordpressSync.post(
         })),
         { ordered: false }
       );
-      await ProductWPRegalModel.insertMany(
+      await ProductModelMap[business].insertMany(
         products.filter(prod => prod.price),
         { ordered: false }
       );
