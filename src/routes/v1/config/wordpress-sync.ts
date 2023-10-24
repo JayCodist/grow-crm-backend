@@ -224,9 +224,6 @@ doWordpressSync.post(
           publicUrls.push(publicUrl);
         }
         uploadedImagesArr.push(publicUrls);
-        console.log(
-          `Done with ${uploadedImagesArr.length} out of ${productsRaw.length}`
-        );
       }
 
       const products = productsRaw.map((rawProd, productIndex) => {
