@@ -2,10 +2,9 @@ import dayjs from "dayjs";
 import express from "express";
 import he from "he";
 import fetch, { Response } from "node-fetch";
-import { wCAuthString } from "../../../config";
+import { wCAuthStringMap } from "../../../config";
 import { ApiError } from "../../../core/ApiError";
 import { SuccessResponse } from "../../../core/ApiResponse";
-import { CategoryWPRegalModel } from "../../../database/model/category-wp/CategoryWPRegal";
 import AppConfigRepo from "../../../database/repository/AppConfigRepo";
 import { getProductSlug, slugify } from "../../../helpers/formatters";
 import { getSearchArray } from "../../../helpers/search-helpers";
@@ -20,9 +19,10 @@ import {
   ProductWPCreate,
   allDesignOptions
 } from "../../../database/model/product-wp/model.interface";
-import { ProductWPRegalModel } from "../../../database/model/product-wp/ProductWPRegal";
 import { Business } from "../../../database/model/Order";
 import {
+  CategoryModelMap,
+  ProductModelMap,
   appConfigSyncDateFieldMap,
   appConfigSyncProgressFieldMap,
   appConfigTotalSyncsFieldMap
@@ -200,11 +200,11 @@ doWordpressSync.post(
           .filter(Boolean)
           .reduce((map, slug) => ({ ...map, [slug]: true }), {}) || {};
       const [{ product_categories: categories }] = await fetchWPContent(
-        `${backendUrlMap[business]}/products/categories?${wCAuthString}&filter[limit]=10000`
+        `${backendUrlMap[business]}/products/categories?${wCAuthStringMap[business]}&filter[limit]=10000`
       );
 
       const [{ products: productsRaw }] = await fetchWPContent(
-        `${backendUrlMap[business]}/products?${wCAuthString}&filter[limit]=10000`
+        `${backendUrlMap[business]}/products?${wCAuthStringMap[business]}&filter[limit]=10000`
       );
 
       const uploadedImagesArr: string[][] = [];
@@ -218,11 +218,15 @@ doWordpressSync.post(
           // eslint-disable-next-line no-await-in-loop
           const publicUrl = await getCloudLinkForImage(
             image.src,
+            business,
             shouldSyncProductImages
           );
           publicUrls.push(publicUrl);
         }
         uploadedImagesArr.push(publicUrls);
+        console.log(
+          `Done with ${uploadedImagesArr.length} out of ${productsRaw.length}`
+        );
       }
 
       const products = productsRaw.map((rawProd, productIndex) => {
@@ -295,14 +299,14 @@ doWordpressSync.post(
       });
       try {
         await Promise.all([
-          ProductWPRegalModel.collection.drop(),
-          CategoryWPRegalModel.collection.drop()
+          ProductModelMap[business].collection.drop(),
+          CategoryModelMap[business].collection.drop()
         ]);
       } catch (err) {
         console.error("Unable to drop collections: ", err);
       }
 
-      await CategoryWPRegalModel.insertMany(
+      await CategoryModelMap[business].insertMany(
         categories.map(category => ({
           ...category,
           slug: slugify(category.name),
@@ -316,7 +320,7 @@ doWordpressSync.post(
         })),
         { ordered: false }
       );
-      await ProductWPRegalModel.insertMany(
+      await ProductModelMap[business].insertMany(
         products.filter(prod => prod.price),
         { ordered: false }
       );
@@ -331,51 +335,51 @@ doWordpressSync.post(
         [appConfigTotalSyncsFieldMap[business]]: currentSyncTotal + 1
       });
 
-      const productCategory = await fetchWPContent(
-        "https://www.regalflower.com/wp-json/wp/v2/product_cat?per_page=100"
-      );
+      // const productCategory = await fetchWPContent(
+      //   "https://www.regalflower.com/wp-json/wp/v2/product_cat?per_page=100"
+      // );
 
-      (productCategory[0] as unknown as any[]).forEach(
-        async (category: any) => {
-          await CategoryWPRegalModel.updateOne(
-            { key: category.id.toString() },
-            {
-              $set: {
-                shortDescription: category.custom_category_description,
-                altImage: category.alt_text_for_images,
-                title: category.title_tag,
-                topHeading: category.custom_top_heading_h1,
-                bottomHeading: category.custom_bottom_heading_h2
-              }
-            }
-          );
-        }
-      );
+      // (productCategory[0] as unknown as any[]).forEach(
+      //   async (category: any) => {
+      //     await CategoryWPRegalModel.updateOne(
+      //       { key: category.id.toString() },
+      //       {
+      //         $set: {
+      //           shortDescription: category.custom_category_description,
+      //           altImage: category.alt_text_for_images,
+      //           title: category.title_tag,
+      //           topHeading: category.custom_top_heading_h1,
+      //           bottomHeading: category.custom_bottom_heading_h2
+      //         }
+      //       }
+      //     );
+      //   }
+      // );
 
-      const [productPage1, productPage2] = await Promise.all([
-        fetchWPContent(
-          "https://www.regalflower.com/wp-json/wp/v2/product?per_page=100&page=1"
-        ),
-        fetchWPContent(
-          "https://www.regalflower.com/wp-json/wp/v2/product?per_page=100&page=2&offset=100"
-        )
-      ]);
+      // const [productPage1, productPage2] = await Promise.all([
+      //   fetchWPContent(
+      //     "https://www.regalflower.com/wp-json/wp/v2/product?per_page=100&page=1"
+      //   ),
+      //   fetchWPContent(
+      //     "https://www.regalflower.com/wp-json/wp/v2/product?per_page=100&page=2&offset=100"
+      //   )
+      // ]);
 
-      [
-        ...(productPage1[0] as unknown as any[]),
-        ...(productPage2[0] as unknown as any[])
-      ].forEach(async (product: any) => {
-        const categoryKey = product.id.toString();
+      // [
+      //   ...(productPage1[0] as unknown as any[]),
+      //   ...(productPage2[0] as unknown as any[])
+      // ].forEach(async (product: any) => {
+      //   const categoryKey = product.id.toString();
 
-        await ProductWPRegalModel.updateOne(
-          { key: categoryKey },
-          {
-            $set: {
-              pageDescription: product.custom_product_description
-            }
-          }
-        );
-      });
+      //   await ProductWPRegalModel.updateOne(
+      //     { key: categoryKey },
+      //     {
+      //       $set: {
+      //         pageDescription: product.custom_product_description
+      //       }
+      //     }
+      //   );
+      // });
 
       new SuccessResponse("Successfully synchronized Wordpress", []).send(res);
     } catch (e) {

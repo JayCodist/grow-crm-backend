@@ -29,6 +29,8 @@ steps:
       - "API_LAYER_KEY=${_API_LAYER_KEY}"
       - "FIREBASE_STORAGE_BUCKET=${_FIREBASE_STORAGE_BUCKET}"
       - "TINIFY_KEY=${_TINIFY_KEY}"
+      - "WC_CONSUMER_KEY_FLORAL=${_WC_CONSUMER_KEY_FLORAL}"
+      - "WC_CONSUMER_SECRET_FLORAL=${_WC_CONSUMER_SECRET_FLORAL}"
   - name: "gcr.io/cloud-builders/gcloud"
     args:
       [
