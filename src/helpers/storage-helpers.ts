@@ -27,10 +27,28 @@ export const getCloudLinkForImage: (
     .storage()
     .bucket(businessBucketMap[business])
     .file(`img${uniqueLink}`);
+
   if (syncToCloud) {
     const source = tinify.fromUrl(url);
     const buffer = await source.toBuffer();
     await file.save(Buffer.from(buffer), {
+      metadata: {
+        cacheControl: "public, max-age=31536000"
+      }
+    });
+
+    // Save mobile version
+    const mobileFile = firebaseAdmin
+      .storage()
+      .bucket()
+      .file(`mobile-img-${uniqueLink}`);
+    const resizedSource = source.resize({
+      method: "scale",
+      width: 1000
+    });
+    const converted = resizedSource.convert({ type: ["image/webp"] });
+    const mobileBuffer = await converted.toBuffer();
+    await mobileFile.save(Buffer.from(mobileBuffer), {
       metadata: {
         cacheControl: "public, max-age=31536000"
       }
