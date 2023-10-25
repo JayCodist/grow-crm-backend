@@ -22,7 +22,8 @@ export const getCloudLinkForImage: (
   }
   const uniqueLink = url
     .replace(/^.+\/wp-content\/uploads/, "")
-    .replaceAll("/", "-");
+    .replaceAll("/", "-")
+    .replaceAll(",", "");
   const file = firebaseAdmin
     .storage()
     .bucket(businessBucketMap[business])
@@ -38,10 +39,15 @@ export const getCloudLinkForImage: (
     });
 
     // Save mobile version
+    const mobileLink = uniqueLink
+      .split(".")
+      .slice(0, -1)
+      .concat(["webp"])
+      .join(".");
     const mobileFile = firebaseAdmin
       .storage()
       .bucket()
-      .file(`mobile-img-${uniqueLink}`);
+      .file(`mobile-img${mobileLink}`);
     const resizedSource = source.resize({
       method: "scale",
       width: 1000
@@ -53,6 +59,7 @@ export const getCloudLinkForImage: (
         cacheControl: "public, max-age=31536000"
       }
     });
+    console.log(mobileFile.publicUrl());
   }
 
   return file.publicUrl();
