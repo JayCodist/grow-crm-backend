@@ -133,3 +133,22 @@ export const templateRender = (order: Order, path: string): string => {
 
   return filledTemplate;
 };
+
+export const clientMessageTemplateRender = (payload: {
+  name: string;
+  email: string;
+  message: string;
+}): string => {
+  const file = fs;
+  const template = file.readFileSync(
+    `./src/templates/client-message.html`,
+    "utf-8"
+  );
+
+  const filledTemplate = template
+    .replace("{{name}}", payload.name)
+    .replace("{{email}}", payload.email)
+    .replace("{{message}}", payload.message);
+
+  return filledTemplate;
+};
