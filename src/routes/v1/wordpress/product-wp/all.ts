@@ -15,11 +15,9 @@ allProductWp.use(
     try {
       const { business } = req.query as { business: Business };
       const response = await ProductWPRepo.getAllProducts(business);
-
-      const data = response.data.filter(product => product.inStock);
       new SuccessResponse("success", {
         ...response,
-        data
+        data: response.data
       }).send(res);
     } catch (error) {
       ApiError.handle(error as Error, res);

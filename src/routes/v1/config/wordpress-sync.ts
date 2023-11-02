@@ -231,71 +231,75 @@ doWordpressSync.post(
         uploadedImagesArr.push(publicUrls);
       }
 
-      const products = productsRaw.map((rawProd, productIndex) => {
-        const relatedVIPRef =
-          Number(
-            rawProd.attributes
-              ?.find((attribute: any) => attribute.name === "VIP Pricing IDS")
-              ?.options?.[0]?.replace(/\D/g, "")
-          ) || null;
-        const prodName = he.decode(rawProd.title.split("-")[0].trim() || "N/A");
-        const product: ProductWPCreate = {
-          key: rawProd.id,
-          name: prodName,
-          _nameSearch: getSearchArray(
-            `${he.decode(rawProd.title.trim() || "N/A")}`
-          ),
-          _categorySearch: getSearchArray(`${rawProd.categories.join(" ")}`),
-          subtitle: he.decode(
-            rawProd.title
-              .split("-")[1]
-              // To remove trailing ellipsis
-              ?.replace(/\.\s*.\..*$/, "")
-              .trim() || ""
-          ),
-          class: /^vip/i.test(prodName) ? "vip" : "regular",
-          slug: getProductSlug(rawProd.permalink || ""),
-          sku: rawProd.sku,
-          price: Number(rawProd.sale_price || rawProd.price) || 0,
-          type: rawProd.type,
-          longDescription: rawProd.description,
-          description: rawProd.short_description || "",
-          categories: rawProd.categories.map(slugify),
-          addonSlug: rawProd.addonSlug,
-          tags: getTagsMap(rawProd),
-          images:
-            rawProd.images?.map((image: any, imageIndex: number) => ({
-              src: uploadedImagesArr[productIndex][imageIndex],
-              alt: image.alt || image.title || ""
-            })) || [],
-          featured: rawProd.featured,
-          designOptions: getDesignOptionMap(rawProd),
-          temporaryNotes:
-            rawProd.attributes?.find(
-              (attribute: any) => attribute.name === "Info Product"
-            )?.options || [],
-          budgetNote:
-            rawProd.attributes?.find(
-              (attribute: any) => attribute.name === "Info Budget"
-            )?.options?.[0] || "",
-          designNote:
-            rawProd.attributes?.find(
-              (attribute: any) => attribute.name === "Info Design"
-            )?.options?.[0] || "",
-          relatedVIPRef,
-          variants: getVariants(
-            rawProd.variations,
-            relatedVIPRef
-              ? productsRaw.find(prod => prod.id === relatedVIPRef)
-                  ?.variations || []
-              : []
-          ),
-          addonsGroups: [],
-          inStock: rawProd.in_stock,
-          pageDescription: ""
-        };
-        return product;
-      });
+      const products = productsRaw
+        .map((rawProd, productIndex) => {
+          const relatedVIPRef =
+            Number(
+              rawProd.attributes
+                ?.find((attribute: any) => attribute.name === "VIP Pricing IDS")
+                ?.options?.[0]?.replace(/\D/g, "")
+            ) || null;
+          const prodName = he.decode(
+            rawProd.title.split("-")[0].trim() || "N/A"
+          );
+          const product: ProductWPCreate = {
+            key: rawProd.id,
+            name: prodName,
+            _nameSearch: getSearchArray(
+              `${he.decode(rawProd.title.trim() || "N/A")}`
+            ),
+            _categorySearch: getSearchArray(`${rawProd.categories.join(" ")}`),
+            subtitle: he.decode(
+              rawProd.title
+                .split("-")[1]
+                // To remove trailing ellipsis
+                ?.replace(/\.\s*.\..*$/, "")
+                .trim() || ""
+            ),
+            class: /^vip/i.test(prodName) ? "vip" : "regular",
+            slug: getProductSlug(rawProd.permalink || ""),
+            sku: rawProd.sku,
+            price: Number(rawProd.sale_price || rawProd.price) || 0,
+            type: rawProd.type,
+            longDescription: rawProd.description,
+            description: rawProd.short_description || "",
+            categories: rawProd.categories.map(slugify),
+            addonSlug: rawProd.addonSlug,
+            tags: getTagsMap(rawProd),
+            images:
+              rawProd.images?.map((image: any, imageIndex: number) => ({
+                src: uploadedImagesArr[productIndex][imageIndex],
+                alt: image.alt || image.title || ""
+              })) || [],
+            featured: rawProd.featured,
+            designOptions: getDesignOptionMap(rawProd),
+            temporaryNotes:
+              rawProd.attributes?.find(
+                (attribute: any) => attribute.name === "Info Product"
+              )?.options || [],
+            budgetNote:
+              rawProd.attributes?.find(
+                (attribute: any) => attribute.name === "Info Budget"
+              )?.options?.[0] || "",
+            designNote:
+              rawProd.attributes?.find(
+                (attribute: any) => attribute.name === "Info Design"
+              )?.options?.[0] || "",
+            relatedVIPRef,
+            variants: getVariants(
+              rawProd.variations,
+              relatedVIPRef
+                ? productsRaw.find(prod => prod.id === relatedVIPRef)
+                    ?.variations || []
+                : []
+            ),
+            addonsGroups: [],
+            inStock: rawProd.in_stock,
+            pageDescription: ""
+          };
+          return product;
+        })
+        .filter(({ inStock }) => inStock);
       await AppConfigRepo.updateConfig({
         [appConfigSyncProgressFieldMap[business]]: true
       });

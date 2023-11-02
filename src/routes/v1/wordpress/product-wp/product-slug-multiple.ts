@@ -22,11 +22,9 @@ productWPSlugMultiple.use(
       };
 
       const slugs = _slugs.split(",").map(slug => slug.trim().toLowerCase());
-      const response = await ProductWPRepo.findBySlugs(slugs, business);
+      const data = await ProductWPRepo.findBySlugs(slugs, business);
 
-      const data = response.filter(product => product.inStock);
-
-      if (!response) {
+      if (!data) {
         new BadRequestResponse("Products not found").send(res);
       }
       new SuccessResponse("success", data).send(res);
