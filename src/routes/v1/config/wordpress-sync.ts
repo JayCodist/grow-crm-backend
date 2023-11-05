@@ -341,51 +341,53 @@ doWordpressSync.post(
         [appConfigTotalSyncsFieldMap[business]]: currentSyncTotal + 1
       });
 
-      const productCategory = await fetchWPContent(
-        `${wordpressUrlMap[business]}/product_cat?per_page=100`
-      );
+      if (business === "regalFlowers") {
+        const productCategory = await fetchWPContent(
+          `${wordpressUrlMap[business]}/product_cat?per_page=100`
+        );
 
-      (productCategory[0] as unknown as any[]).forEach(
-        async (category: any) => {
-          await CategoryModelMap[business].updateOne(
-            { key: category.id.toString() },
+        (productCategory[0] as unknown as any[]).forEach(
+          async (category: any) => {
+            await CategoryModelMap[business].updateOne(
+              { key: category.id.toString() },
+              {
+                $set: {
+                  shortDescription: category.custom_category_description,
+                  altImage: category.alt_text_for_images,
+                  title: category.title_tag,
+                  topHeading: category.custom_top_heading_h1,
+                  bottomHeading: category.custom_bottom_heading_h2
+                }
+              }
+            );
+          }
+        );
+
+        const [productPage1, productPage2] = await Promise.all([
+          fetchWPContent(
+            `${wordpressUrlMap[business]}/product?per_page=100&page=1`
+          ),
+          fetchWPContent(
+            `${wordpressUrlMap[business]}/product?per_page=100&page=2&offset=100`
+          )
+        ]);
+
+        [
+          ...(productPage1[0] as unknown as any[]),
+          ...(productPage2[0] as unknown as any[])
+        ].forEach(async (product: any) => {
+          const categoryKey = product.id.toString();
+
+          await ProductModelMap[business].updateOne(
+            { key: categoryKey },
             {
               $set: {
-                shortDescription: category.custom_category_description,
-                altImage: category.alt_text_for_images,
-                title: category.title_tag,
-                topHeading: category.custom_top_heading_h1,
-                bottomHeading: category.custom_bottom_heading_h2
+                pageDescription: product.custom_product_description
               }
             }
           );
-        }
-      );
-
-      const [productPage1, productPage2] = await Promise.all([
-        fetchWPContent(
-          `${wordpressUrlMap[business]}/product?per_page=100&page=1`
-        ),
-        fetchWPContent(
-          `${wordpressUrlMap[business]}/product?per_page=100&page=2&offset=100`
-        )
-      ]);
-
-      [
-        ...(productPage1[0] as unknown as any[]),
-        ...(productPage2[0] as unknown as any[])
-      ].forEach(async (product: any) => {
-        const categoryKey = product.id.toString();
-
-        await ProductModelMap[business].updateOne(
-          { key: categoryKey },
-          {
-            $set: {
-              pageDescription: product.custom_product_description
-            }
-          }
-        );
-      });
+        });
+      }
 
       new SuccessResponse("Successfully synchronized Wordpress", []).send(res);
     } catch (e) {
