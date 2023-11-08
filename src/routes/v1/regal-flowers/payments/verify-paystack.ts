@@ -38,7 +38,7 @@ verifyPaystack.post(
       );
       const json = await response.json();
       if (json.status && json.data.status === "success") {
-        const orderId = (req.query.ref as string).split("-")[0];
+        const orderId = (req.query.ref as string).split("-")[1];
         const { data } = json;
         const snap = await db
           .collection("orders")
