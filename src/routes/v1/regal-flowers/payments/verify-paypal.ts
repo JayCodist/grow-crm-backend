@@ -85,7 +85,7 @@ verifyPaypal.post(
       if (json.status === "COMPLETED" && paymentStatus === "COMPLETED") {
         const paymentDetails: PapPalPaymentDetails = json.purchase_units[0];
         const currencyCode = paymentDetails.amount.currency_code;
-        const orderID = (paymentDetails.reference_id as string).split("-")[0];
+        const orderID = (paymentDetails.reference_id as string).split("-")[1];
 
         if (currencyCode === "USD" || currencyCode === "GBP") {
           const snap = await db.collection("orders").doc(orderID).get();
