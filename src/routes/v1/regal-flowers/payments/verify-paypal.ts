@@ -6,7 +6,7 @@ import { URLSearchParams } from "url";
 import { Environment } from "../../../../config";
 import {
   ApiError,
-  InternalError,
+  NotFoundError,
   PaymentFailureError
 } from "../../../../core/ApiError";
 import {
@@ -85,12 +85,16 @@ verifyPaypal.post(
       if (json.status === "COMPLETED" && paymentStatus === "COMPLETED") {
         const paymentDetails: PapPalPaymentDetails = json.purchase_units[0];
         const currencyCode = paymentDetails.amount.currency_code;
-        const orderID = (paymentDetails.reference_id as string).split("-")[0];
+        const orderID = (paymentDetails.reference_id as string).split("-")[1];
 
         if (currencyCode === "USD" || currencyCode === "GBP") {
           const snap = await db.collection("orders").doc(orderID).get();
 
           const order = snap.data() as Order | undefined;
+
+          if (!order) {
+            throw new NotFoundError("Order not found");
+          }
 
           const currency = currencyOptions.find(
             currency => currency.name === currencyCode
@@ -100,17 +104,38 @@ verifyPaypal.post(
               (currency?.conversionRate as number)
           );
 
-          if (!order || order.amount > nairaAmount) {
-            throw new InternalError(
-              "Payment Verification Failed: The amount paid is less than the order's total amount."
-            );
-          }
-
           const adminNotes = getAdminNoteText(
             order.adminNotes,
             currencyCode,
             order.amount
           );
+
+          if (!order || order.amount > nairaAmount) {
+            await db
+              .collection("orders")
+              .doc(orderID)
+              .update({
+                paymentStatus:
+                  "PART- PAYMENT PAID - GO AHEAD (but not seen yet)",
+                adminNotes,
+                currency: currencyCode,
+                paymentDetails: `Website: Paid  ${getPriceDisplay(
+                  order.amount,
+                  currency
+                )} to Paypal`
+              });
+
+            await sendEmailToAddress(
+              ["info@regalflowers.com.ng"],
+              templateRender(
+                { ...order, adminNotes, currency: currencyCode },
+                "new-order"
+              ),
+              `Warning a New Order amount mismatch (${order.fullOrderId})`,
+              "5055243"
+            );
+            return new SuccessResponse("Payment is successful", true).send(res);
+          }
 
           await db
             .collection("orders")
