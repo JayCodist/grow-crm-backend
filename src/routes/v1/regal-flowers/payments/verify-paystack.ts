@@ -52,6 +52,12 @@ verifyPaystack.post(
           );
         }
 
+        const adminNotes = getAdminNoteText(
+          order.adminNotes,
+          data.currency,
+          order.amount
+        );
+
         const currency = currencyOptions.find(
           currency => currency.name === data.currency
         ) as AppCurrency;
@@ -62,25 +68,61 @@ verifyPaystack.post(
           );
 
           if (order.amount > nairaAmount) {
-            throw new InternalError(
-              "Payment Verification Failed: The amount paid is less than the order's total amount."
+            await db
+              .collection("orders")
+              .doc(orderId)
+              .update({
+                paymentStatus:
+                  "PART- PAYMENT PAID - GO AHEAD (but not seen yet)",
+                adminNotes,
+                currency: "USD",
+                paymentDetails: `Website: Paid  ${getPriceDisplay(
+                  order.amount,
+                  currency
+                )} to Paypal`
+              });
+
+            await sendEmailToAddress(
+              ["info@regalflowers.com.ng"],
+              templateRender(
+                { ...order, adminNotes, currency: "USD" },
+                "new-order"
+              ),
+              `Warning a New Order amount mismatch (${order.fullOrderId})`,
+              "5055243"
             );
+            return new SuccessResponse("Payment is successful", true).send(res);
           }
         } else if (data.currency === "NGN") {
           const paidAmount = data.amount / 100;
 
           if (order.amount > paidAmount) {
-            throw new InternalError(
-              "Payment Verification Failed: The amount paid is less than the order's total amount."
+            await db
+              .collection("orders")
+              .doc(orderId)
+              .update({
+                paymentStatus:
+                  "PART- PAYMENT PAID - GO AHEAD (but not seen yet)",
+                adminNotes,
+                currency: "NGN",
+                paymentDetails: `Website: Paid  ${getPriceDisplay(
+                  order.amount,
+                  currency
+                )} to Paypal`
+              });
+
+            await sendEmailToAddress(
+              ["info@regalflowers.com.ng"],
+              templateRender(
+                { ...order, adminNotes, currency: "NGN" },
+                "new-order"
+              ),
+              `Warning a New Order amount mismatch (${order.fullOrderId})`,
+              "5055243"
             );
+            return new SuccessResponse("Payment is successful", true).send(res);
           }
         }
-
-        const adminNotes = getAdminNoteText(
-          order.adminNotes,
-          data.currency,
-          order.amount
-        );
 
         await firestore()
           .collection("orders")
