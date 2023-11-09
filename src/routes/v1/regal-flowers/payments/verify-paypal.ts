@@ -134,6 +134,16 @@ verifyPaypal.post(
               `Warning a New Order amount mismatch (${order.fullOrderId})`,
               "5055243"
             );
+
+            await sendEmailToAddress(
+              [order.client.email as string],
+              templateRender(
+                { ...order, adminNotes, currency: currencyCode },
+                "order"
+              ),
+              `Thank you for your order (${order.fullOrderId})`,
+              "5055243"
+            );
             return new SuccessResponse("Payment is successful", true).send(res);
           }
 

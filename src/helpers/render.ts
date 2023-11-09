@@ -46,6 +46,7 @@ export const templateRender = (order: Order, path: string): string => {
     )
     .replace("{{subtotal}}", `${getPriceDisplay(subtotal, currency)}`)
     .replace("{{total}}", `${getPriceDisplay(order.amount, currency)}`)
+    .replace("{{paymentDetails}}", `${order.paymentDetails}`)
     .replace(
       "{{deliveryCharge}}",
       order.deliveryAmount
