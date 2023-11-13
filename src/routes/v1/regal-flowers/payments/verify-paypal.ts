@@ -83,9 +83,12 @@ verifyPaypal.post(
       const paymentStatus = json.purchase_units[0].payments.captures[0].status;
 
       if (json.status === "COMPLETED" && paymentStatus === "COMPLETED") {
-        const paymentDetails: PapPalPaymentDetails = json.purchase_units[0];
-        const currencyCode = paymentDetails.amount.currency_code;
-        const orderID = (paymentDetails.reference_id as string).split("-")[1];
+        const paypalPaymentDetails: PapPalPaymentDetails =
+          json.purchase_units[0];
+        const currencyCode = paypalPaymentDetails.amount.currency_code;
+        const orderID = (paypalPaymentDetails.reference_id as string).split(
+          "-"
+        )[1];
 
         if (currencyCode === "USD" || currencyCode === "GBP") {
           const snap = await db.collection("orders").doc(orderID).get();
@@ -100,7 +103,7 @@ verifyPaypal.post(
             currency => currency.name === currencyCode
           ) as AppCurrency;
           const nairaAmount = Math.round(
-            parseFloat(paymentDetails.amount.value) *
+            parseFloat(paypalPaymentDetails.amount.value) *
               (currency?.conversionRate as number)
           );
 
@@ -110,25 +113,28 @@ verifyPaypal.post(
             order.amount
           );
 
+          const paymentDetails = `Website: Paid  ${getPriceDisplay(
+            order.amount,
+            currency
+          )} to Paypal`;
+
           if (!order || order.amount > nairaAmount) {
-            await db
-              .collection("orders")
-              .doc(orderID)
-              .update({
-                paymentStatus:
-                  "PART- PAYMENT PAID - GO AHEAD (but not seen yet)",
-                adminNotes,
-                currency: currencyCode,
-                paymentDetails: `Website: Paid  ${getPriceDisplay(
-                  order.amount,
-                  currency
-                )} to Paypal`
-              });
+            await db.collection("orders").doc(orderID).update({
+              paymentStatus: "PART- PAYMENT PAID - GO AHEAD (but not seen yet)",
+              adminNotes,
+              currency: currencyCode,
+              paymentDetails
+            });
 
             await sendEmailToAddress(
               ["info@regalflowers.com.ng"],
               templateRender(
-                { ...order, adminNotes, currency: currencyCode },
+                {
+                  ...order,
+                  adminNotes,
+                  currency: currencyCode,
+                  paymentDetails
+                },
                 "new-order"
               ),
               `Warning a New Order amount mismatch (${order.fullOrderId})`,
@@ -147,24 +153,18 @@ verifyPaypal.post(
             return new SuccessResponse("Payment is successful", true).send(res);
           }
 
-          await db
-            .collection("orders")
-            .doc(orderID)
-            .update({
-              paymentStatus: "PAID - GO AHEAD (Paypal)",
-              adminNotes,
-              currency: currencyCode,
-              paymentDetails: `Website: Paid  ${getPriceDisplay(
-                order.amount,
-                currency
-              )} to Paypal`
-            });
+          await db.collection("orders").doc(orderID).update({
+            paymentStatus: "PAID - GO AHEAD (Paypal)",
+            adminNotes,
+            currency: currencyCode,
+            paymentDetails
+          });
 
           // Send email to admin and client
           await sendEmailToAddress(
             ["info@regalflowers.com.ng"],
             templateRender(
-              { ...order, adminNotes, currency: currencyCode },
+              { ...order, adminNotes, currency: currencyCode, paymentDetails },
               "new-order"
             ),
             `New Order (${order.fullOrderId})`,
