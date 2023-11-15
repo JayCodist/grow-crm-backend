@@ -68,3 +68,9 @@ export const paymentMethodMap: Record<PaymentMethod, string> = {
   natwestTransfer: "Natwest Transfer",
   bitcoinTransfer: "Bitcoin Transfer"
 };
+
+export type DespatchLocation = "lagos" | "abuja";
+export const despatchLocationMap: Record<DespatchLocation, string> = {
+  lagos: "Ikoyi",
+  abuja: "Abuja"
+};
