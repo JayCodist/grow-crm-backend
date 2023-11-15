@@ -58,6 +58,7 @@ const validation = {
       despatchLocation: Joi.string().default("").allow(""),
       purpose: Joi.string().default("").allow(""),
       adminNotes: Joi.string().default("").allow(""),
+      deliveryZone: Joi.string().default("").allow(""),
       recipient: Joi.object({
         name: Joi.string().default("").allow(""),
         phone: Joi.string().default("").allow(""),
