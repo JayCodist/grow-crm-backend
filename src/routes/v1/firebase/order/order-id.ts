@@ -133,7 +133,7 @@ orderID.get(
 
       const data = {
         ...order,
-        fullOrderId: `${businessLetter}${order?.deliveryZone}${order?.orderID}W`,
+        fullOrderId: `${businessLetter}${order.deliveryZone}${order?.orderID}W`,
         id: req.params.id,
         adminNotes
       };

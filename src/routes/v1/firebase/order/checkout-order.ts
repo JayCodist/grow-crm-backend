@@ -277,15 +277,13 @@ checkoutOrder.put(
           adminNotes,
           currency,
           deliveryAmount,
-          fullOrderId: `${businessLetter}WEB${existingOrder.orderID}W`,
+          fullOrderId: `${businessLetter}${existingOrder.deliveryZone}${existingOrder.orderID}W`,
           despatchFrom:
             despatchLocationMap[
               (orderData.despatchLocation.toLowerCase() as DespatchLocation) ||
                 (orderData.deliveryDetails.state.toLowerCase() as DespatchLocation)
             ] || "Unselected",
-          deliveryZone: orderData.despatchLocation
-            ? `Pickup${orderData.despatchLocation}`
-            : ""
+          deliveryZone: orderData.deliveryZone
         } as Partial<Order>);
 
       return new SuccessResponse("Order successfully checked out", null).send(
