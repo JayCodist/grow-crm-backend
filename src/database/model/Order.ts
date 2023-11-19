@@ -261,6 +261,7 @@ export interface Order {
   despatchLocation?: string;
   fullOrderId: string;
   paymentMethod: PaymentMethod | null;
+  paymentDetails: string;
 }
 
 export type OrderCreate = Omit<Order, "id">;

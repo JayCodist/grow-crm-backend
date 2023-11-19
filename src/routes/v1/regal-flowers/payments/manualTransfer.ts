@@ -48,23 +48,22 @@ manualTransfer.post(
         _currency => _currency.name === currency
       ) as AppCurrency;
 
-      await firestore()
-        .collection("orders")
-        .doc(req.params.id)
-        .update({
-          paymentStatus: "WEBSITE PAID - GO AHEAD (but not seen yet)",
-          currency,
-          paymentDetails: `Website: Paid  ${
-            _currency.sign
-          }${amount.toLocaleString()}  with ${accountName} to ${
-            _currency.name
-          } - ${bankMap[_currency.name]} ${referenceNumber}`
-        });
+      const paymentDetails = `Website: Paid  ${
+        _currency.sign
+      }${amount.toLocaleString()}  with ${accountName} to ${_currency.name} - ${
+        bankMap[_currency.name]
+      } ${referenceNumber}`;
+
+      await firestore().collection("orders").doc(req.params.id).update({
+        paymentStatus: "WEBSITE PAID - GO AHEAD (but not seen yet)",
+        currency,
+        paymentDetails
+      });
 
       // Send email to admin and client
       await sendEmailToAddress(
         ["info@regalflowers.com.ng"],
-        templateRender({ ...order }, "new-order"),
+        templateRender({ ...order, paymentDetails }, "new-order"),
         `New Order (${order.fullOrderId})`,
         "5055243"
       );
