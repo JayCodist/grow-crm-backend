@@ -16,7 +16,7 @@ subscribe.post(
       const response = await SubscriberRepo.create({
         ...(req.query as SubscriberCreate)
       });
-      return new SuccessResponse("Successfully subscribed", response);
+      return new SuccessResponse("Successfully subscribed", response).send(res);
     } catch (err) {
       return ApiError.handle(err as Error, res);
     }
