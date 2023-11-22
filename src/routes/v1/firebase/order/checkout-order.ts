@@ -30,7 +30,9 @@ import { handleContactHooks } from "./utils";
 import validation from "./validation";
 import {
   DeliveryZoneAmount,
-  deliveryZoneAmount
+  DespatchLocation,
+  deliveryZoneAmount,
+  despatchLocationMap
 } from "../../../../helpers/constants";
 import { AppCurrencyName } from "../../../../database/model/AppConfig";
 
@@ -216,6 +218,12 @@ checkoutOrder.put(
       }
 
       const client = await handleContactHooks(userData, "client");
+
+      orderData.recipient.phone =
+        userData.phone === orderData.recipient.phone
+          ? `Call ${formatPhoneNumber(userData.phone)}`
+          : orderData.recipient.phone;
+
       const recipient = await handleContactHooks(
         orderData.recipient.method === "delivery"
           ? orderData.recipient
@@ -269,7 +277,13 @@ checkoutOrder.put(
           adminNotes,
           currency,
           deliveryAmount,
-          fullOrderId: `${businessLetter}${existingOrder?.deliveryZone}${existingOrder.orderID}W`
+          fullOrderId: `${businessLetter}${existingOrder.deliveryZone}${existingOrder.orderID}W`,
+          despatchFrom:
+            despatchLocationMap[
+              (orderData.despatchLocation.toLowerCase() as DespatchLocation) ||
+                (orderData.deliveryDetails.state.toLowerCase() as DespatchLocation)
+            ] || "Unselected",
+          deliveryZone: orderData.deliveryZone
         } as Partial<Order>);
 
       return new SuccessResponse("Order successfully checked out", null).send(

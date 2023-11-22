@@ -250,7 +250,8 @@ createOrder.post(
         orderID: 0,
         deliveryInstruction: "",
         fullOrderId: "",
-        paymentMethod: null
+        paymentMethod: null,
+        paymentDetails: ""
       };
 
       const response = await db.add({

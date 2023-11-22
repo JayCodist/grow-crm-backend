@@ -38,7 +38,7 @@ verifyPaystack.post(
       );
       const json = await response.json();
       if (json.status && json.data.status === "success") {
-        const orderId = (req.query.ref as string).split("-")[0];
+        const orderId = (req.query.ref as string).split("-")[1];
         const { data } = json;
         const snap = await db
           .collection("orders")
@@ -52,9 +52,20 @@ verifyPaystack.post(
           );
         }
 
+        const adminNotes = getAdminNoteText(
+          order.adminNotes,
+          data.currency,
+          order.amount
+        );
+
         const currency = currencyOptions.find(
           currency => currency.name === data.currency
         ) as AppCurrency;
+
+        const paymentDetails = `Website: Paid  ${getPriceDisplay(
+          order.amount,
+          currency
+        )} to Paystack`;
 
         if (data.currency === "USD") {
           const nairaAmount = Math.round(
@@ -62,25 +73,78 @@ verifyPaystack.post(
           );
 
           if (order.amount > nairaAmount) {
-            throw new InternalError(
-              "Payment Verification Failed: The amount paid is less than the order's total amount."
+            await db.collection("orders").doc(orderId).update({
+              paymentStatus: "PART- PAYMENT PAID - GO AHEAD (but not seen yet)",
+              adminNotes,
+              currency: "USD",
+              paymentDetails
+            });
+
+            await sendEmailToAddress(
+              ["info@regalflowers.com.ng"],
+              templateRender(
+                { ...order, adminNotes, currency: "USD", paymentDetails },
+                "new-order"
+              ),
+              `Warning a New Order amount mismatch (${order.fullOrderId})`,
+              "5055243"
             );
+            await sendEmailToAddress(
+              [order.client.email as string],
+              templateRender(
+                { ...order, adminNotes, currency: data.currency },
+                "order"
+              ),
+              `Thank you for your order (${order.fullOrderId})`,
+              "5055243"
+            );
+            return new SuccessResponse("Payment is successful", true).send(res);
           }
         } else if (data.currency === "NGN") {
           const paidAmount = data.amount / 100;
 
           if (order.amount > paidAmount) {
-            throw new InternalError(
-              "Payment Verification Failed: The amount paid is less than the order's total amount."
+            await db
+              .collection("orders")
+              .doc(orderId)
+              .update({
+                paymentStatus:
+                  "PART- PAYMENT PAID - GO AHEAD (but not seen yet)",
+                adminNotes,
+                currency: "NGN",
+                paymentDetails: `Website: Paid  ${getPriceDisplay(
+                  order.amount,
+                  currency
+                )} to Paystack`
+              });
+
+            await sendEmailToAddress(
+              ["info@regalflowers.com.ng"],
+              templateRender(
+                {
+                  ...order,
+                  adminNotes,
+                  currency: "NGN",
+                  paymentDetails
+                },
+                "new-order"
+              ),
+              `Warning a New Order amount mismatch (${order.fullOrderId})`,
+              "5055243"
             );
+
+            await sendEmailToAddress(
+              [order.client.email as string],
+              templateRender(
+                { ...order, adminNotes, currency: data.currency },
+                "order"
+              ),
+              `Thank you for your order (${order.fullOrderId})`,
+              "5055243"
+            );
+            return new SuccessResponse("Payment is successful", true).send(res);
           }
         }
-
-        const adminNotes = getAdminNoteText(
-          order.adminNotes,
-          data.currency,
-          order.amount
-        );
 
         await firestore()
           .collection("orders")
@@ -89,17 +153,19 @@ verifyPaystack.post(
             paymentStatus: "PAID - GO AHEAD (Website - Card)",
             adminNotes,
             currency: data.currency,
-            paymentDetails: `Website: Paid ${getPriceDisplay(
-              order.amount,
-              currency
-            )}  to paystack`
+            paymentDetails
           });
 
         // Send email to admin and client
         await sendEmailToAddress(
           ["info@regalflowers.com.ng"],
           templateRender(
-            { ...order, adminNotes, currency: data.currency },
+            {
+              ...order,
+              adminNotes,
+              currency: data.currency,
+              paymentDetails
+            },
             "new-order"
           ),
           `New Order (${order.fullOrderId})`,

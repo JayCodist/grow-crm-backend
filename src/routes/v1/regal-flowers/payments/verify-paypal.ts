@@ -6,7 +6,7 @@ import { URLSearchParams } from "url";
 import { Environment } from "../../../../config";
 import {
   ApiError,
-  InternalError,
+  NotFoundError,
   PaymentFailureError
 } from "../../../../core/ApiError";
 import {
@@ -83,30 +83,29 @@ verifyPaypal.post(
       const paymentStatus = json.purchase_units[0].payments.captures[0].status;
 
       if (json.status === "COMPLETED" && paymentStatus === "COMPLETED") {
-        const paymentDetails: PapPalPaymentDetails = json.purchase_units[0];
-        const currencyCode = paymentDetails.amount.currency_code;
+        const paypalPaymentDetails: PapPalPaymentDetails =
+          json.purchase_units[0];
+        const currencyCode = paypalPaymentDetails.amount.currency_code;
+        const orderID = (paypalPaymentDetails.reference_id as string).split(
+          "-"
+        )[1];
 
         if (currencyCode === "USD" || currencyCode === "GBP") {
-          const snap = await db
-            .collection("orders")
-            .doc(paymentDetails.reference_id as string)
-            .get();
+          const snap = await db.collection("orders").doc(orderID).get();
 
           const order = snap.data() as Order | undefined;
+
+          if (!order) {
+            throw new NotFoundError("Order not found");
+          }
 
           const currency = currencyOptions.find(
             currency => currency.name === currencyCode
           ) as AppCurrency;
           const nairaAmount = Math.round(
-            parseFloat(paymentDetails.amount.value) *
+            parseFloat(paypalPaymentDetails.amount.value) *
               (currency?.conversionRate as number)
           );
-
-          if (!order || order.amount > nairaAmount) {
-            throw new InternalError(
-              "Payment Verification Failed: The amount paid is less than the order's total amount."
-            );
-          }
 
           const adminNotes = getAdminNoteText(
             order.adminNotes,
@@ -114,24 +113,58 @@ verifyPaypal.post(
             order.amount
           );
 
-          await db
-            .collection("orders")
-            .doc(paymentDetails.reference_id as string)
-            .update({
-              paymentStatus: "PAID - GO AHEAD (Paypal)",
+          const paymentDetails = `Website: Paid  ${getPriceDisplay(
+            order.amount,
+            currency
+          )} to Paypal`;
+
+          if (!order || order.amount > nairaAmount) {
+            await db.collection("orders").doc(orderID).update({
+              paymentStatus: "PART- PAYMENT PAID - GO AHEAD (but not seen yet)",
               adminNotes,
               currency: currencyCode,
-              paymentDetails: `Website: Paid  ${getPriceDisplay(
-                order.amount,
-                currency
-              )} to Paypal`
+              paymentDetails
             });
+
+            await sendEmailToAddress(
+              ["info@regalflowers.com.ng"],
+              templateRender(
+                {
+                  ...order,
+                  adminNotes,
+                  currency: currencyCode,
+                  paymentDetails
+                },
+                "new-order"
+              ),
+              `Warning a New Order amount mismatch (${order.fullOrderId})`,
+              "5055243"
+            );
+
+            await sendEmailToAddress(
+              [order.client.email as string],
+              templateRender(
+                { ...order, adminNotes, currency: currencyCode },
+                "order"
+              ),
+              `Thank you for your order (${order.fullOrderId})`,
+              "5055243"
+            );
+            return new SuccessResponse("Payment is successful", true).send(res);
+          }
+
+          await db.collection("orders").doc(orderID).update({
+            paymentStatus: "PAID - GO AHEAD (Paypal)",
+            adminNotes,
+            currency: currencyCode,
+            paymentDetails
+          });
 
           // Send email to admin and client
           await sendEmailToAddress(
             ["info@regalflowers.com.ng"],
             templateRender(
-              { ...order, adminNotes, currency: currencyCode },
+              { ...order, adminNotes, currency: currencyCode, paymentDetails },
               "new-order"
             ),
             `New Order (${order.fullOrderId})`,
