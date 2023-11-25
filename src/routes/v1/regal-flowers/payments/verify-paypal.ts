@@ -16,7 +16,7 @@ import {
 import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
-import { Order } from "../../../../database/model/Order";
+import { Business, Order } from "../../../../database/model/Order";
 import { currencyOptions } from "../../../../helpers/constants";
 import { getAdminNoteText } from "../../../../helpers/formatters";
 import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
@@ -28,34 +28,45 @@ const db = firestore();
 
 const verifyPaypal = express.Router();
 
-const handlePaypalLogin: () => Promise<string> = async () => {
-  try {
-    const base64Pass = Buffer.from(
-      unescape(
-        encodeURIComponent(
-          `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
-        )
-      )
-    ).toString("base64");
-    const response = await fetch(
-      `${process.env.PAYPAL_BASE_URL}/v1/oauth2/token`,
-      {
-        method: "POST",
-        body: new URLSearchParams({
-          grant_type: "client_credentials"
-        }),
-        headers: {
-          Authorization: `Basic ${base64Pass}`
-        }
-      }
-    );
-    const json = await response.json();
-    return json.access_token;
-  } catch (err) {
-    console.error("Unable to login to paypal: ", err);
-    throw new InternalErrorResponse("Failed paypal authorization");
-  }
+export const businessPaypalScret: Record<Business, string> = {
+  floralHub: process.env.FLORAL_HUB_PAYPAL_CLIENT_SECRET as string,
+  regalFlowers: process.env.REGAL_FLOWERS_PAYPAL_CLIENT_SECRET as string
 };
+
+const businessPaypalClientId: Record<Business, string> = {
+  floralHub: process.env.FLORAL_HUB_PAYPAL_CLIENT_ID as string,
+  regalFlowers: process.env.REGAL_FLOWERS_PAYPAL_CLIENT_ID as string
+};
+
+const handlePaypalLogin: (business: Business) => Promise<string> =
+  async business => {
+    try {
+      const base64Pass = Buffer.from(
+        unescape(
+          encodeURIComponent(
+            `${businessPaypalClientId[business]}:${businessPaypalScret[business]}`
+          )
+        )
+      ).toString("base64");
+      const response = await fetch(
+        `${process.env.PAYPAL_BASE_URL}/v1/oauth2/token`,
+        {
+          method: "POST",
+          body: new URLSearchParams({
+            grant_type: "client_credentials"
+          }),
+          headers: {
+            Authorization: `Basic ${base64Pass}`
+          }
+        }
+      );
+      const json = await response.json();
+      return json.access_token;
+    } catch (err) {
+      console.error("Unable to login to paypal: ", err);
+      throw new InternalErrorResponse("Failed paypal authorization");
+    }
+  };
 
 interface PapPalPaymentDetails {
   reference_id: string;
@@ -70,7 +81,9 @@ verifyPaypal.post(
   validator(validation.verifyPaymentPaypal, "query"),
   async (req, res) => {
     try {
-      const paypalToken = await handlePaypalLogin();
+      const paypalToken = await handlePaypalLogin(
+        req.query.business as Business
+      );
       const response = await fetch(
         `${process.env.PAYPAL_BASE_URL}/v2/checkout/orders/${req.query.ref}`,
         {
