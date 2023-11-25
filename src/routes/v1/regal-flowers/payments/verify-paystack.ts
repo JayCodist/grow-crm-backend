@@ -8,7 +8,7 @@ import {
   PaymentFailureError
 } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
-import { Order } from "../../../../database/model/Order";
+import { Business, Order } from "../../../../database/model/Order";
 import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
@@ -23,6 +23,11 @@ const db = firestore();
 
 const verifyPaystack = express.Router();
 
+export const businessPaystackScret: Record<Business, string> = {
+  floralHub: process.env.FLORAL_HUB_PAYSTACK_SECRET_KEY as string,
+  regalFlowers: process.env.REGAL_FLOWERS_PAYSTACK_SECRET_KEY as string
+};
+
 verifyPaystack.post(
   "/",
   validator(validation.verifyPaymentPaystack, "query"),
@@ -32,7 +37,9 @@ verifyPaystack.post(
         `https://api.paystack.co/transaction/verify/${req.query.ref}`,
         {
           headers: {
-            Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`
+            Authorization: `Bearer ${
+              businessPaystackScret[req.query.business as Business]
+            }`
           }
         }
       );
@@ -183,7 +190,7 @@ verifyPaystack.post(
         );
 
         const environment: Environment = /test/i.test(
-          process.env.PAYSTACK_SECRET_KEY || ""
+          process.env.FLORAL_HUB_PAYSTACK_SECRET_KEY || ""
         )
           ? "development"
           : "production";
