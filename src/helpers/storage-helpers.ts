@@ -46,7 +46,7 @@ export const getCloudLinkForImage: (
       .join(".");
     const mobileFile = firebaseAdmin
       .storage()
-      .bucket()
+      .bucket(businessBucketMap[business])
       .file(`mobile-img${mobileLink}`);
     const resizedSource = source.resize({
       method: "scale",
@@ -59,7 +59,6 @@ export const getCloudLinkForImage: (
         cacheControl: "public, max-age=31536000"
       }
     });
-    console.log(mobileFile.publicUrl());
   }
 
   return file.publicUrl();
