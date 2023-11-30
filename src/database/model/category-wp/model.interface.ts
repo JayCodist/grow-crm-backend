@@ -26,5 +26,7 @@ export const categoryWPProjection = [
   "altImage",
   "title",
   "topHeading",
-  "bottomHeading"
+  "bottomHeading",
+  "heroImage",
+  "heroDescription"
 ];

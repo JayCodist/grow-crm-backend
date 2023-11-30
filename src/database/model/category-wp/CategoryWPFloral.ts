@@ -5,7 +5,10 @@ import { CategoryWPCreate } from "./model.interface";
 const DOCUMENT_NAME = "CategoryWPFloral";
 const COLLECTION_NAME = "categoryWPFloral";
 
-interface CategoryWPDocument extends CategoryWPCreate {}
+interface CategoryWPDocument extends CategoryWPCreate {
+  heroImage: string;
+  heroDescription: string;
+}
 
 const schema = new Schema(
   {
@@ -13,7 +16,16 @@ const schema = new Schema(
     key: String,
     name: String,
     slug: String,
-    _nameSearch: { type: [String], index: true }
+    _nameSearch: { type: [String], index: true },
+    description: String,
+    image: String,
+    shortDescription: String,
+    altImage: String,
+    title: String,
+    topHeading: String,
+    bottomHeading: String,
+    heroImage: String,
+    heroDescription: String
   },
   { _id: false }
 ).index({
