@@ -364,7 +364,8 @@ doWordpressSync.post(
                   heroImage: category.category_hero_image
                     ? category.category_hero_image.guid
                     : "",
-                  heroDescription: category.custom_top_category_description
+                  heroDescription: category.custom_top_category_description,
+                  info: category.category_alert
                 }
               : {};
           await CategoryModelMap[business].updateOne(

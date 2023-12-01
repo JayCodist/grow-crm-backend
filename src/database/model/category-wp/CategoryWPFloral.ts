@@ -8,6 +8,7 @@ const COLLECTION_NAME = "categoryWPFloral";
 interface CategoryWPDocument extends CategoryWPCreate {
   heroImage: string;
   heroDescription: string;
+  info: string;
 }
 
 const schema = new Schema(
@@ -25,7 +26,8 @@ const schema = new Schema(
     topHeading: String,
     bottomHeading: String,
     heroImage: String,
-    heroDescription: String
+    heroDescription: String,
+    info: String
   },
   { _id: false }
 ).index({
