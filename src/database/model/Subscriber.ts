@@ -38,7 +38,5 @@ export const SubscriberModel = model<SubscriberDocument>(
 SubscriberModel.on("index", err => {
   if (err) {
     Logger.error({ message: "Subscriber index error: ", err });
-  } else {
-    Logger.info("Subscriber indexing complete");
   }
 });

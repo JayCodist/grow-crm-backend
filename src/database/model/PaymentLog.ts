@@ -33,7 +33,5 @@ export const PaymentLogModel = model<Document & PaymentLog>(
 PaymentLogModel.on("index", error => {
   if (error) {
     Logger.error(error);
-  } else {
-    Logger.info(`${DOCUMENT_NAME} index created!`);
   }
 });

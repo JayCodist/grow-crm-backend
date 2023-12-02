@@ -95,7 +95,5 @@ export const ContactModel = model<Document & ContactCreate>(
 ContactModel.on("index", error => {
   if (error) {
     Logger.error(error);
-  } else {
-    Logger.info(`${DOCUMENT_NAME} index created!`);
   }
 });

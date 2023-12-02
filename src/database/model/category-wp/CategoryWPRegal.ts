@@ -36,7 +36,5 @@ export const CategoryWPRegalModel = model<CategoryWPDocument & Document>(
 CategoryWPRegalModel.on("index", error => {
   if (error) {
     Logger.error(error);
-  } else {
-    Logger.info(`${DOCUMENT_NAME} index created!`);
   }
 });

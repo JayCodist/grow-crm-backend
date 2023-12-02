@@ -29,7 +29,5 @@ export const CategoryWPFloralModel = model<CategoryWPDocument & Document>(
 CategoryWPFloralModel.on("index", error => {
   if (error) {
     Logger.error(error);
-  } else {
-    Logger.info(`${DOCUMENT_NAME} index created!`);
   }
 });

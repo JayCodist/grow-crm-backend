@@ -61,7 +61,5 @@ export const ClientAccessLogModel = model<ClientAccessLogDocument>(
 ClientAccessLogModel.on("index", err => {
   if (err) {
     Logger.error({ message: "ClientAccessLog index error: ", err });
-  } else {
-    Logger.info("ClientAccessLog indexing complete");
   }
 });
