@@ -103,8 +103,8 @@ export class UserUpgradeRequiredError extends ApiError {
   constructor(
     message = "Upgrade is required for legacy user. OTP has been sent to your inbox"
   ) {
-    super(ErrorType.FORBIDDEN, message);
-    Object.setPrototypeOf(this, ForbiddenError.prototype);
+    super(ErrorType.USER_UPGRADE_REQUIRED, message);
+    Object.setPrototypeOf(this, UserUpgradeRequiredError.prototype);
   }
 }
 
