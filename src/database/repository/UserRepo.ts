@@ -1,7 +1,11 @@
 import dayjs from "dayjs";
 import bcrypt from "bcrypt";
 import { PartialLoose } from "../../helpers/type-helpers";
-import { AuthFailureError, BadRequestError } from "../../core/ApiError";
+import {
+  AuthFailureError,
+  BadRequestError,
+  UserUpgradeRequiredError
+} from "../../core/ApiError";
 import {
   formatPhoneNumber,
   getLoginResponse,
@@ -10,6 +14,8 @@ import {
 import User, { LoginResponse, UserCreate } from "../model/user/model.interface";
 import { Business } from "../model/Order";
 import { UserModelMap } from "./utils";
+import OTPRecordRepo from "./OTPRecordRepo";
+import { sendEmailToAddress } from "../../helpers/messaging-helpers";
 
 export default class UsersRepo {
   public static async signup(userData: UserCreate, business: Business) {
@@ -30,11 +36,24 @@ export default class UsersRepo {
     if (!user) {
       throw new AuthFailureError("Credentials entered are not valid");
     }
+    if (user.isLegacyUser) {
+      this.handleLegacyUser(email, business);
+    }
     const passwordWorks = await bcrypt.compare(password, user.password);
     if (!passwordWorks) {
       throw new AuthFailureError("Credentials entered are not valid");
     }
     return getLoginResponse(user);
+  }
+
+  public static async handleLegacyUser(email: string, business: Business) {
+    const code = await OTPRecordRepo.createOTPRecord(email);
+    await sendEmailToAddress(
+      [email],
+      `Your one-time password from ${business} is ${code}. This password expires in 10 minutes`,
+      "One-time password"
+    );
+    throw new UserUpgradeRequiredError();
   }
 
   public static async createUser(
@@ -46,6 +65,9 @@ export default class UsersRepo {
       .lean<User>()
       .exec();
     if (existingUser) {
+      if (existingUser.isLegacyUser) {
+        this.handleLegacyUser(input.email, business);
+      }
       throw new BadRequestError("User already exists");
     }
     const data: UserCreate = {

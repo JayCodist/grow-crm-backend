@@ -28,7 +28,7 @@ requestOTP.use(
       const code = await OTPRecordRepo.createOTPRecord(email);
       await sendEmailToAddress(
         [email],
-        `Your one-time password from regalflowers is ${code}. This password expires in 10 minutes`,
+        `Your one-time password from ${business} is ${code}. This password expires in 10 minutes`,
         "One-time password"
       );
       new SuccessResponse("OTP sent successfully", null).send(res);

@@ -22,7 +22,7 @@ validateOTP.use(
         code: string;
         business: Business;
       };
-      const user = await UsersRepo.findByEmail(email, business);
+      let user = await UsersRepo.findByEmail(email, business);
       if (!user) {
         throw new AuthFailureError("Email does not belong to existing user");
       }
@@ -36,7 +36,16 @@ validateOTP.use(
       if (isOutdated) {
         throw new AuthFailureError("One-time password has expired");
       }
-
+      if (user.isLegacyUser) {
+        user = await UsersRepo.update(
+          {
+            id: user.id,
+            isLegacyUser: false,
+            legacyResolutionDate: dayjs().format()
+          },
+          business
+        );
+      }
       new SuccessResponse("success", user).send(res);
     } catch (error) {
       ApiError.handle(error as Error, res);
