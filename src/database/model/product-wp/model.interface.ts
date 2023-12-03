@@ -21,7 +21,9 @@ export const productWPProjection = [
   "designNote",
   "budgetNote",
   "inStock",
-  "pageDescription"
+  "pageDescription",
+  "info1",
+  "info2"
 ];
 
 export const productWPProjectionMinimal = [
@@ -141,6 +143,8 @@ export interface ProductWP {
   relatedProducts?: MinimalProductWP[];
   inStock: boolean;
   pageDescription: string;
+  info1: string;
+  info2: string;
 }
 
 export interface ProductWPCreate extends ProductWP {

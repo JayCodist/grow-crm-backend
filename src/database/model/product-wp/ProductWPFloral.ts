@@ -77,7 +77,10 @@ const schema = new Schema({
   timeStamp: String,
   designNote: String,
   budgetNote: String,
-  inStock: Boolean
+  inStock: Boolean,
+  pageDescription: String,
+  info1: String,
+  info2: String
 });
 
 export const ProductWPFloralModel = model<ProductWPFloralDocument & Document>(

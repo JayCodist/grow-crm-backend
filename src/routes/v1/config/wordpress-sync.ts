@@ -35,7 +35,7 @@ const backendUrlMap: Record<Business, string> = {
 
 const wordpressUrlMap: Record<Business, string> = {
   regalFlowers: "https://www.regalflower.com/wp-json/wp/v2",
-  floralHub: "https://www.floralhub.com/wp-json/wp/v2"
+  floralHub: "https://www.floralhub.com.ng/wp-json/wp/v2"
 };
 
 const doWordpressSync = express.Router();
@@ -295,7 +295,9 @@ doWordpressSync.post(
             ),
             addonsGroups: [],
             inStock: rawProd.in_stock,
-            pageDescription: ""
+            pageDescription: "",
+            info1: "",
+            info2: ""
           };
           return product;
         })
@@ -341,53 +343,63 @@ doWordpressSync.post(
         [appConfigTotalSyncsFieldMap[business]]: currentSyncTotal + 1
       });
 
-      if (business === "regalFlowers") {
-        const productCategory = await fetchWPContent(
-          `${wordpressUrlMap[business]}/product_cat?per_page=100`
-        );
+      const productCategory = await fetchWPContent(
+        `${wordpressUrlMap[business]}/product_cat?per_page=100`
+      );
 
-        (productCategory[0] as unknown as any[]).forEach(
-          async (category: any) => {
-            await CategoryModelMap[business].updateOne(
-              { key: category.id.toString() },
-              {
-                $set: {
-                  shortDescription: category.custom_category_description,
-                  altImage: category.alt_text_for_images,
-                  title: category.title_tag,
-                  topHeading: category.custom_top_heading_h1,
-                  bottomHeading: category.custom_bottom_heading_h2
+      const [productPage1, productPage2] = await Promise.all([
+        fetchWPContent(
+          `${wordpressUrlMap[business]}/product?per_page=100&page=1`
+        ),
+        fetchWPContent(
+          `${wordpressUrlMap[business]}/product?per_page=100&page=2&offset=100`
+        )
+      ]);
+
+      (productCategory[0] as unknown as any[]).forEach(
+        async (category: any) => {
+          const otherFields =
+            business === "floralHub"
+              ? {
+                  heroImage: category.category_hero_image
+                    ? category.category_hero_image.guid
+                    : "",
+                  heroDescription: category.custom_top_category_description
                 }
-              }
-            );
-          }
-        );
-
-        const [productPage1, productPage2] = await Promise.all([
-          fetchWPContent(
-            `${wordpressUrlMap[business]}/product?per_page=100&page=1`
-          ),
-          fetchWPContent(
-            `${wordpressUrlMap[business]}/product?per_page=100&page=2&offset=100`
-          )
-        ]);
-
-        [
-          ...(productPage1[0] as unknown as any[]),
-          ...(productPage2[0] as unknown as any[])
-        ].forEach(async (product: any) => {
-          const categoryKey = product.id.toString();
-
-          await ProductModelMap[business].updateOne(
-            { key: categoryKey },
+              : {};
+          await CategoryModelMap[business].updateOne(
+            { key: category.id.toString() },
             {
               $set: {
-                pageDescription: product.custom_product_description
+                ...otherFields,
+                shortDescription: category.custom_category_description,
+                altImage: category.alt_text_for_images,
+                title: category.title_tag,
+                topHeading: category.custom_top_heading_h1,
+                bottomHeading: category.custom_bottom_heading_h2
               }
             }
           );
-        });
-      }
+        }
+      );
+
+      [
+        ...(productPage1[0] as unknown as any[]),
+        ...(productPage2[0] as unknown as any[])
+      ].forEach(async (product: any) => {
+        const categoryKey = product.id.toString();
+
+        await ProductModelMap[business].updateOne(
+          { key: categoryKey },
+          {
+            $set: {
+              pageDescription: product.custom_product_description,
+              info1: product.product_alert,
+              info2: product.product_alert_2
+            }
+          }
+        );
+      });
 
       new SuccessResponse("Successfully synchronized Wordpress", []).send(res);
     } catch (e) {
