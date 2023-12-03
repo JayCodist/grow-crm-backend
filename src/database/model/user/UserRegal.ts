@@ -26,6 +26,7 @@ const schema = new Schema({
   gender: String,
   city: String,
   email: String,
+  createdAt: String,
   phone: String,
   phoneAlt: String,
   state: String,

@@ -32,6 +32,7 @@ const schema = new Schema({
   dob: String,
   password: String,
   phoneCountryCode: String,
+  createdAt: String,
   isLegacyUser: Boolean,
   legacyResolutionDate: String
 }).index({
