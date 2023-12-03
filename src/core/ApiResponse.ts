@@ -6,6 +6,7 @@ enum ResponseStatus {
   UNAUTHORIZED = 401,
   FORBIDDEN = 403,
   NOT_FOUND = 404,
+  USER_UPGRADE_REQUIRED = 436,
   INTERNAL_ERROR = 500
 }
 
@@ -65,6 +66,12 @@ export class ForbiddenResponse extends ApiResponse {
 export class BadRequestResponse extends ApiResponse {
   constructor(message = "Bad Parameters") {
     super(ResponseStatus.BAD_REQUEST, message);
+  }
+}
+
+export class UserUpgradeRequiredResponse extends ApiResponse {
+  constructor(message = "Upgrade of legacy user required") {
+    super(ResponseStatus.USER_UPGRADE_REQUIRED, message);
   }
 }
 

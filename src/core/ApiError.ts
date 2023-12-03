@@ -6,7 +6,8 @@ import {
   InternalErrorResponse,
   NotFoundResponse,
   BadRequestResponse,
-  ForbiddenResponse
+  ForbiddenResponse,
+  UserUpgradeRequiredResponse
 } from "./ApiResponse";
 import Logger from "./Logger";
 
@@ -20,7 +21,8 @@ enum ErrorType {
   NO_ENTRY = "NoEntryError",
   NO_DATA = "NoDataError",
   BAD_REQUEST = "BadRequestError",
-  FORBIDDEN = "ForbiddenError"
+  FORBIDDEN = "ForbiddenError",
+  USER_UPGRADE_REQUIRED = "UserUpgradeRequiredError"
 }
 
 export abstract class ApiError extends Error {
@@ -47,6 +49,8 @@ export abstract class ApiError extends Error {
         return new BadRequestResponse(err.message).send(res);
       case ErrorType.FORBIDDEN:
         return new ForbiddenResponse(err.message).send(res);
+      case ErrorType.USER_UPGRADE_REQUIRED:
+        return new UserUpgradeRequiredResponse(err.message).send(res);
       default: {
         let { message } = err;
         // Do not send failure message in production as it may send sensitive data
@@ -90,6 +94,15 @@ export class NotFoundError extends ApiError {
 
 export class ForbiddenError extends ApiError {
   constructor(message = "Permission denied") {
+    super(ErrorType.FORBIDDEN, message);
+    Object.setPrototypeOf(this, ForbiddenError.prototype);
+  }
+}
+
+export class UserUpgradeRequiredError extends ApiError {
+  constructor(
+    message = "Upgrade is required for legacy user. OTP has been sent to your inbox"
+  ) {
     super(ErrorType.FORBIDDEN, message);
     Object.setPrototypeOf(this, ForbiddenError.prototype);
   }
