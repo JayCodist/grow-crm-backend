@@ -37,7 +37,7 @@ export default class UsersRepo {
       throw new AuthFailureError("Credentials entered are not valid");
     }
     if (user.isLegacyUser) {
-      this.handleLegacyUser(email, business);
+      await this.handleLegacyUser(email, business);
     }
     const passwordWorks = await bcrypt.compare(password, user.password);
     if (!passwordWorks) {
@@ -66,7 +66,7 @@ export default class UsersRepo {
       .exec();
     if (existingUser) {
       if (existingUser.isLegacyUser) {
-        this.handleLegacyUser(input.email, business);
+        await this.handleLegacyUser(input.email, business);
       }
       throw new BadRequestError("User already exists");
     }
