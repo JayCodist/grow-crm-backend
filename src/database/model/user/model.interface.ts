@@ -45,9 +45,12 @@ export default interface User {
   recipients: Recipient[];
   phoneCountryCode: string;
   altPhoneCountryCode: string;
+  isLegacyUser?: boolean;
+  legacyResolutionDate?: string;
 }
 
-export interface LoginResponse extends Omit<User, "password"> {
+export interface LoginResponse
+  extends Omit<User, "password" | "legacyResolutionDate"> {
   authToken: string;
 }
 
