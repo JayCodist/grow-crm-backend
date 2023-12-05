@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Order</title>
+    <style type="text/css"></style>
+  </head>
+  <body
+    style="
+      font-size: 1rem;
+      color: #737373;
+      font-family: Geneva, Tahoma, sans-serif;
+      line-height: 1.5;
+      letter-spacing: 0.5px;
+    "
+  >
+    <table
+      role="presentation"
+      width="100%"
+      align="center"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      style="
+        border: 0.1rem solid rgb(233, 233, 233);
+        max-width: 50rem;
+        align-items: center;
+        background-color: white;
+      "
+    >
+      <tr>
+        <td
+          style="
+            width: 100%;
+            text-align: center;
+            background-color: #b240da;
+            color: white;
+            font-weight: 500;
+            padding: 3.6rem 0;
+            font-size: 2rem;
+          "
+        >
+          New Order
+        </td>
+      </tr>
+      <tr>
+        <td width="100%" style="padding: 3rem 4rem">
+          <p style="margin: 1.5rem 0; color: #737373">
+            You’ve received a new order from {{name}}:
+          </p>
+
+          <p
+            style="
+              color: #b240da;
+              font-weight: 600;
+              font-size: 1.5rem;
+              margin-top: 2rem;
+              margin: 1rem 0;
+            "
+          >
+            [Order #{{orderID}}] ({{deliveryDate}})
+          </p>
+          <table
+            style="
+              width: 100%;
+              margin-bottom: 2rem;
+              padding: 2rem;
+              border-radius: 0.5rem;
+              color: #737373;
+              vertical-align: middle;
+              width: 100%;
+              border: 0.1rem solid #e4e4e4;
+              padding: 0.8rem;
+              text-align: left;
+              border-collapse: collapse;
+            "
+          >
+            <tr>
+              <th
+                style="
+                  border: 0.1rem solid #e4e4e4;
+                  padding: 0.8rem;
+                  width: 50%;
+                "
+              >
+                Product
+              </th>
+              <th
+                style="
+                  border: 0.1rem solid #e4e4e4;
+                  padding: 0.8rem;
+                  width: 20%;
+                  min-width: 6rem;
+                "
+              >
+                Quantity
+              </th>
+              <th
+                style="
+                  border: 0.1rem solid #e4e4e4;
+                  padding: 0.8rem;
+                  width: 25%;
+                "
+              >
+                Price
+              </th>
+            </tr>
+            {{orderProducts}}
+          </table>
+          <p
+            style="
+              color: #b240da;
+              font-weight: 600;
+              font-size: 1.2rem;
+              margin: 0.5rem 0;
+            "
+          >
+            Sender's Information
+          </p>
+          <p style="margin: 0.5rem 0; color: #737373">
+            <span style="font-weight: 600">Name:</span>
+            {{senderName}}
+          </p>
+          <p style="margin: 0.5rem 0; color: #737373">
+            <span style="font-weight: 600">Phone Number:</span>
+            {{senderPhone}}
+          </p>
+          <p style="margin: 0.5rem 0; color: #737373">
+            <span style="font-weight: 600">Email:</span>
+            {{senderEmail}}
+          </p>
+          <p style="margin: 0.5rem 0; color: #737373">
+            <span style="font-weight: 600">Delivery Date:</span>
+            {{deliveryDate}}
+          </p>
+          {{pickUp}} {{recipient}} {{optionalMessage}} {{addtionalInfo}}
+          {{deliveryMessage}} {{purpose}}
+          <p
+            style="
+              color: #b240da;
+              font-weight: 600;
+              font-size: 1.2rem;
+              margin: 0.5rem 0;
+            "
+          >
+            Payment Details
+          </p>
+          <p style="margin: 0.5rem 0; color: #737373">
+            <span style="font-weight: 600">Sub Total:</span>
+            {{subtotal}}
+          </p>
+          {{deliveryCharge}}
+          <p style="margin: 0.5rem 0; color: #737373">
+            <span style="font-weight: 600">Total:</span>
+            {{total}}
+          </p>
+          <p style="margin: 0.5rem 0; color: #737373">
+            <span style="font-weight: 600">Payment Details:</span>
+            {{paymentDetails}}
+          </p>
+
+          <p style="color: #737373">
+            We look forward to fulfilling your order soon.
+          </p>
+        </td>
+      </tr>
+    </table>
+    <footer style="font-size: 0.8rem; max-width: 50rem; margin: 0 auto">
+      <table style="width: 100%">
+        <tr>
+          <td style="text-align: center; width: 100%">
+            <div style="display: inline-block; margin-top: 0.6rem">
+              <p style="color: #737373">
+                Please note your Order Number in all correspondence with us.
+              </p>
+              <a href="www.Floralhub.com.ng ">www.Floralhub.com.ng </a>
+              <p style="color: #737373">
+                We don’t just deliver flowers, we deliver happiness
+              </p>
+              <a href="info@floralhub.com.ng">info@floralhub.com.ng</a>
+              <p style="color: #737373">+234 (0) 907 777 7994</p>
+              <p style="margin: 16px 0; color: #737373">
+                LAGOS STORE<br />
+                15, Ikeja Way, Dolphin Estate, <br />
+                Ikoyi, Lagos<br />
+              </p>
+              <p style="margin: 0 0 16px; color: #737373">
+                ABUJA STORE<br />
+                5, Nairobi Street,<br />
+                off Aminu Kano Crescent,<br />
+                Wuse 2, Abuja
+              </p>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </footer>
+  </body>
+</html>

@@ -18,7 +18,8 @@ const validation = {
     amount: Joi.number().required(),
     accountName: Joi.string().required().allow(""),
     referenceNumber: Joi.string().allow(""),
-    currency: Joi.string().required().valid("NGN", "USD", "GBP")
+    currency: Joi.string().required().valid("NGN", "USD", "GBP"),
+    business: Joi.string().required().valid("floralHub", "regalFlowers")
   })
 };
 
