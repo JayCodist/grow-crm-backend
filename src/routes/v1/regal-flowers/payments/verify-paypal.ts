@@ -23,6 +23,11 @@ import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
 import { templateRender } from "../../../../helpers/render";
 import { getPriceDisplay } from "../../../../helpers/type-conversion";
 import { AppCurrency } from "../../../../database/model/AppConfig";
+import {
+  businessNewOrderPath,
+  businessOrderPath,
+  businessTemplateId
+} from "./verify-paystack";
 
 const db = firestore();
 
@@ -81,9 +86,8 @@ verifyPaypal.post(
   validator(validation.verifyPaymentPaypal, "query"),
   async (req, res) => {
     try {
-      const paypalToken = await handlePaypalLogin(
-        req.query.business as Business
-      );
+      const business = req.query.business as Business;
+      const paypalToken = await handlePaypalLogin(business);
       const response = await fetch(
         `${process.env.PAYPAL_BASE_URL}/v2/checkout/orders/${req.query.ref}`,
         {
@@ -148,20 +152,24 @@ verifyPaypal.post(
                   currency: currencyCode,
                   paymentDetails
                 },
-                "new-order"
+                businessNewOrderPath[business],
+                business
               ),
               `Warning a New Order amount mismatch (${order.fullOrderId})`,
-              "5055243"
+              businessTemplateId[business],
+              business
             );
 
             await sendEmailToAddress(
               [order.client.email as string],
               templateRender(
                 { ...order, adminNotes, currency: currencyCode },
-                "order"
+                businessOrderPath[business],
+                business
               ),
               `Thank you for your order (${order.fullOrderId})`,
-              "5055243"
+              businessTemplateId[business],
+              business
             );
             return new SuccessResponse("Payment is successful", true).send(res);
           }
@@ -178,20 +186,24 @@ verifyPaypal.post(
             ["info@regalflowers.com.ng"],
             templateRender(
               { ...order, adminNotes, currency: currencyCode, paymentDetails },
-              "new-order"
+              businessNewOrderPath[business],
+              business
             ),
             `New Order (${order.fullOrderId})`,
-            "5055243"
+            businessTemplateId[business],
+            business
           );
 
           await sendEmailToAddress(
             [order.client.email as string],
             templateRender(
               { ...order, adminNotes, currency: currencyCode },
-              "order"
+              businessOrderPath[business],
+              business
             ),
             `Thank you for your order (${order.fullOrderId})`,
-            "5055243"
+            businessTemplateId[business],
+            business
           );
           const environment: Environment = /sandbox/i.test(
             process.env.PAYPAL_BASE_URL || ""

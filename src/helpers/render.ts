@@ -1,10 +1,19 @@
 import fs from "fs";
 import { AppCurrency } from "../database/model/AppConfig";
-import { Order } from "../database/model/Order";
+import { Business, Order } from "../database/model/Order";
 import { currencyOptions, pickupLocations } from "./constants";
 import { getPriceDisplay } from "./type-conversion";
 
-export const templateRender = (order: Order, path: string): string => {
+const businessColor: Record<Business, string> = {
+  floralHub: "#b240d",
+  regalFlowers: "#ba0b4f"
+};
+
+export const templateRender = (
+  order: Order,
+  path: string,
+  business: Business
+): string => {
   const file = fs;
   const template = file.readFileSync(`./src/templates/${path}.html`, "utf-8");
   const subtotal = order.deliveryAmount
@@ -59,7 +68,7 @@ export const templateRender = (order: Order, path: string): string => {
     .replace(
       "{{optionalMessage}}",
       displayOptionalMessage
-        ? `<p style="color: #ba0b4f; font-weight: 600; font-size: 1.2rem; margin: 0.5rem 0;">Optional Message</p>`
+        ? `<p style="color: ${businessColor[business]}; font-weight: 600; font-size: 1.2rem; margin: 0.5rem 0;">Optional Message</p>`
         : ""
     )
     .replace(
@@ -87,7 +96,11 @@ export const templateRender = (order: Order, path: string): string => {
     .replace(
       "{{pickUp}}",
       order.isClientRecipient
-        ? `<p style="color: #ba0b4f; font-weight: 600; font-size: 1.2rem; margin: 0.5rem 0">Pick Up Location</p>
+        ? `<p style="color: ${
+            businessColor[business]
+          }; font-weight: 600; font-size: 1.2rem; margin: 0.5rem 0; style="color: ${
+            businessColor[business]
+          }">Pick Up Location</p>
               <p style="margin: 0.5rem 0; color: #737373;">
               ${pickupLocations[order.despatchLocation as string]}
               </p>
@@ -98,7 +111,7 @@ export const templateRender = (order: Order, path: string): string => {
       "{{recipient}}",
       !order.isClientRecipient
         ? `
-              <p style="color: #ba0b4f; font-weight: 600; font-size: 1.2rem; margin: 0.5rem 0">Receiver's Information</p>
+              <p style="color: ${businessColor[business]}; font-weight: 600; font-size: 1.2rem; margin: 0.5rem 0">Receiver's Information</p>
             <p style="margin: 0.5rem 0; color: #737373;">
               <span style="font-weight: 600">Name:</span>
               ${order.deliveryDetails.recipientName}
