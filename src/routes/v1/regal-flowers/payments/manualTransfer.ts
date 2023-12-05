@@ -3,7 +3,7 @@ import { firestore } from "firebase-admin";
 import { Environment } from "../../../../config";
 import { ApiError, InternalError } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
-import { Order } from "../../../../database/model/Order";
+import { Business, Order } from "../../../../database/model/Order";
 import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
@@ -14,6 +14,11 @@ import {
 } from "../../../../database/model/AppConfig";
 import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
 import { templateRender } from "../../../../helpers/render";
+import {
+  businessEmail,
+  businessNewOrderPath,
+  businessOrderPath
+} from "./verify-paystack";
 
 const db = firestore();
 
@@ -30,12 +35,14 @@ manualTransfer.post(
   validator(validation.manualTransfer, "body"),
   async (req, res) => {
     try {
-      const { amount, accountName, referenceNumber, currency } = req.body as {
-        amount: number;
-        accountName: string;
-        referenceNumber: string;
-        currency: AppCurrencyName;
-      };
+      const { amount, accountName, referenceNumber, currency, business } =
+        req.body as {
+          amount: number;
+          accountName: string;
+          referenceNumber: string;
+          currency: AppCurrencyName;
+          business: Business;
+        };
 
       const snap = await db.collection("orders").doc(req.params.id).get();
       const order = snap.data() as Order | undefined;
@@ -62,17 +69,23 @@ manualTransfer.post(
 
       // Send email to admin and client
       await sendEmailToAddress(
-        ["info@regalflowers.com.ng"],
-        templateRender({ ...order, paymentDetails }, "new-order"),
+        [businessEmail[business]],
+        templateRender(
+          { ...order, paymentDetails },
+          businessNewOrderPath[business],
+          business
+        ),
         `New Order (${order.fullOrderId})`,
-        "5055243"
+        "5055243",
+        business
       );
 
       await sendEmailToAddress(
         [order.client.email as string],
-        templateRender({ ...order }, "order"),
+        templateRender({ ...order }, businessOrderPath[business], business),
         `Thank you for your order (${order.fullOrderId})`,
-        "5055243"
+        "5055243",
+        business
       );
 
       const environment: Environment = /test/i.test(

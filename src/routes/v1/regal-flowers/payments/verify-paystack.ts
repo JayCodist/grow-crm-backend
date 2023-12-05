@@ -28,18 +28,38 @@ export const businessPaystackScret: Record<Business, string> = {
   regalFlowers: process.env.REGAL_FLOWERS_PAYSTACK_SECRET_KEY as string
 };
 
+export const businessOrderPath: Record<Business, string> = {
+  floralHub: "floral-order",
+  regalFlowers: "order"
+};
+
+export const businessNewOrderPath: Record<Business, string> = {
+  floralHub: "new-floral-order",
+  regalFlowers: "new-order"
+};
+
+export const businessEmail: Record<Business, string> = {
+  floralHub: "info@floralhub.com.ng",
+  regalFlowers: "info@regalflowers.com.ng"
+};
+
+export const businessTemplateId: Record<Business, string> = {
+  floralHub: "5369366",
+  regalFlowers: "5055243"
+};
+
 verifyPaystack.post(
   "/",
   validator(validation.verifyPaymentPaystack, "query"),
   async (req, res) => {
     try {
+      const business = req.query.business as Business;
+      console.log("templateId", businessTemplateId[business]);
       const response = await fetch(
         `https://api.paystack.co/transaction/verify/${req.query.ref}`,
         {
           headers: {
-            Authorization: `Bearer ${
-              businessPaystackScret[req.query.business as Business]
-            }`
+            Authorization: `Bearer ${businessPaystackScret[business]}`
           }
         }
       );
@@ -88,22 +108,26 @@ verifyPaystack.post(
             });
 
             await sendEmailToAddress(
-              ["info@regalflowers.com.ng"],
+              [businessEmail[business]],
               templateRender(
                 { ...order, adminNotes, currency: "USD", paymentDetails },
-                "new-order"
+                businessOrderPath[business],
+                business
               ),
               `Warning a New Order amount mismatch (${order.fullOrderId})`,
-              "5055243"
+              businessTemplateId[business],
+              business
             );
             await sendEmailToAddress(
               [order.client.email as string],
               templateRender(
                 { ...order, adminNotes, currency: data.currency },
-                "order"
+                businessOrderPath[business],
+                business
               ),
               `Thank you for your order (${order.fullOrderId})`,
-              "5055243"
+              businessTemplateId[business],
+              business
             );
             return new SuccessResponse("Payment is successful", true).send(res);
           }
@@ -126,7 +150,7 @@ verifyPaystack.post(
               });
 
             await sendEmailToAddress(
-              ["info@regalflowers.com.ng"],
+              [businessEmail[business]],
               templateRender(
                 {
                   ...order,
@@ -134,20 +158,24 @@ verifyPaystack.post(
                   currency: "NGN",
                   paymentDetails
                 },
-                "new-order"
+                businessNewOrderPath[business],
+                business
               ),
               `Warning a New Order amount mismatch (${order.fullOrderId})`,
-              "5055243"
+              businessTemplateId[business],
+              business
             );
 
             await sendEmailToAddress(
               [order.client.email as string],
               templateRender(
                 { ...order, adminNotes, currency: data.currency },
-                "order"
+                businessOrderPath[business],
+                business
               ),
               `Thank you for your order (${order.fullOrderId})`,
-              "5055243"
+              businessTemplateId[business],
+              business
             );
             return new SuccessResponse("Payment is successful", true).send(res);
           }
@@ -165,7 +193,7 @@ verifyPaystack.post(
 
         // Send email to admin and client
         await sendEmailToAddress(
-          ["info@regalflowers.com.ng"],
+          [businessEmail[business]],
           templateRender(
             {
               ...order,
@@ -173,20 +201,24 @@ verifyPaystack.post(
               currency: data.currency,
               paymentDetails
             },
-            "new-order"
+            businessNewOrderPath[business],
+            business
           ),
           `New Order (${order.fullOrderId})`,
-          "5055243"
+          businessTemplateId[business],
+          business
         );
 
         await sendEmailToAddress(
           [order.client.email as string],
           templateRender(
             { ...order, adminNotes, currency: data.currency },
-            "order"
+            businessOrderPath[business],
+            business
           ),
           `Thank you for your order (${order.fullOrderId})`,
-          "5055243"
+          businessTemplateId[business],
+          business
         );
 
         const environment: Environment = /test/i.test(
