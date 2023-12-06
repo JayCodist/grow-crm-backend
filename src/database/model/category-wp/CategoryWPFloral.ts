@@ -9,6 +9,7 @@ interface CategoryWPDocument extends CategoryWPCreate {
   heroImage: string;
   heroDescription: string;
   info: string;
+  topHeadingH2: string;
 }
 
 const schema = new Schema(
@@ -27,7 +28,8 @@ const schema = new Schema(
     bottomHeading: String,
     heroImage: String,
     heroDescription: String,
-    info: String
+    info: String,
+    topHeadingH2: String
   },
   { _id: false }
 ).index({
