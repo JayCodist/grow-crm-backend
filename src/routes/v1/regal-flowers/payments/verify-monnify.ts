@@ -12,7 +12,7 @@ import {
   InternalErrorResponse,
   SuccessResponse
 } from "../../../../core/ApiResponse";
-import { Order } from "../../../../database/model/Order";
+import { Business, Order } from "../../../../database/model/Order";
 import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
@@ -56,6 +56,7 @@ verifyMonnify.post(
   async (req, res) => {
     try {
       const monnifyToken = await handleMonnifyLogin();
+      const business = req.query.business as Business;
       const response = await fetch(
         `${process.env.MONNIFY_BASE_URL}/api/v2/transactions/${req.query.ref}`,
         {
@@ -94,14 +95,14 @@ verifyMonnify.post(
         // Send email to admin and client
         await sendEmailToAddress(
           ["info@regalflowers.com.ng"],
-          templateRender({ ...order, adminNotes }, "new-order"),
+          templateRender({ ...order, adminNotes }, "new-order", business),
           `New Order (${order.fullOrderId})`,
           "5055243"
         );
 
         await sendEmailToAddress(
           [order.client.email as string],
-          templateRender({ ...order, adminNotes }, "order"),
+          templateRender({ ...order, adminNotes }, "order", business),
           `Thank you for your order (${order.fullOrderId})`,
           "5055243"
         );
