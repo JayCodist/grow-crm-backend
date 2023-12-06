@@ -29,5 +29,6 @@ export const categoryWPProjection = [
   "bottomHeading",
   "heroImage",
   "heroDescription",
-  "info"
+  "info",
+  "topHeadingH2"
 ];
