@@ -193,7 +193,7 @@ createOrder.post(
         paymentStatus: "Website Not Paid (finalized discussion)",
         cost: 0,
         deliveryDate: deliveryDate || "",
-        admin: adminEmailBusinessMap[business],
+        admin: "regalflowersnigeria@gmail.com",
         adminNotes: `${
           _currency && _currency.name !== "NGN"
             ? getPriceDisplay(totalPrice, _currency)
