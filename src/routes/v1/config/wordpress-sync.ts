@@ -30,12 +30,12 @@ import {
 
 const backendUrlMap: Record<Business, string> = {
   regalFlowers: "https://www.regalflower.com/wc-api/v3",
-  floralHub: "https://www.floralhub.com.ng/wc-api/v3"
+  floralHub: "https://www.faaji.com/wc-api/v3"
 };
 
 const wordpressUrlMap: Record<Business, string> = {
   regalFlowers: "https://www.regalflower.com/wp-json/wp/v2",
-  floralHub: "https://www.floralhub.com.ng/wp-json/wp/v2"
+  floralHub: "https://www.faaji.com/wp-json/wp/v2"
 };
 
 const doWordpressSync = express.Router();
