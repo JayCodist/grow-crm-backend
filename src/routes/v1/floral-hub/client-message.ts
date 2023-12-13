@@ -5,6 +5,7 @@ import { SuccessResponse } from "../../../core/ApiResponse";
 import validation from "./validation";
 import validator from "../../../helpers/validator";
 import { ApiError } from "../../../core/ApiError";
+import { businessTemplateId } from "../regal-flowers/payments/verify-paystack";
 
 const clientMessage = express.Router();
 
@@ -19,7 +20,8 @@ clientMessage.post(
         ["info@floralhub.com.ng"],
         clientMessageTemplateRender({ message, email, name }),
         `Client Enquiry - Contact Us`,
-        "5055243"
+        businessTemplateId.floralHub,
+        "floralHub"
       );
 
       return new SuccessResponse("Message sent successfully", true).send(res);
