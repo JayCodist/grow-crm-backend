@@ -8,7 +8,6 @@ import { SuccessResponse } from "../../../../core/ApiResponse";
 import {
   Business,
   OrderCreate,
-  adminEmailBusinessMap,
   businessTitleMap,
   channelBusinessMap
 } from "../../../../database/model/Order";
@@ -44,7 +43,9 @@ export const deduceProductTruePrice = (
       0
     : product.price;
   if (subTotal === 0) {
-    throw new BadRequestError("Invalid product or product size selected");
+    throw new BadRequestError(
+      `Invalid product or product size selected ${product.name}`
+    );
   }
 
   const designPrice = cartItem.design
@@ -131,7 +132,10 @@ createOrder.post(
       const wpProducts = getWpProducts(cartItems, _wpProducts);
 
       if (wpProducts.length !== cartItems.length) {
-        throw new BadRequestError("Some products not found");
+        const missingProduct = cartItems.filter(
+          item => !wpProducts.some(prod => prod.key === item.key)
+        );
+        throw new BadRequestError(`Some products not found ${missingProduct}`);
       }
 
       const totalPrice = wpProducts.reduce((price, product, index) => {
