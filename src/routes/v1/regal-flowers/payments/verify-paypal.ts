@@ -24,6 +24,7 @@ import { templateRender } from "../../../../helpers/render";
 import { getPriceDisplay } from "../../../../helpers/type-conversion";
 import { AppCurrency } from "../../../../database/model/AppConfig";
 import {
+  businessEmail,
   businessNewOrderPath,
   businessOrderPath,
   businessTemplateId
@@ -218,6 +219,42 @@ verifyPaypal.post(
         json.error_description || "Invalid details"
       );
     } catch (err) {
+      const business = req.query.business as Business;
+      const orderId = req.query.orderId as string;
+      const snap = await db
+        .collection("orders")
+        .doc(orderId as string)
+        .get();
+      const order = snap.data() as Order | undefined;
+
+      if (order) {
+        await firestore()
+          .collection("orders")
+          .doc(orderId as string)
+          .update({
+            paymentStatus: "PAID - GO AHEAD (Paypal)",
+            adminNotes: `${order.adminNotes} (Ver Failed)`
+          });
+
+        await sendEmailToAddress(
+          [businessEmail[business]],
+          templateRender(
+            { ...order, currency: "USD" },
+            businessOrderPath[business],
+            business
+          ),
+          `Warning a New Order Ver Failed (${order.fullOrderId})`,
+          businessTemplateId[business],
+          business
+        );
+        await sendEmailToAddress(
+          [order.client.email as string],
+          templateRender({ ...order }, businessOrderPath[business], business),
+          `Thank you for your order (${order.fullOrderId})`,
+          businessTemplateId[business],
+          business
+        );
+      }
       return ApiError.handle(err as Error, res);
     }
   }
