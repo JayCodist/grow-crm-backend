@@ -12,7 +12,8 @@ const validation = {
   }),
   verifyPaymentPaypal: Joi.object().keys({
     ...businessValidation,
-    ref: Joi.string().required()
+    ref: Joi.string().required(),
+    orderId: Joi.string().required()
   }),
   manualTransfer: Joi.object().keys({
     amount: Joi.number().required(),

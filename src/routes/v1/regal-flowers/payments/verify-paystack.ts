@@ -54,7 +54,6 @@ verifyPaystack.post(
   async (req, res) => {
     try {
       const business = req.query.business as Business;
-      console.log("templateId", businessTemplateId[business]);
       const response = await fetch(
         `https://api.paystack.co/transaction/verify/${req.query.ref}`,
         {
@@ -232,6 +231,42 @@ verifyPaystack.post(
 
       throw new PaymentFailureError(json.data.message);
     } catch (err) {
+      const business = req.query.business as Business;
+      const orderId = (req.query.ref as string).split("-")[1];
+      const snap = await db
+        .collection("orders")
+        .doc(orderId as string)
+        .get();
+      const order = snap.data() as Order | undefined;
+
+      if (order) {
+        await firestore()
+          .collection("orders")
+          .doc(orderId as string)
+          .update({
+            paymentStatus: "PAID - GO AHEAD (Website - Card)",
+            adminNotes: `${order.adminNotes} (Ver Failed)`
+          });
+
+        await sendEmailToAddress(
+          [businessEmail[business]],
+          templateRender(
+            { ...order, currency: "USD" },
+            businessOrderPath[business],
+            business
+          ),
+          `Warning a New Order Ver Failed (${order.fullOrderId})`,
+          businessTemplateId[business],
+          business
+        );
+        await sendEmailToAddress(
+          [order.client.email as string],
+          templateRender({ ...order }, businessOrderPath[business], business),
+          `Thank you for your order (${order.fullOrderId})`,
+          businessTemplateId[business],
+          business
+        );
+      }
       return ApiError.handle(err as Error, res);
     }
   }
