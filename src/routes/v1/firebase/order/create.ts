@@ -28,6 +28,7 @@ import validator from "../../../../helpers/validator";
 const createOrder = express.Router();
 const { firestore } = firebaseAdmin;
 const db = firestore().collection("orders");
+const recentOrderChangesDb = firestore().collection("recentOrderChanges");
 
 export const getFBProductDisplayName = (product: any) =>
   product.displayNameAdmin ||
@@ -261,6 +262,14 @@ createOrder.post(
       const response = await db.add({
         ...payload,
         timestamp: firestore.FieldValue.serverTimestamp()
+      });
+      await recentOrderChangesDb.add({
+        adminName: "website",
+        orderid: response.id,
+        type: "add",
+        updates: null,
+        timestamp: firestore.FieldValue.serverTimestamp(),
+        time: new Date().toISOString()
       });
 
       if (!response) {
