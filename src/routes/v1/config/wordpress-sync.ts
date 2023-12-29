@@ -365,7 +365,6 @@ doWordpressSync.post(
                     ? category.category_hero_image.guid
                     : "",
                   heroDescription: category.custom_top_category_description,
-                  info: category.category_alert,
                   topHeadingH2: category.custom_top_heading_h2
                 }
               : {};
@@ -378,7 +377,8 @@ doWordpressSync.post(
                 altImage: category.alt_text_for_images,
                 title: category.title_tag,
                 topHeading: category.custom_top_heading_h1,
-                bottomHeading: category.custom_bottom_heading_h2
+                bottomHeading: category.custom_bottom_heading_h2,
+                info: category.category_alert
               }
             }
           );
