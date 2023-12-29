@@ -32,7 +32,7 @@ import {
   deliveryZoneAmount,
   paymentMethodMap
 } from "../../../../helpers/constants";
-import { getPriceDisplay } from "../../../../helpers/type-conversion";
+import { getPriceDisplay } from "../../../../helpers/render";
 
 export const updateOrder = express.Router();
 

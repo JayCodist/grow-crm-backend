@@ -20,15 +20,14 @@ import { Business, Order } from "../../../../database/model/Order";
 import { currencyOptions } from "../../../../helpers/constants";
 import { getAdminNoteText } from "../../../../helpers/formatters";
 import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
-import { templateRender } from "../../../../helpers/render";
-import { getPriceDisplay } from "../../../../helpers/type-conversion";
+import { getPriceDisplay, templateRender } from "../../../../helpers/render";
 import { AppCurrency } from "../../../../database/model/AppConfig";
 import {
-  businessEmail,
-  businessNewOrderPath,
-  businessOrderPath,
-  businessTemplateId
-} from "./verify-paystack";
+  businessEmailMap,
+  businessNewOrderPathMap,
+  businessOrderPathMap,
+  businessTemplateIdMap
+} from "../../../../database/repository/utils";
 
 const db = firestore();
 
@@ -153,11 +152,11 @@ verifyPaypal.post(
                   currency: currencyCode,
                   paymentDetails
                 },
-                businessNewOrderPath[business],
+                businessNewOrderPathMap[business],
                 business
               ),
               `Warning a New Order amount mismatch (${order.fullOrderId})`,
-              businessTemplateId[business],
+              businessTemplateIdMap[business],
               business
             );
 
@@ -165,11 +164,11 @@ verifyPaypal.post(
               [order.client.email as string],
               templateRender(
                 { ...order, adminNotes, currency: currencyCode },
-                businessOrderPath[business],
+                businessOrderPathMap[business],
                 business
               ),
               `Thank you for your order (${order.fullOrderId})`,
-              businessTemplateId[business],
+              businessTemplateIdMap[business],
               business
             );
             return new SuccessResponse("Payment is successful", true).send(res);
@@ -187,11 +186,11 @@ verifyPaypal.post(
             ["info@regalflowers.com.ng"],
             templateRender(
               { ...order, adminNotes, currency: currencyCode, paymentDetails },
-              businessNewOrderPath[business],
+              businessNewOrderPathMap[business],
               business
             ),
             `New Order (${order.fullOrderId})`,
-            businessTemplateId[business],
+            businessTemplateIdMap[business],
             business
           );
 
@@ -199,11 +198,11 @@ verifyPaypal.post(
             [order.client.email as string],
             templateRender(
               { ...order, adminNotes, currency: currencyCode },
-              businessOrderPath[business],
+              businessOrderPathMap[business],
               business
             ),
             `Thank you for your order (${order.fullOrderId})`,
-            businessTemplateId[business],
+            businessTemplateIdMap[business],
             business
           );
           const environment: Environment = /sandbox/i.test(
@@ -237,21 +236,25 @@ verifyPaypal.post(
           });
 
         await sendEmailToAddress(
-          [businessEmail[business]],
+          [businessEmailMap[business]],
           templateRender(
             { ...order, currency: "USD" },
-            businessOrderPath[business],
+            businessOrderPathMap[business],
             business
           ),
           `Warning a New Order Ver Failed (${order.fullOrderId})`,
-          businessTemplateId[business],
+          businessTemplateIdMap[business],
           business
         );
         await sendEmailToAddress(
           [order.client.email as string],
-          templateRender({ ...order }, businessOrderPath[business], business),
+          templateRender(
+            { ...order },
+            businessOrderPathMap[business],
+            business
+          ),
           `Thank you for your order (${order.fullOrderId})`,
-          businessTemplateId[business],
+          businessTemplateIdMap[business],
           business
         );
       }

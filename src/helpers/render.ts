@@ -2,7 +2,13 @@ import fs from "fs";
 import { AppCurrency } from "../database/model/AppConfig";
 import { Business, Order } from "../database/model/Order";
 import { currencyOptions, pickupLocations } from "./constants";
-import { getPriceDisplay } from "./type-conversion";
+
+export const getPriceDisplay: (price: number, currency: AppCurrency) => string =
+  (price, currency) => {
+    return `${currency.sign || ""}${Math.ceil(
+      price / currency.conversionRate
+    ).toLocaleString()}`;
+  };
 
 const businessColor: Record<Business, string> = {
   floralHub: "#b240d",

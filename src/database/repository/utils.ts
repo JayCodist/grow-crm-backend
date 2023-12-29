@@ -41,3 +41,28 @@ export const UserModelMap: Record<Business, Model<User>> = {
   regalFlowers: UserRegalModel,
   floralHub: UserFloralModel
 };
+
+export const businessPaystackScret: Record<Business, string> = {
+  floralHub: process.env.FLORAL_HUB_PAYSTACK_SECRET_KEY as string,
+  regalFlowers: process.env.REGAL_FLOWERS_PAYSTACK_SECRET_KEY as string
+};
+
+export const businessOrderPathMap: Record<Business, string> = {
+  floralHub: "floral-order",
+  regalFlowers: "order"
+};
+
+export const businessNewOrderPathMap: Record<Business, string> = {
+  floralHub: "new-floral-order",
+  regalFlowers: "new-order"
+};
+
+export const businessEmailMap: Record<Business, string> = {
+  floralHub: "info@floralhub.com.ng",
+  regalFlowers: "info@regalflowers.com.ng"
+};
+
+export const businessTemplateIdMap: Record<Business, string> = {
+  floralHub: "5369366",
+  regalFlowers: "5055243"
+};

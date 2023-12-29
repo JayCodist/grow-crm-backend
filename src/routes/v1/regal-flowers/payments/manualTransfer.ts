@@ -15,10 +15,10 @@ import {
 import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
 import { templateRender } from "../../../../helpers/render";
 import {
-  businessEmail,
-  businessNewOrderPath,
-  businessOrderPath
-} from "./verify-paystack";
+  businessEmailMap,
+  businessNewOrderPathMap,
+  businessOrderPathMap
+} from "../../../../database/repository/utils";
 
 const db = firestore();
 
@@ -69,10 +69,10 @@ manualTransfer.post(
 
       // Send email to admin and client
       await sendEmailToAddress(
-        [businessEmail[business]],
+        [businessEmailMap[business]],
         templateRender(
           { ...order, paymentDetails },
-          businessNewOrderPath[business],
+          businessNewOrderPathMap[business],
           business
         ),
         `New Order (${order.fullOrderId})`,
@@ -82,7 +82,7 @@ manualTransfer.post(
 
       await sendEmailToAddress(
         [order.client.email as string],
-        templateRender({ ...order }, businessOrderPath[business], business),
+        templateRender({ ...order }, businessOrderPathMap[business], business),
         `Thank you for your order (${order.fullOrderId})`,
         "5055243",
         business
