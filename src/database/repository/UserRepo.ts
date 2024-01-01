@@ -18,10 +18,21 @@ import OTPRecordRepo from "./OTPRecordRepo";
 import { sendEmailToAddress } from "../../helpers/messaging-helpers";
 
 export default class UsersRepo {
-  public static async signup(userData: UserCreate, business: Business) {
-    const password = await hashPassword(userData.password as string);
-    const user = await this.createUser({ ...userData, password }, business);
-    return getLoginResponse(user);
+  public static async signup(
+    userData: UserCreate,
+    business: Business,
+    shouldFailQuietly?: boolean
+  ) {
+    try {
+      const password = await hashPassword(userData.password as string);
+      const user = await this.createUser({ ...userData, password }, business);
+      return getLoginResponse(user);
+    } catch (err) {
+      if (shouldFailQuietly) {
+        return null;
+      }
+      throw err;
+    }
   }
 
   public static async login(
@@ -57,7 +68,9 @@ export default class UsersRepo {
             style="
               background-color: #9b0000;
               color: white;
-              padding: 0.8rem 2rem;
+              padding: 0.6rem 1.6rem;
+              font-size: inherit;
+              text-decoration: none;
               margin: 0.5rem 0;
               display: inline-block;
               font-weight: 600;

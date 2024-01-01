@@ -137,7 +137,7 @@ checkoutOrder.put(
             "You have to provide email and password to create new account"
           );
         }
-        user = await UsersRepo.signup(userData, business);
+        user = await UsersRepo.signup(userData, business, true);
       }
       if (shouldSaveAddress) {
         if (!user) {
