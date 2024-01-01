@@ -13,7 +13,7 @@ import {
 } from "../../helpers/formatters";
 import User, { LoginResponse, UserCreate } from "../model/user/model.interface";
 import { Business } from "../model/Order";
-import { UserModelMap } from "./utils";
+import { UserModelMap, businessProdUrlMap } from "./utils";
 import OTPRecordRepo from "./OTPRecordRepo";
 import { sendEmailToAddress } from "../../helpers/messaging-helpers";
 
@@ -50,7 +50,22 @@ export default class UsersRepo {
     const code = await OTPRecordRepo.createOTPRecord(email);
     await sendEmailToAddress(
       [email],
-      `Your one-time password from ${business} is ${code}. This password expires in 10 minutes`,
+      `
+        <p>Your one-time password from ${business} is ${code}. This password expires in 10 minutes.</p>
+        <p>You can also click this button to reset password: <br /> 
+          <a
+            style="
+              background-color: #9b0000;
+              color: white;
+              padding: 0.8rem 2rem;
+              margin: 0.5rem 0;
+              display: inline-block;
+              font-weight: 600;
+              border-radius: 0.5rem;
+            "
+            href="${businessProdUrlMap[business]}/user-upgrade?code=${code}"
+          >Reset Password</a>
+        </p>`,
       "One-time password"
     );
     throw new UserUpgradeRequiredError();

@@ -66,3 +66,8 @@ export const businessTemplateIdMap: Record<Business, string> = {
   floralHub: "5369366",
   regalFlowers: "5055243"
 };
+
+export const businessProdUrlMap: Record<Business, string> = {
+  floralHub: "https://floralhub.com.ng",
+  regalFlowers: "https://regalflowers.com.ng"
+};
