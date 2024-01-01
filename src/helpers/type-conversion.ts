@@ -1,5 +1,5 @@
 import { firestore } from "firebase-admin";
-import { Business, Order } from "../database/model/Order";
+import { Business, Order, PaymentStatus } from "../database/model/Order";
 import { sendEmailToAddress } from "./messaging-helpers";
 import {
   businessEmailMap,
@@ -7,12 +7,21 @@ import {
   businessTemplateIdMap
 } from "../database/repository/utils";
 import { templateRender } from "./render";
+import { PaymentType } from "../database/model/PaymentLog";
 
 const db = firestore();
 
+const paymentProviderStatusMap: Record<PaymentType, PaymentStatus> = {
+  paypal: "PAID - GO AHEAD (Paypal)",
+  paystack: "PAID - GO AHEAD (Website - Card)",
+  monnify: "PAID - GO AHEAD (Bank Transfer)",
+  manualTransfer: "PAID - GO AHEAD (Bank Transfer)"
+};
+
 export const handleFailedVerification = async (
   orderId: string,
-  business: Business
+  business: Business,
+  paymentType: PaymentType
 ) => {
   const snap = await db
     .collection("orders")
@@ -25,7 +34,7 @@ export const handleFailedVerification = async (
       .collection("orders")
       .doc(orderId as string)
       .update({
-        paymentStatus: "PAID - GO AHEAD (Website - Card)",
+        paymentStatus: paymentProviderStatusMap[paymentType],
         adminNotes: `${order.adminNotes} (Ver Failed)`
       });
 

@@ -211,7 +211,7 @@ verifyPaystack.post(
     } catch (err) {
       const business = req.query.business as Business;
       const orderId = (req.query.ref as string).split("-")[1];
-      await handleFailedVerification(orderId, business);
+      await handleFailedVerification(orderId, business, "paystack");
       return new SuccessResponse("Payment is successful", true).send(res);
     }
   }

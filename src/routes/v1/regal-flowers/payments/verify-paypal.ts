@@ -4,11 +4,7 @@ import fetch from "node-fetch";
 import { unescape } from "querystring";
 import { URLSearchParams } from "url";
 import { Environment } from "../../../../config";
-import {
-  ApiError,
-  NotFoundError,
-  PaymentFailureError
-} from "../../../../core/ApiError";
+import { NotFoundError, PaymentFailureError } from "../../../../core/ApiError";
 import {
   InternalErrorResponse,
   SuccessResponse
@@ -23,11 +19,11 @@ import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
 import { getPriceDisplay, templateRender } from "../../../../helpers/render";
 import { AppCurrency } from "../../../../database/model/AppConfig";
 import {
-  businessEmailMap,
   businessNewOrderPathMap,
   businessOrderPathMap,
   businessTemplateIdMap
 } from "../../../../database/repository/utils";
+import { handleFailedVerification } from "../../../../helpers/type-conversion";
 
 const db = firestore();
 
@@ -220,45 +216,8 @@ verifyPaypal.post(
     } catch (err) {
       const business = req.query.business as Business;
       const orderId = req.query.orderId as string;
-      const snap = await db
-        .collection("orders")
-        .doc(orderId as string)
-        .get();
-      const order = snap.data() as Order | undefined;
-
-      if (order) {
-        await firestore()
-          .collection("orders")
-          .doc(orderId as string)
-          .update({
-            paymentStatus: "PAID - GO AHEAD (Paypal)",
-            adminNotes: `${order.adminNotes} (Ver Failed)`
-          });
-
-        await sendEmailToAddress(
-          [businessEmailMap[business]],
-          templateRender(
-            { ...order, currency: "USD" },
-            businessOrderPathMap[business],
-            business
-          ),
-          `Warning a New Order Ver Failed (${order.fullOrderId})`,
-          businessTemplateIdMap[business],
-          business
-        );
-        await sendEmailToAddress(
-          [order.client.email as string],
-          templateRender(
-            { ...order },
-            businessOrderPathMap[business],
-            business
-          ),
-          `Thank you for your order (${order.fullOrderId})`,
-          businessTemplateIdMap[business],
-          business
-        );
-      }
-      return ApiError.handle(err as Error, res);
+      await handleFailedVerification(orderId, business, "paypal");
+      return new SuccessResponse("Payment is successful", true).send(res);
     }
   }
 );

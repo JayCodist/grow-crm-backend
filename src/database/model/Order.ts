@@ -8,7 +8,7 @@ interface OrderItem {
   price: number;
 }
 
-type PaymentStatus =
+export type PaymentStatus =
   | "PAID - GO AHEAD (but not seen yet)"
   | "Not Paid (finalized discussion)"
   | "PAID - GO AHEAD (Bank Transfer)"

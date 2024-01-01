@@ -1,7 +1,7 @@
 import express from "express";
 import { firestore } from "firebase-admin";
 import { Environment } from "../../../../config";
-import { ApiError, InternalError } from "../../../../core/ApiError";
+import { InternalError } from "../../../../core/ApiError";
 import { SuccessResponse } from "../../../../core/ApiResponse";
 import { Business, Order } from "../../../../database/model/Order";
 import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
@@ -19,6 +19,7 @@ import {
   businessNewOrderPathMap,
   businessOrderPathMap
 } from "../../../../database/repository/utils";
+import { handleFailedVerification } from "../../../../helpers/type-conversion";
 
 const db = firestore();
 
@@ -100,7 +101,10 @@ manualTransfer.post(
       );
       return new SuccessResponse("Payment is successful", true).send(res);
     } catch (error) {
-      return ApiError.handle(error as Error, res);
+      const business = req.query.business as Business;
+      const orderId = req.query.orderId as string;
+      await handleFailedVerification(orderId, business, "manualTransfer");
+      return new SuccessResponse("Payment is successful", true).send(res);
     }
   }
 );
