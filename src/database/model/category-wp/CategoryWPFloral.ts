@@ -8,7 +8,6 @@ const COLLECTION_NAME = "categoryWPFloral";
 interface CategoryWPDocument extends CategoryWPCreate {
   heroImage: string;
   heroDescription: string;
-  info: string;
   topHeadingH2: string;
 }
 
