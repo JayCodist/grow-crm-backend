@@ -39,8 +39,8 @@ export const defaultCurrency: AppCurrency = {
 
 export const currencyOptions: AppCurrency[] = [
   { ...defaultCurrency },
-  { name: "USD", conversionRate: 700, sign: "$" },
-  { name: "GBP", conversionRate: 890, sign: "£" }
+  { name: "USD", conversionRate: 895.303, sign: "$" },
+  { name: "GBP", conversionRate: 1134.91, sign: "£" }
 ];
 
 export const pickupLocations: Record<string, string> = {
