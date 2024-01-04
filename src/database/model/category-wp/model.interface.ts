@@ -9,6 +9,7 @@ export default interface CategoryWP {
   key: string;
   topHeading: string;
   bottomHeading: string;
+  info: string;
 }
 
 export interface CategoryWPCreate extends Omit<CategoryWP, "id"> {

@@ -20,7 +20,8 @@ const schema = new Schema(
     altImage: String,
     title: String,
     topHeading: String,
-    bottomHeading: String
+    bottomHeading: String,
+    info: String
   },
   { _id: false }
 ).index({
