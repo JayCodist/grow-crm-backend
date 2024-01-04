@@ -3,7 +3,6 @@ import { convert } from "html-to-text";
 import { PartialLoose } from "../../helpers/type-helpers";
 import { BadRequestError, InternalError } from "../../core/ApiError";
 import { formatResponseRecord } from "../../helpers/formatters";
-import { getSearchArray } from "../../helpers/search-helpers";
 import {
   Blog,
   BlogCreate,
@@ -86,10 +85,7 @@ export default class BlogRepo {
       ...input,
       createdAt: input.createdAt || dayjs().format(),
       lastUpdatedAt: null,
-      _blogSearch: [
-        ...getSearchArray(input.title),
-        ...getSearchArray(stringifiedBody)
-      ]
+      _blogSearch: `${input.title} ${stringifiedBody}`
     };
     const { createdAt, _id: id } = await BlogModelMap[business].create(data);
     return { ...input, createdAt, id };
@@ -103,10 +99,10 @@ export default class BlogRepo {
     if (update.title || update.body) {
       const oldBlogData = await this.findById(id as string, business);
       extraProps = {
-        _blogSearch: [
-          ...getSearchArray(update.title || oldBlogData?.title || ""),
-          ...getSearchArray(convert(update.body || oldBlogData?.body || ""))
-        ]
+        _blogSearch: `${update.title || oldBlogData?.title || ""} ${convert(
+          update.body || oldBlogData?.body || "",
+          { wordwrap: 20000 }
+        )}`
       };
     }
 

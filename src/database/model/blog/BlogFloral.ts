@@ -8,18 +8,19 @@ const COLLECTION_NAME = "blogsFloral";
 const schema = new Schema({
   title: String,
   featuredImage: String,
-  active: { type: Boolean, index: true },
-  excerpt: String,
-  author: { type: String, index: true },
   body: String,
   category: { type: [String], index: true },
+  active: { type: Boolean, index: true },
+  excerpt: String,
   createdAt: String,
+  author: { type: String, index: true },
   lastUpdatedAt: String,
   readMinutes: Number,
-  _blogSearch: { type: [String], index: true },
-  slug: { type: String, index: true }
+  _blogSearch: { type: String, index: true },
+  slug: { type: String, index: true, unique: true }
 }).index({
-  createdAt: 1
+  createdAt: 1,
+  _blogSearch: "text"
 });
 
 export const BlogFloralModel = model<Document & Blog>(

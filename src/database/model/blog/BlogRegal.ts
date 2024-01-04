@@ -16,10 +16,11 @@ const schema = new Schema({
   author: { type: String, index: true },
   lastUpdatedAt: String,
   readMinutes: Number,
-  _blogSearch: { type: [String], index: true },
-  slug: { type: String, index: true }
+  _blogSearch: { type: String, index: true },
+  slug: { type: String, index: true, unique: true }
 }).index({
-  createdAt: 1
+  createdAt: 1,
+  _blogSearch: "text"
 });
 
 export const BlogRegalModel = model<Document & Blog>(
