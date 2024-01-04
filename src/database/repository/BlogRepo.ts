@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { convert } from "html-to-text";
 import { PartialLoose } from "../../helpers/type-helpers";
 import { BadRequestError, InternalError } from "../../core/ApiError";
 import { formatResponseRecord } from "../../helpers/formatters";
@@ -79,13 +80,15 @@ export default class BlogRepo {
     if (existingBlog) {
       throw new BadRequestError("Provided slug is already in use");
     }
+    const stringifiedBody = convert(input.body, { wordwrap: 20000 });
+
     const data: BlogCreate = {
       ...input,
       createdAt: input.createdAt || dayjs().format(),
       lastUpdatedAt: null,
       _blogSearch: [
         ...getSearchArray(input.title),
-        ...getSearchArray(input.body)
+        ...getSearchArray(stringifiedBody)
       ]
     };
     const { createdAt, _id: id } = await BlogModelMap[business].create(data);
