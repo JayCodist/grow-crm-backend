@@ -7,7 +7,8 @@ const validation = {
     pageSize: Joi.number().integer().min(1),
     sortField: Joi.string().allow(""),
     searchStr: Joi.string().allow(""),
-    sortType: Joi.string().valid("asc", "desc")
+    sortType: Joi.string().valid("asc", "desc"),
+    ...businessValidation
   }),
   create: Joi.object().keys({
     title: Joi.string().min(3).max(50).required(),
