@@ -10,6 +10,7 @@ const schema = new Schema({
   featuredImage: String,
   active: { type: Boolean, index: true },
   excerpt: String,
+  author: { type: String, index: true },
   body: String,
   category: { type: [String], index: true },
   createdAt: String,

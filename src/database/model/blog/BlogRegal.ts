@@ -13,6 +13,7 @@ const schema = new Schema({
   active: { type: Boolean, index: true },
   excerpt: String,
   createdAt: String,
+  author: { type: String, index: true },
   lastUpdatedAt: String,
   readMinutes: Number,
   _blogSearch: { type: [String], index: true },
