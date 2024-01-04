@@ -39,7 +39,7 @@ export default class BlogRepo {
     return new Promise((resolve, reject) => {
       const filter = {
         ...(_filter || {}),
-        ...(searchStr ? { _blogSearch: searchStr } : {})
+        ...(searchStr ? { $text: { $search: searchStr } } : {})
       };
       BlogModelMap[business]
         .find(filter)
