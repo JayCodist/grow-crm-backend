@@ -22,6 +22,7 @@ import { saveSendersInfo } from "./firebase/order/save-senders-info";
 import updatePaymentMethodDetails from "./firebase/order/update-payment-details";
 import categoryWPSlug from "./wordpress/category-wp/category-slug";
 import floralhubRoutes from "./floral-hub";
+import blogRoutes from "./blog";
 
 const router = express.Router();
 
@@ -76,5 +77,7 @@ router.use("/payments", paymentRoutes);
 router.use("/regal", regalFlowersRoutes);
 
 router.use("/floralhub", floralhubRoutes);
+
+router.use("/blog", blogRoutes);
 
 export default router;
