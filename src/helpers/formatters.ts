@@ -67,7 +67,8 @@ export const minimizeProduct: (product: ProductWP) => MinimalProductWP =
       images: product.images[0],
       subtitle: product.subtitle,
       slug: product.slug,
-      price: product.price
+      price: product.price,
+      variants: product.variants
     };
   };
 
