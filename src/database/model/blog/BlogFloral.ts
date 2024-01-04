@@ -8,6 +8,8 @@ const COLLECTION_NAME = "blogsFloral";
 const schema = new Schema({
   title: String,
   featuredImage: String,
+  active: { type: Boolean, index: true },
+  excerpt: String,
   body: String,
   category: { type: [String], index: true },
   createdAt: String,

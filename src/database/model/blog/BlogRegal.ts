@@ -10,6 +10,8 @@ const schema = new Schema({
   featuredImage: String,
   body: String,
   category: { type: [String], index: true },
+  active: { type: Boolean, index: true },
+  excerpt: String,
   createdAt: String,
   lastUpdatedAt: String,
   readMinutes: Number,

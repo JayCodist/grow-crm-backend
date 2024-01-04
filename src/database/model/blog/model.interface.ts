@@ -5,7 +5,9 @@ export const blogProjection = [
   "createdAt",
   "lastUpdatedAt",
   "readMinutes",
-  "slug"
+  "slug",
+  "active",
+  "excerpt"
 ];
 
 export interface Blog {
@@ -18,6 +20,8 @@ export interface Blog {
   lastUpdatedAt: string | null;
   readMinutes: number;
   slug: string;
+  active: boolean;
+  excerpt: string;
 }
 
 export interface BlogCreate extends Omit<Blog, "id"> {
