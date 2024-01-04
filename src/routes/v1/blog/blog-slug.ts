@@ -10,7 +10,7 @@ import BlogRepo from "../../../database/repository/BlogRepo";
 const blogSlug = express.Router();
 
 blogSlug.get(
-  "/slug/:slug",
+  "/:slug",
   validator(validation.business, "query"),
   async (req, res) => {
     try {
