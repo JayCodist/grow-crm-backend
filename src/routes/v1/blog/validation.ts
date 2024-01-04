@@ -17,7 +17,7 @@ const validation = {
     body: Joi.string().required(),
     readMinutes: Joi.number().optional(),
     slug: Joi.string().min(3).max(50).required(),
-    category: Joi.array().items(Joi.string()).required(),
+    category: Joi.array().items(Joi.string().optional()).required(),
     excerpt: Joi.string().optional().allow(""),
     author: Joi.string().required().allow("")
   }),
@@ -28,7 +28,7 @@ const validation = {
     body: Joi.string().optional(),
     readMinutes: Joi.number().optional(),
     slug: Joi.string().min(3).max(50).optional(),
-    category: Joi.array().items(Joi.string()).optional(),
+    category: Joi.array().items(Joi.string().optional()).optional(),
     excerpt: Joi.string().optional().allow(""),
     author: Joi.string().optional().allow("")
   }),
