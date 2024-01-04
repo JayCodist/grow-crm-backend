@@ -97,9 +97,22 @@ export default class BlogRepo {
 
   public static async update(updateParams: Partial<Blog>, business: Business) {
     const { id, ...update } = updateParams;
+
+    let extraProps: Record<string, any> = {};
+
+    if (update.title || update.body) {
+      const oldBlogData = await this.findById(id as string, business);
+      extraProps = {
+        _blogSearch: [
+          ...getSearchArray(update.title || oldBlogData?.title || ""),
+          ...getSearchArray(convert(update.body || oldBlogData?.body || ""))
+        ]
+      };
+    }
+
     await BlogModelMap[business].findByIdAndUpdate(
       id,
-      { ...update, lastUpdatedAt: dayjs().format() },
+      { ...update, ...extraProps, lastUpdatedAt: dayjs().format() },
       {
         new: true
       }
