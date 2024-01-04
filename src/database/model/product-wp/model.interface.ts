@@ -33,6 +33,7 @@ export const productWPProjectionMinimal = [
   "images",
   "slug",
   "subtitle",
+  "variants",
   "sku",
   "class"
 ];
