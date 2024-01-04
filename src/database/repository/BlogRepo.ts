@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { PartialLoose } from "../../helpers/type-helpers";
-import { InternalError } from "../../core/ApiError";
+import { BadRequestError, InternalError } from "../../core/ApiError";
 import { formatResponseRecord } from "../../helpers/formatters";
 import { getSearchArray } from "../../helpers/search-helpers";
 import {
@@ -24,20 +24,23 @@ export interface PaginatedFetchParams {
   pageSize?: number;
   sortLogic?: SortLogic;
   filter?: Record<string, any>;
-  search?: string;
+  searchStr?: string;
 }
-
-const defaultFilter = {};
 
 export default class BlogRepo {
   public static getPaginatedBlogs({
-    filter = defaultFilter,
+    filter: _filter,
     pageNumber = defaultPageAttr.pageNumber,
     pageSize = defaultPageAttr.pageSize,
     sortLogic = defaultSortLogic,
+    searchStr,
     business
   }: PaginatedFetchParams): Promise<{ data: Blog[]; count: number }> {
     return new Promise((resolve, reject) => {
+      const filter = {
+        ...(_filter || {}),
+        ...(searchStr ? { _blogSearch: searchStr } : {})
+      };
       BlogModelMap[business]
         .find(filter)
         .sort(sortLogic)
@@ -50,10 +53,9 @@ export default class BlogRepo {
             reject(new InternalError(err.message));
           } else {
             const filterQuery = BlogModelMap[business].find(filter);
-            const countQuery =
-              filter === defaultFilter
-                ? filterQuery.estimatedDocumentCount()
-                : BlogModelMap[business].countDocuments(filter);
+            const countQuery = _filter
+              ? filterQuery.estimatedDocumentCount()
+              : BlogModelMap[business].countDocuments(filter);
             countQuery.exec((countErr, count) => {
               if (countErr) {
                 reject(new InternalError(countErr.message));
@@ -73,9 +75,14 @@ export default class BlogRepo {
     input: Omit<Blog, "id">,
     business: Business
   ): Promise<Blog> {
+    const existingBlog = await this.findBySlug(input.slug, business);
+    if (existingBlog) {
+      throw new BadRequestError("Provided slug is already in use");
+    }
     const data: BlogCreate = {
       ...input,
       createdAt: input.createdAt || dayjs().format(),
+      lastUpdatedAt: null,
       _blogSearch: [
         ...getSearchArray(input.title),
         ...getSearchArray(input.body)
@@ -85,10 +92,7 @@ export default class BlogRepo {
     return { ...input, createdAt, id };
   }
 
-  public static async update(
-    updateParams: PartialLoose<Blog>,
-    business: Business
-  ) {
+  public static async update(updateParams: Partial<Blog>, business: Business) {
     const { id, ...update } = updateParams;
     await BlogModelMap[business].findByIdAndUpdate(
       id,
