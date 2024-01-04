@@ -10,6 +10,9 @@ import { CategoryWPFloralModel } from "../model/category-wp/CategoryWPFloral";
 import User from "../model/user/model.interface";
 import { UserRegalModel } from "../model/user/UserRegal";
 import { UserFloralModel } from "../model/user/UserFloral";
+import { BlogRegalModel } from "../model/blog/BlogRegal";
+import { Blog } from "../model/blog/model.interface";
+import { BlogFloralModel } from "../model/blog/BlogFloral";
 
 export const appConfigSyncProgressFieldMap: Record<Business, keyof AppConfig> =
   {
@@ -40,6 +43,11 @@ export const CategoryModelMap: Record<Business, Model<CategoryWP>> = {
 export const UserModelMap: Record<Business, Model<User>> = {
   regalFlowers: UserRegalModel,
   floralHub: UserFloralModel
+};
+
+export const BlogModelMap: Record<Business, Model<Blog>> = {
+  regalFlowers: BlogRegalModel,
+  floralHub: BlogFloralModel
 };
 
 export const businessPaystackScret: Record<Business, string> = {

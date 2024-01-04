@@ -21,6 +21,5 @@ export interface Blog {
 }
 
 export interface BlogCreate extends Omit<Blog, "id"> {
-  _bodySearch: string[];
-  _titleSearch: string[];
+  _blogSearch: string[];
 }

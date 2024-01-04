@@ -13,8 +13,7 @@ const schema = new Schema({
   createdAt: String,
   lastUpdatedAt: String,
   readMinutes: Number,
-  _bodySearch: { type: [String], index: true },
-  _titleSearch: { type: [String], index: true },
+  _blogSearch: { type: [String], index: true },
   slug: { type: String, index: true }
 }).index({
   createdAt: 1
