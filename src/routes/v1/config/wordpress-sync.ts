@@ -206,12 +206,6 @@ doWordpressSync.post(
         uploadedImagesArr.push(publicUrls);
       }
 
-      const problemProd = productsRaw.find(
-        prod =>
-          getProductSlug(prod.permalink || "") ===
-          "orange-roses-and-million-stars-bouquet-orange-roses-and-million-stars"
-      );
-
       const products = productsRaw
         .map((rawProd, productIndex) => {
           const prodName = he.decode(
@@ -371,9 +365,7 @@ doWordpressSync.post(
         );
       });
 
-      new SuccessResponse("Successfully synchronized Wordpress", {
-        problemProd
-      }).send(res);
+      new SuccessResponse("Successfully synchronized Wordpress", []).send(res);
     } catch (e) {
       await AppConfigRepo.updateConfig({
         [appConfigSyncProgressFieldMap[business]]: false
