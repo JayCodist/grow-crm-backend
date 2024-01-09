@@ -140,7 +140,6 @@ export interface ProductWP {
   tags: string[];
   budgetNote: string;
   designNote: string;
-  relatedVIPRef: number | null;
   relatedProducts?: MinimalProductWP[];
   inStock: boolean;
   pageDescription: string;
