@@ -17,7 +17,7 @@ const schema = new Schema({
   lastUpdatedAt: String,
   readMinutes: Number,
   _blogSearch: { type: String, index: true },
-  slug: { type: String, index: true, unique: true }
+  slug: { type: String, index: true }
 }).index({
   createdAt: 1,
   _blogSearch: "text"
