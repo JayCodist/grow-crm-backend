@@ -220,7 +220,8 @@ checkoutOrder.put(
       const client = await handleContactHooks(userData, "client");
 
       orderData.recipient.phone =
-        userData.phone === orderData.recipient.phone
+        formatPhoneNumber(userData.phone) ===
+        formatPhoneNumber(orderData.recipient.phone)
           ? `Call ${formatPhoneNumber(userData.phone)}`
           : orderData.recipient.phone;
 
