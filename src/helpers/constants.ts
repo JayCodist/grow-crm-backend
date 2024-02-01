@@ -25,12 +25,12 @@ export type DeliveryZoneAmount =
 export const deliveryZoneAmount: Record<DeliveryZoneAmount, number> = {
   highLagos: 10000,
   freeLagos: 0,
-  highLagosVals: 30000,
+  highLagosVals: 29900,
   freeLagosVals: 0,
   mediumLagos: 4500,
   mediumAbuja: 3500,
   freeAbuja: 0,
-  highAbujaVals: 30000,
+  highAbujaVals: 29900,
   freeAbujaVals: 0,
   highAbuja: 6000,
   mediumAbujaVals: 20000,
@@ -81,8 +81,9 @@ export const paymentMethodMap: Record<PaymentMethod, string> = {
   bitcoinTransfer: "Bitcoin Transfer"
 };
 
-export type DespatchLocation = "lagos" | "abuja";
+export type DespatchLocation = "ikoyi" | "lekki" | "abuja";
 export const despatchLocationMap: Record<DespatchLocation, string> = {
-  lagos: "Ikoyi",
-  abuja: "Abuja"
+  ikoyi: "Ikoyi",
+  abuja: "Abuja",
+  lekki: "Lekki"
 };
