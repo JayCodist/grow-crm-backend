@@ -284,7 +284,8 @@ checkoutOrder.put(
               (orderData.despatchLocation.toLowerCase() as DespatchLocation) ||
                 (orderData.deliveryDetails.state.toLowerCase() as DespatchLocation)
             ] || "Unselected",
-          deliveryZone: orderData.deliveryZone
+          deliveryZone: orderData.deliveryZone,
+          pickupState: orderData.pickupState
         } as Partial<Order>);
 
       return new SuccessResponse("Order successfully checked out", null).send(
