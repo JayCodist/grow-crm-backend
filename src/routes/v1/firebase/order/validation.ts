@@ -82,7 +82,7 @@ const validation = {
         recipientPhoneCountryCode: Joi.string().default("").allow(""),
         recipientAltPhoneCountryCode: Joi.string().default("").allow("")
       }).allow(null),
-      pickupState: Joi.string().valid("lagos", "abuja")
+      pickupState: Joi.string().allow("")
     }).required(),
     userData: Joi.object().keys({
       name: Joi.string().required(),
