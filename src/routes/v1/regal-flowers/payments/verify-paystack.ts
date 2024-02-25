@@ -52,7 +52,9 @@ verifyPaystack.post(
           .collection("orders")
           .doc(orderId as string)
           .get();
-        const order = snap.data() as Order | undefined;
+        const order = snap.exists
+          ? ({ id: snap.id, ...snap.data() } as Order)
+          : undefined;
 
         if (!order) {
           throw new InternalError(

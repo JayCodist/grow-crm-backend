@@ -108,7 +108,9 @@ verifyPaypal.post(
         if (currencyCode === "USD" || currencyCode === "GBP") {
           const snap = await db.collection("orders").doc(orderID).get();
 
-          const order = snap.data() as Order | undefined;
+          const order = snap.exists
+            ? ({ id: snap.id, ...snap.data() } as Order)
+            : undefined;
 
           if (!order) {
             throw new NotFoundError("Order not found");

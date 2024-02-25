@@ -50,7 +50,9 @@ manualTransfer.post(
         };
 
       const snap = await db.collection("orders").doc(req.params.id).get();
-      const order = snap.data() as Order | undefined;
+      const order = snap.exists
+        ? ({ id: snap.id, ...snap.data() } as Order)
+        : undefined;
 
       if (!order) {
         throw new InternalError("The order does not exist");
