@@ -151,7 +151,7 @@ type DeliveryZone =
   | "LPM"
   | "OST";
 
-type DespatchedFrom = "Unselected" | "Ikoyi" | "VI" | "Abuja";
+type DespatchedFrom = "Unselected" | "Ikoyi" | "VI" | "Abuja" | "Lekki";
 
 type Line =
   | "Unselected"
