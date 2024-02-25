@@ -3,7 +3,10 @@ import { firestore } from "firebase-admin";
 import fetch from "node-fetch";
 import { Environment } from "../../../../config";
 import { InternalError, PaymentFailureError } from "../../../../core/ApiError";
-import { SuccessResponse } from "../../../../core/ApiResponse";
+import {
+  SuccessButCaveatResponse,
+  SuccessResponse
+} from "../../../../core/ApiResponse";
 import { Business, Order } from "../../../../database/model/Order";
 import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
@@ -21,6 +24,7 @@ import {
   businessTemplateIdMap
 } from "../../../../database/repository/utils";
 import { handleFailedVerification } from "../../../../helpers/type-conversion";
+import { performDeliveryDateNormalization } from "./payment-utils";
 
 const db = firestore();
 
@@ -55,6 +59,11 @@ verifyPaystack.post(
             "Payment Verification Failed: The order does not exist"
           );
         }
+
+        const infoMessage = await performDeliveryDateNormalization(
+          order,
+          business
+        );
 
         const adminNotes = getAdminNoteText(
           order.adminNotes,
@@ -106,7 +115,6 @@ verifyPaystack.post(
               businessTemplateIdMap[business],
               business
             );
-            return new SuccessResponse("Payment is successful", true).send(res);
           }
         } else if (data.currency === "NGN") {
           const paidAmount = data.amount / 100;
@@ -154,7 +162,6 @@ verifyPaystack.post(
               businessTemplateIdMap[business],
               business
             );
-            return new SuccessResponse("Payment is successful", true).send(res);
           }
         }
 
@@ -204,7 +211,10 @@ verifyPaystack.post(
           ? "development"
           : "production";
         await PaymentLogRepo.createPaymentLog("paystack", json, environment);
-        return new SuccessResponse("Payment is successful", true).send(res);
+        return new (infoMessage ? SuccessButCaveatResponse : SuccessResponse)(
+          infoMessage || "Payment is successful",
+          true
+        ).send(res);
       }
 
       throw new PaymentFailureError(json.data.message);

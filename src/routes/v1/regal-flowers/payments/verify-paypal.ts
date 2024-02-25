@@ -7,6 +7,7 @@ import { Environment } from "../../../../config";
 import { NotFoundError, PaymentFailureError } from "../../../../core/ApiError";
 import {
   InternalErrorResponse,
+  SuccessButCaveatResponse,
   SuccessResponse
 } from "../../../../core/ApiResponse";
 import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
@@ -24,6 +25,7 @@ import {
   businessTemplateIdMap
 } from "../../../../database/repository/utils";
 import { handleFailedVerification } from "../../../../helpers/type-conversion";
+import { performDeliveryDateNormalization } from "./payment-utils";
 
 const db = firestore();
 
@@ -112,6 +114,11 @@ verifyPaypal.post(
             throw new NotFoundError("Order not found");
           }
 
+          const infoMessage = await performDeliveryDateNormalization(
+            order,
+            business
+          );
+
           const currency = currencyOptions.find(
             currency => currency.name === currencyCode
           ) as AppCurrency;
@@ -167,7 +174,6 @@ verifyPaypal.post(
               businessTemplateIdMap[business],
               business
             );
-            return new SuccessResponse("Payment is successful", true).send(res);
           }
 
           await db.collection("orders").doc(orderID).update({
@@ -207,7 +213,10 @@ verifyPaypal.post(
             ? "development"
             : "production";
           await PaymentLogRepo.createPaymentLog("paypal", json, environment);
-          return new SuccessResponse("Payment is successful", true).send(res);
+          return new (infoMessage ? SuccessButCaveatResponse : SuccessResponse)(
+            infoMessage || "Payment is successful",
+            true
+          ).send(res);
         }
       }
       throw new PaymentFailureError(
