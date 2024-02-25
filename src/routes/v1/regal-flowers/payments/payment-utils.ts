@@ -13,18 +13,18 @@ export const performDeliveryDateNormalization: (
   const isPickup = /pickup/i.test(order.recipient.name || "");
   // If order is for today and the time is past 11:50pm, move it to the next day (for pickup)
   const safeDeliveryDateThresholdForPickup =
-    currentDate.hour() > 23 && currentDate.minute() >= 50
+    currentDate.hour() >= 23 && currentDate.minute() >= 50
       ? currentDate.add(1, "day")
       : currentDate;
   // If order is for today and the time is past 9pm, move it to the next day (for delivery)
   const safeDeliveryDateThresholdForDelivery =
-    currentDate.hour() > 21 ? currentDate.add(1, "day") : currentDate;
+    currentDate.hour() >= 21 ? currentDate.add(1, "day") : currentDate;
 
   let newDeliveryDate: Dayjs;
 
   if (
     !oldDeliveryDate ||
-    !oldDeliveryDate.isValid ||
+    !oldDeliveryDate.isValid() ||
     oldDeliveryDate.isBefore(currentDate, "day")
   ) {
     // Safely move order delivery date to current date
