@@ -2,6 +2,7 @@ import { Response } from "express";
 
 enum ResponseStatus {
   SUCCESS = 200,
+  SUCCESS_BUT_CAVEAT = 214,
   BAD_REQUEST = 400,
   UNAUTHORIZED = 401,
   FORBIDDEN = 403,
@@ -30,6 +31,17 @@ export abstract class ApiResponse {
 export class SuccessResponse extends ApiResponse {
   constructor(message: string, _data: any) {
     super(ResponseStatus.SUCCESS, message);
+    this.data = _data;
+  }
+
+  send(res: Response): Response {
+    return super.prepare<SuccessResponse>(res, this);
+  }
+}
+
+export class SuccessButCaveatResponse extends ApiResponse {
+  constructor(message: string, _data: any) {
+    super(ResponseStatus.SUCCESS_BUT_CAVEAT, message);
     this.data = _data;
   }
 
