@@ -10,6 +10,9 @@ import { CategoryWPFloralModel } from "../model/category-wp/CategoryWPFloral";
 import User from "../model/user/model.interface";
 import { UserRegalModel } from "../model/user/UserRegal";
 import { UserFloralModel } from "../model/user/UserFloral";
+import { BlogRegalModel } from "../model/blog/BlogRegal";
+import { Blog } from "../model/blog/model.interface";
+import { BlogFloralModel } from "../model/blog/BlogFloral";
 
 export const appConfigSyncProgressFieldMap: Record<Business, keyof AppConfig> =
   {
@@ -40,4 +43,39 @@ export const CategoryModelMap: Record<Business, Model<CategoryWP>> = {
 export const UserModelMap: Record<Business, Model<User>> = {
   regalFlowers: UserRegalModel,
   floralHub: UserFloralModel
+};
+
+export const BlogModelMap: Record<Business, Model<Blog>> = {
+  regalFlowers: BlogRegalModel,
+  floralHub: BlogFloralModel
+};
+
+export const businessPaystackScret: Record<Business, string> = {
+  floralHub: process.env.FLORAL_HUB_PAYSTACK_SECRET_KEY as string,
+  regalFlowers: process.env.REGAL_FLOWERS_PAYSTACK_SECRET_KEY as string
+};
+
+export const businessOrderPathMap: Record<Business, string> = {
+  floralHub: "floral-order",
+  regalFlowers: "order"
+};
+
+export const businessNewOrderPathMap: Record<Business, string> = {
+  floralHub: "new-floral-order",
+  regalFlowers: "new-order"
+};
+
+export const businessEmailMap: Record<Business, string> = {
+  floralHub: "info@floralhub.com.ng",
+  regalFlowers: "info@regalflowers.com.ng"
+};
+
+export const businessTemplateIdMap: Record<Business, string> = {
+  floralHub: "5369366",
+  regalFlowers: "5055243"
+};
+
+export const businessProdUrlMap: Record<Business, string> = {
+  floralHub: "https://floralhub.com.ng",
+  regalFlowers: "https://regalflowers.com.ng"
 };

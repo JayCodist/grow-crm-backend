@@ -1,8 +1,11 @@
 import express from "express";
 import { firestore } from "firebase-admin";
 import { Environment } from "../../../../config";
-import { ApiError, InternalError } from "../../../../core/ApiError";
-import { SuccessResponse } from "../../../../core/ApiResponse";
+import { InternalError } from "../../../../core/ApiError";
+import {
+  SuccessButCaveatResponse,
+  SuccessResponse
+} from "../../../../core/ApiResponse";
 import { Business, Order } from "../../../../database/model/Order";
 import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
@@ -15,10 +18,12 @@ import {
 import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
 import { templateRender } from "../../../../helpers/render";
 import {
-  businessEmail,
-  businessNewOrderPath,
-  businessOrderPath
-} from "./verify-paystack";
+  businessEmailMap,
+  businessNewOrderPathMap,
+  businessOrderPathMap
+} from "../../../../database/repository/utils";
+import { handleFailedVerification } from "../../../../helpers/type-conversion";
+import { performDeliveryDateNormalization } from "./payment-utils";
 
 const db = firestore();
 
@@ -45,11 +50,18 @@ manualTransfer.post(
         };
 
       const snap = await db.collection("orders").doc(req.params.id).get();
-      const order = snap.data() as Order | undefined;
+      const order = snap.exists
+        ? ({ id: snap.id, ...snap.data() } as Order)
+        : undefined;
 
       if (!order) {
         throw new InternalError("The order does not exist");
       }
+
+      const infoMessage = await performDeliveryDateNormalization(
+        order,
+        business
+      );
 
       const _currency = currencyOptions.find(
         _currency => _currency.name === currency
@@ -69,10 +81,10 @@ manualTransfer.post(
 
       // Send email to admin and client
       await sendEmailToAddress(
-        [businessEmail[business]],
+        [businessEmailMap[business]],
         templateRender(
           { ...order, paymentDetails },
-          businessNewOrderPath[business],
+          businessNewOrderPathMap[business],
           business
         ),
         `New Order (${order.fullOrderId})`,
@@ -82,7 +94,7 @@ manualTransfer.post(
 
       await sendEmailToAddress(
         [order.client.email as string],
-        templateRender({ ...order }, businessOrderPath[business], business),
+        templateRender({ ...order }, businessOrderPathMap[business], business),
         `Thank you for your order (${order.fullOrderId})`,
         "5055243",
         business
@@ -98,9 +110,15 @@ manualTransfer.post(
         bankMap[_currency.name],
         environment
       );
-      return new SuccessResponse("Payment is successful", true).send(res);
+      return new (infoMessage ? SuccessButCaveatResponse : SuccessResponse)(
+        infoMessage || "Payment is successful",
+        true
+      ).send(res);
     } catch (error) {
-      return ApiError.handle(error as Error, res);
+      const business = req.query.business as Business;
+      const orderId = req.query.orderId as string;
+      await handleFailedVerification(orderId, business, "manualTransfer");
+      return new SuccessResponse("Payment is successful", true).send(res);
     }
   }
 );

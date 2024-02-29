@@ -13,8 +13,8 @@ import {
   AppCurrency,
   AppCurrencyName
 } from "../../../../database/model/AppConfig";
-import { getPriceDisplay } from "../../../../helpers/type-conversion";
 import { SuccessResponse } from "../../../../core/ApiResponse";
+import { getPriceDisplay } from "../../../../helpers/render";
 
 const db = firestore();
 

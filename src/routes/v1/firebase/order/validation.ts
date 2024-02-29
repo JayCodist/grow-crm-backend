@@ -81,7 +81,8 @@ const validation = {
         recidenceType: Joi.string().allow(""),
         recipientPhoneCountryCode: Joi.string().default("").allow(""),
         recipientAltPhoneCountryCode: Joi.string().default("").allow("")
-      }).allow(null)
+      }).allow(null),
+      pickupState: Joi.string().allow("")
     }).required(),
     userData: Joi.object().keys({
       name: Joi.string().required(),

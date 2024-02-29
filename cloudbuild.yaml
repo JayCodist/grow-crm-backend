@@ -1,11 +1,11 @@
 steps:
-  - name: node:16.14.0
+  - name: node:18.19.0
     entrypoint: yarn
     args: ["install"]
-  - name: node:16.14.0
+  - name: node:18.19.0
     entrypoint: yarn
     args: ["build"]
-  - name: node:16.14.0
+  - name: node:18.19.0
     entrypoint: yarn
     args: ["create-env"]
     env:

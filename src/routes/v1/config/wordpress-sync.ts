@@ -121,73 +121,48 @@ const getTagsMap: (rawProd: any) => any = rawProd => {
   return tags;
 };
 
-const getVariants: (
-  productVariations: any[],
-  vipVariations: any[]
-) => ProductVariant[] = (productVariations, vipVariations) => {
-  const conversionMap: Record<string, DesignOptionName> = {
-    "box-arrangement": "box",
-    "wrapped-bouquet": "wrappedBouquet",
-    "in-a-vase": "inVase",
-    "in-large-vase": "inLargeVase"
+const getVariants: (productVariations: any[]) => ProductVariant[] =
+  productVariations => {
+    const conversionMap: Record<string, DesignOptionName> = {
+      "box-arrangement": "box",
+      "wrapped-bouquet": "wrappedBouquet",
+      "in-a-vase": "inVase",
+      "in-large-vase": "inLargeVase"
+    };
+
+    const regularVariants: ProductVariant[] = productVariations.map(
+      variation => {
+        let variantName = null;
+        let variantDesign: null | DesignOption[] = null;
+        if (variation.attributes?.length > 1) {
+          variantName = variation.attributes[0].option;
+
+          const design = allDesignOptions.filter(design => {
+            return (
+              conversionMap[variation.attributes[1].option] === design.name
+            );
+          });
+          variantDesign = [allDesignOptions[0], ...design];
+        }
+        variantName = variation.attributes[0].option;
+
+        return {
+          class: /vip/i.test(variantName) ? "vip" : "regular",
+          sku: variation.sku,
+          price: Number(variation.sale_price || variation.price) || 0,
+          name:
+            variantName
+              ?.replace(/-/g, " ")
+              .replace(/vip/i, "VIP")
+              .replace(/^./, (char: string) => char.toUpperCase())
+              .replace(/2$/, "") || "N/A",
+          design: variantDesign
+        };
+      }
+    );
+
+    return regularVariants.sort((a, b) => a.price - b.price);
   };
-
-  const regularVariants: ProductVariant[] = productVariations.map(variation => {
-    let variantName = null;
-    let variantDesign: null | DesignOption[] = null;
-    if (variation.attributes?.length > 1) {
-      variantName = variation.attributes[0].option;
-
-      const design = allDesignOptions.filter(design => {
-        return conversionMap[variation.attributes[1].option] === design.name;
-      });
-      variantDesign = [allDesignOptions[0], ...design];
-    }
-    variantName = variation.attributes[0].option;
-
-    return {
-      class: /vip/i.test(variantName) ? "vip" : "regular",
-      sku: variation.sku,
-      price: Number(variation.sale_price || variation.price) || 0,
-      name:
-        variantName
-          ?.replace(/-/g, " ")
-          .replace(/vip/i, "VIP")
-          .replace(/^./, (char: string) => char.toUpperCase())
-          .replace(/2$/, "") || "N/A",
-      design: variantDesign
-    };
-  });
-
-  const vipVariants: ProductVariant[] = vipVariations.map(variation => {
-    let variantName = null;
-    let variantDesign: null | DesignOption[] = null;
-    if (variation.attributes?.length > 1) {
-      variantName = variation.attributes[0].option;
-
-      const design = allDesignOptions.filter(design => {
-        return conversionMap[variation.attributes[1].option] === design.name;
-      });
-      variantDesign = [allDesignOptions[0], ...design];
-    } else {
-      variantName = variation.attributes[0].option;
-    }
-    return {
-      class: /vip/i.test(variantName) ? "vip" : "regular",
-      sku: variation.sku,
-      price: Number(variation.sale_price || variation.price) || 0,
-      name:
-        variantName
-          ?.replace(/-/g, " ")
-          .replace(/vip/i, "VIP")
-          .replace(/^./, (char: string) => char.toUpperCase())
-          .replace(/2$/, "") || "N/A",
-      design: variantDesign
-    };
-  });
-
-  return [...regularVariants, ...vipVariants].sort((a, b) => a.price - b.price);
-};
 
 doWordpressSync.post(
   "/",
@@ -233,12 +208,6 @@ doWordpressSync.post(
 
       const products = productsRaw
         .map((rawProd, productIndex) => {
-          const relatedVIPRef =
-            Number(
-              rawProd.attributes
-                ?.find((attribute: any) => attribute.name === "VIP Pricing IDS")
-                ?.options?.[0]?.replace(/\D/g, "")
-            ) || null;
           const prodName = he.decode(
             rawProd.title.split("-")[0].trim() || "N/A"
           );
@@ -285,14 +254,7 @@ doWordpressSync.post(
               rawProd.attributes?.find(
                 (attribute: any) => attribute.name === "Info Design"
               )?.options?.[0] || "",
-            relatedVIPRef,
-            variants: getVariants(
-              rawProd.variations,
-              relatedVIPRef
-                ? productsRaw.find(prod => prod.id === relatedVIPRef)
-                    ?.variations || []
-                : []
-            ),
+            variants: getVariants(rawProd.variations),
             addonsGroups: [],
             inStock: rawProd.in_stock,
             pageDescription: "",

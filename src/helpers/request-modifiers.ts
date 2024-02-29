@@ -3,6 +3,7 @@ import formidable from "formidable";
 import { BadTokenError } from "../core/ApiError";
 import User from "../database/model/user/model.interface";
 import { decodeToken } from "./formatters";
+import firebaseAdmin from "./firebase-admin";
 
 export const handleFormDataParsing = () => {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -46,6 +47,27 @@ export const handleAuthValidation = (allowAbsentTokens = false) => {
           ? null
           : new BadTokenError("Provided authentication token is invalid")
       );
+    }
+  };
+};
+
+export const handleFirebaseAuthValidation = () => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const authToken = (req.headers.authorization || "").replace(
+        /^bearer /i,
+        ""
+      );
+      const { email, phone_number: phone } = await firebaseAdmin
+        .auth()
+        .verifyIdToken(authToken);
+      req.firebaseUser = {
+        email,
+        phone
+      };
+      next();
+    } catch (err) {
+      next(new BadTokenError("Provided authentication token is invalid"));
     }
   };
 };

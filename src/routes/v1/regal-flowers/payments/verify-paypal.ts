@@ -4,13 +4,10 @@ import fetch from "node-fetch";
 import { unescape } from "querystring";
 import { URLSearchParams } from "url";
 import { Environment } from "../../../../config";
-import {
-  ApiError,
-  NotFoundError,
-  PaymentFailureError
-} from "../../../../core/ApiError";
+import { NotFoundError, PaymentFailureError } from "../../../../core/ApiError";
 import {
   InternalErrorResponse,
+  SuccessButCaveatResponse,
   SuccessResponse
 } from "../../../../core/ApiResponse";
 import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
@@ -20,15 +17,15 @@ import { Business, Order } from "../../../../database/model/Order";
 import { currencyOptions } from "../../../../helpers/constants";
 import { getAdminNoteText } from "../../../../helpers/formatters";
 import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
-import { templateRender } from "../../../../helpers/render";
-import { getPriceDisplay } from "../../../../helpers/type-conversion";
+import { getPriceDisplay, templateRender } from "../../../../helpers/render";
 import { AppCurrency } from "../../../../database/model/AppConfig";
 import {
-  businessEmail,
-  businessNewOrderPath,
-  businessOrderPath,
-  businessTemplateId
-} from "./verify-paystack";
+  businessNewOrderPathMap,
+  businessOrderPathMap,
+  businessTemplateIdMap
+} from "../../../../database/repository/utils";
+import { handleFailedVerification } from "../../../../helpers/type-conversion";
+import { performDeliveryDateNormalization } from "./payment-utils";
 
 const db = firestore();
 
@@ -111,11 +108,18 @@ verifyPaypal.post(
         if (currencyCode === "USD" || currencyCode === "GBP") {
           const snap = await db.collection("orders").doc(orderID).get();
 
-          const order = snap.data() as Order | undefined;
+          const order = snap.exists
+            ? ({ id: snap.id, ...snap.data() } as Order)
+            : undefined;
 
           if (!order) {
             throw new NotFoundError("Order not found");
           }
+
+          const infoMessage = await performDeliveryDateNormalization(
+            order,
+            business
+          );
 
           const currency = currencyOptions.find(
             currency => currency.name === currencyCode
@@ -153,11 +157,11 @@ verifyPaypal.post(
                   currency: currencyCode,
                   paymentDetails
                 },
-                businessNewOrderPath[business],
+                businessNewOrderPathMap[business],
                 business
               ),
               `Warning a New Order amount mismatch (${order.fullOrderId})`,
-              businessTemplateId[business],
+              businessTemplateIdMap[business],
               business
             );
 
@@ -165,14 +169,13 @@ verifyPaypal.post(
               [order.client.email as string],
               templateRender(
                 { ...order, adminNotes, currency: currencyCode },
-                businessOrderPath[business],
+                businessOrderPathMap[business],
                 business
               ),
               `Thank you for your order (${order.fullOrderId})`,
-              businessTemplateId[business],
+              businessTemplateIdMap[business],
               business
             );
-            return new SuccessResponse("Payment is successful", true).send(res);
           }
 
           await db.collection("orders").doc(orderID).update({
@@ -187,11 +190,11 @@ verifyPaypal.post(
             ["info@regalflowers.com.ng"],
             templateRender(
               { ...order, adminNotes, currency: currencyCode, paymentDetails },
-              businessNewOrderPath[business],
+              businessNewOrderPathMap[business],
               business
             ),
             `New Order (${order.fullOrderId})`,
-            businessTemplateId[business],
+            businessTemplateIdMap[business],
             business
           );
 
@@ -199,11 +202,11 @@ verifyPaypal.post(
             [order.client.email as string],
             templateRender(
               { ...order, adminNotes, currency: currencyCode },
-              businessOrderPath[business],
+              businessOrderPathMap[business],
               business
             ),
             `Thank you for your order (${order.fullOrderId})`,
-            businessTemplateId[business],
+            businessTemplateIdMap[business],
             business
           );
           const environment: Environment = /sandbox/i.test(
@@ -212,7 +215,10 @@ verifyPaypal.post(
             ? "development"
             : "production";
           await PaymentLogRepo.createPaymentLog("paypal", json, environment);
-          return new SuccessResponse("Payment is successful", true).send(res);
+          return new (infoMessage ? SuccessButCaveatResponse : SuccessResponse)(
+            infoMessage || "Payment is successful",
+            true
+          ).send(res);
         }
       }
       throw new PaymentFailureError(
@@ -221,41 +227,8 @@ verifyPaypal.post(
     } catch (err) {
       const business = req.query.business as Business;
       const orderId = req.query.orderId as string;
-      const snap = await db
-        .collection("orders")
-        .doc(orderId as string)
-        .get();
-      const order = snap.data() as Order | undefined;
-
-      if (order) {
-        await firestore()
-          .collection("orders")
-          .doc(orderId as string)
-          .update({
-            paymentStatus: "PAID - GO AHEAD (Paypal)",
-            adminNotes: `${order.adminNotes} (Ver Failed)`
-          });
-
-        await sendEmailToAddress(
-          [businessEmail[business]],
-          templateRender(
-            { ...order, currency: "USD" },
-            businessOrderPath[business],
-            business
-          ),
-          `Warning a New Order Ver Failed (${order.fullOrderId})`,
-          businessTemplateId[business],
-          business
-        );
-        await sendEmailToAddress(
-          [order.client.email as string],
-          templateRender({ ...order }, businessOrderPath[business], business),
-          `Thank you for your order (${order.fullOrderId})`,
-          businessTemplateId[business],
-          business
-        );
-      }
-      return ApiError.handle(err as Error, res);
+      await handleFailedVerification(orderId, business, "paypal");
+      return new SuccessResponse("Payment is successful", true).send(res);
     }
   }
 );

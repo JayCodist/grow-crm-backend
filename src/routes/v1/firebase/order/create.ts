@@ -17,13 +17,13 @@ import { handleFormDataParsing } from "../../../../helpers/request-modifiers";
 import { handleContactHooks } from "./utils";
 import { AppCurrencyName } from "../../../../database/model/AppConfig";
 import { currencyOptions } from "../../../../helpers/constants";
-import { getPriceDisplay } from "../../../../helpers/type-conversion";
 import {
   ProductWP,
   allDesignOptions
 } from "../../../../database/model/product-wp/model.interface";
 import validation from "./validation";
 import validator from "../../../../helpers/validator";
+import { getPriceDisplay } from "../../../../helpers/render";
 
 const createOrder = express.Router();
 const { firestore } = firebaseAdmin;
