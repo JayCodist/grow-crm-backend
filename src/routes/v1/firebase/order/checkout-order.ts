@@ -137,7 +137,7 @@ checkoutOrder.put(
             "You have to provide email and password to create new account"
           );
         }
-        user = await UsersRepo.signup(userData, business);
+        user = await UsersRepo.signup(userData, business, true);
       }
       if (shouldSaveAddress) {
         if (!user) {
@@ -220,9 +220,18 @@ checkoutOrder.put(
       const client = await handleContactHooks(userData, "client");
 
       orderData.recipient.phone =
-        userData.phone === orderData.recipient.phone
+        userData.name !== orderData.recipient.name &&
+        formatPhoneNumber(userData.phone) ===
+          formatPhoneNumber(orderData.recipient.phone)
           ? `Call ${formatPhoneNumber(userData.phone)}`
           : orderData.recipient.phone;
+
+      orderData.recipient.phoneAlt =
+        userData.name !== orderData.recipient.name &&
+        formatPhoneNumber(userData.phone) ===
+          formatPhoneNumber(orderData.recipient.phoneAlt)
+          ? `Call ${formatPhoneNumber(userData.phone)}`
+          : orderData.recipient.phoneAlt;
 
       const recipient = await handleContactHooks(
         orderData.recipient.method === "delivery"
@@ -283,7 +292,8 @@ checkoutOrder.put(
               (orderData.despatchLocation.toLowerCase() as DespatchLocation) ||
                 (orderData.deliveryDetails.state.toLowerCase() as DespatchLocation)
             ] || "Unselected",
-          deliveryZone: orderData.deliveryZone
+          deliveryZone: orderData.deliveryZone,
+          pickupState: orderData.pickupState
         } as Partial<Order>);
 
       return new SuccessResponse("Order successfully checked out", null).send(

@@ -10,6 +10,7 @@ import {
 } from "../../../../core/ApiError";
 import {
   InternalErrorResponse,
+  SuccessButCaveatResponse,
   SuccessResponse
 } from "../../../../core/ApiResponse";
 import { Business, Order } from "../../../../database/model/Order";
@@ -19,6 +20,7 @@ import validation from "./validation";
 import { getAdminNoteText } from "../../../../helpers/formatters";
 import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
 import { templateRender } from "../../../../helpers/render";
+import { performDeliveryDateNormalization } from "./payment-utils";
 
 const db = firestore();
 
@@ -71,13 +73,19 @@ verifyMonnify.post(
           .collection("orders")
           .doc(req.query.ref as string)
           .get();
-        const order = snap.data() as Order | undefined;
+        const order = snap.exists
+          ? ({ id: snap.id, ...snap.data() } as Order)
+          : undefined;
         // TODO: confirm currency is right
         if (!order || order.amount > json.data.amount) {
           return new InternalError(
             "Unexpected error occured. Please contact your administrator"
           );
         }
+        const infoMessage = await performDeliveryDateNormalization(
+          order,
+          business
+        );
 
         const adminNotes = getAdminNoteText(
           order.adminNotes,
@@ -113,7 +121,10 @@ verifyMonnify.post(
           ? "development"
           : "production";
         await PaymentLogRepo.createPaymentLog("monnify", json, environment);
-        return new SuccessResponse("Payment is successful", true).send(res);
+        return new (infoMessage ? SuccessButCaveatResponse : SuccessResponse)(
+          infoMessage || "Payment is successful",
+          true
+        ).send(res);
       }
 
       throw new PaymentFailureError(json.responseMessage);

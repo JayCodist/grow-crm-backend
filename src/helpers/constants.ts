@@ -14,21 +14,33 @@ export type DeliveryZoneAmount =
   | "freeAbujaVals"
   | "highAbuja"
   | "mediumAbujaVals"
-  | "mediumLagosVals";
+  | "mediumLagosVals"
+  | "mediumAbujaFestive"
+  | "mediumLagosFestive"
+  | "highAbujaFestive"
+  | "highLagosFestive"
+  | "freeAbujaFestive"
+  | "freeLagosFestive";
 
 export const deliveryZoneAmount: Record<DeliveryZoneAmount, number> = {
   highLagos: 10000,
   freeLagos: 0,
-  highLagosVals: 15000,
+  highLagosVals: 29900,
   freeLagosVals: 0,
   mediumLagos: 4500,
   mediumAbuja: 3500,
   freeAbuja: 0,
-  highAbujaVals: 15000,
+  highAbujaVals: 29900,
   freeAbujaVals: 0,
   highAbuja: 6000,
-  mediumAbujaVals: 7000,
-  mediumLagosVals: 7000
+  mediumAbujaVals: 20000,
+  mediumLagosVals: 20000,
+  mediumAbujaFestive: 7000,
+  mediumLagosFestive: 7000,
+  highAbujaFestive: 15000,
+  highLagosFestive: 15000,
+  freeAbujaFestive: 0,
+  freeLagosFestive: 0
 };
 
 export const defaultCurrency: AppCurrency = {
@@ -39,8 +51,8 @@ export const defaultCurrency: AppCurrency = {
 
 export const currencyOptions: AppCurrency[] = [
   { ...defaultCurrency },
-  { name: "USD", conversionRate: 700, sign: "$" },
-  { name: "GBP", conversionRate: 890, sign: "£" }
+  { name: "USD", conversionRate: 895.303, sign: "$" },
+  { name: "GBP", conversionRate: 1134.91, sign: "£" }
 ];
 
 export const pickupLocations: Record<string, string> = {
@@ -69,8 +81,9 @@ export const paymentMethodMap: Record<PaymentMethod, string> = {
   bitcoinTransfer: "Bitcoin Transfer"
 };
 
-export type DespatchLocation = "lagos" | "abuja";
+export type DespatchLocation = "ikoyi" | "lekki" | "abuja";
 export const despatchLocationMap: Record<DespatchLocation, string> = {
-  lagos: "Ikoyi",
-  abuja: "Abuja"
+  ikoyi: "Ikoyi",
+  abuja: "Abuja",
+  lekki: "Lekki"
 };

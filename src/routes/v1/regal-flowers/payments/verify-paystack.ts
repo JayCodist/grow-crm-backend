@@ -2,12 +2,11 @@ import express from "express";
 import { firestore } from "firebase-admin";
 import fetch from "node-fetch";
 import { Environment } from "../../../../config";
+import { InternalError, PaymentFailureError } from "../../../../core/ApiError";
 import {
-  ApiError,
-  InternalError,
-  PaymentFailureError
-} from "../../../../core/ApiError";
-import { SuccessResponse } from "../../../../core/ApiResponse";
+  SuccessButCaveatResponse,
+  SuccessResponse
+} from "../../../../core/ApiResponse";
 import { Business, Order } from "../../../../database/model/Order";
 import PaymentLogRepo from "../../../../database/repository/PaymentLogRepo";
 import validator from "../../../../helpers/validator";
@@ -15,38 +14,21 @@ import validation from "./validation";
 import { currencyOptions } from "../../../../helpers/constants";
 import { AppCurrency } from "../../../../database/model/AppConfig";
 import { getAdminNoteText } from "../../../../helpers/formatters";
-import { templateRender } from "../../../../helpers/render";
+import { getPriceDisplay, templateRender } from "../../../../helpers/render";
 import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
-import { getPriceDisplay } from "../../../../helpers/type-conversion";
+import {
+  businessEmailMap,
+  businessNewOrderPathMap,
+  businessOrderPathMap,
+  businessPaystackScret,
+  businessTemplateIdMap
+} from "../../../../database/repository/utils";
+import { handleFailedVerification } from "../../../../helpers/type-conversion";
+import { performDeliveryDateNormalization } from "./payment-utils";
 
 const db = firestore();
 
 const verifyPaystack = express.Router();
-
-export const businessPaystackScret: Record<Business, string> = {
-  floralHub: process.env.FLORAL_HUB_PAYSTACK_SECRET_KEY as string,
-  regalFlowers: process.env.REGAL_FLOWERS_PAYSTACK_SECRET_KEY as string
-};
-
-export const businessOrderPath: Record<Business, string> = {
-  floralHub: "floral-order",
-  regalFlowers: "order"
-};
-
-export const businessNewOrderPath: Record<Business, string> = {
-  floralHub: "new-floral-order",
-  regalFlowers: "new-order"
-};
-
-export const businessEmail: Record<Business, string> = {
-  floralHub: "info@floralhub.com.ng",
-  regalFlowers: "info@regalflowers.com.ng"
-};
-
-export const businessTemplateId: Record<Business, string> = {
-  floralHub: "5369366",
-  regalFlowers: "5055243"
-};
 
 verifyPaystack.post(
   "/",
@@ -70,13 +52,20 @@ verifyPaystack.post(
           .collection("orders")
           .doc(orderId as string)
           .get();
-        const order = snap.data() as Order | undefined;
+        const order = snap.exists
+          ? ({ id: snap.id, ...snap.data() } as Order)
+          : undefined;
 
         if (!order) {
           throw new InternalError(
             "Payment Verification Failed: The order does not exist"
           );
         }
+
+        const infoMessage = await performDeliveryDateNormalization(
+          order,
+          business
+        );
 
         const adminNotes = getAdminNoteText(
           order.adminNotes,
@@ -107,28 +96,27 @@ verifyPaystack.post(
             });
 
             await sendEmailToAddress(
-              [businessEmail[business]],
+              [businessEmailMap[business]],
               templateRender(
                 { ...order, adminNotes, currency: "USD", paymentDetails },
-                businessOrderPath[business],
+                businessOrderPathMap[business],
                 business
               ),
               `Warning a New Order amount mismatch (${order.fullOrderId})`,
-              businessTemplateId[business],
+              businessTemplateIdMap[business],
               business
             );
             await sendEmailToAddress(
               [order.client.email as string],
               templateRender(
                 { ...order, adminNotes, currency: data.currency },
-                businessOrderPath[business],
+                businessOrderPathMap[business],
                 business
               ),
               `Thank you for your order (${order.fullOrderId})`,
-              businessTemplateId[business],
+              businessTemplateIdMap[business],
               business
             );
-            return new SuccessResponse("Payment is successful", true).send(res);
           }
         } else if (data.currency === "NGN") {
           const paidAmount = data.amount / 100;
@@ -149,7 +137,7 @@ verifyPaystack.post(
               });
 
             await sendEmailToAddress(
-              [businessEmail[business]],
+              [businessEmailMap[business]],
               templateRender(
                 {
                   ...order,
@@ -157,11 +145,11 @@ verifyPaystack.post(
                   currency: "NGN",
                   paymentDetails
                 },
-                businessNewOrderPath[business],
+                businessNewOrderPathMap[business],
                 business
               ),
               `Warning a New Order amount mismatch (${order.fullOrderId})`,
-              businessTemplateId[business],
+              businessTemplateIdMap[business],
               business
             );
 
@@ -169,14 +157,13 @@ verifyPaystack.post(
               [order.client.email as string],
               templateRender(
                 { ...order, adminNotes, currency: data.currency },
-                businessOrderPath[business],
+                businessOrderPathMap[business],
                 business
               ),
               `Thank you for your order (${order.fullOrderId})`,
-              businessTemplateId[business],
+              businessTemplateIdMap[business],
               business
             );
-            return new SuccessResponse("Payment is successful", true).send(res);
           }
         }
 
@@ -192,7 +179,7 @@ verifyPaystack.post(
 
         // Send email to admin and client
         await sendEmailToAddress(
-          [businessEmail[business]],
+          [businessEmailMap[business]],
           templateRender(
             {
               ...order,
@@ -200,11 +187,11 @@ verifyPaystack.post(
               currency: data.currency,
               paymentDetails
             },
-            businessNewOrderPath[business],
+            businessNewOrderPathMap[business],
             business
           ),
           `New Order (${order.fullOrderId})`,
-          businessTemplateId[business],
+          businessTemplateIdMap[business],
           business
         );
 
@@ -212,11 +199,11 @@ verifyPaystack.post(
           [order.client.email as string],
           templateRender(
             { ...order, adminNotes, currency: data.currency },
-            businessOrderPath[business],
+            businessOrderPathMap[business],
             business
           ),
           `Thank you for your order (${order.fullOrderId})`,
-          businessTemplateId[business],
+          businessTemplateIdMap[business],
           business
         );
 
@@ -226,48 +213,18 @@ verifyPaystack.post(
           ? "development"
           : "production";
         await PaymentLogRepo.createPaymentLog("paystack", json, environment);
-        return new SuccessResponse("Payment is successful", true).send(res);
+        return new (infoMessage ? SuccessButCaveatResponse : SuccessResponse)(
+          infoMessage || "Payment is successful",
+          true
+        ).send(res);
       }
 
       throw new PaymentFailureError(json.data.message);
     } catch (err) {
       const business = req.query.business as Business;
       const orderId = (req.query.ref as string).split("-")[1];
-      const snap = await db
-        .collection("orders")
-        .doc(orderId as string)
-        .get();
-      const order = snap.data() as Order | undefined;
-
-      if (order) {
-        await firestore()
-          .collection("orders")
-          .doc(orderId as string)
-          .update({
-            paymentStatus: "PAID - GO AHEAD (Website - Card)",
-            adminNotes: `${order.adminNotes} (Ver Failed)`
-          });
-
-        await sendEmailToAddress(
-          [businessEmail[business]],
-          templateRender(
-            { ...order, currency: "USD" },
-            businessOrderPath[business],
-            business
-          ),
-          `Warning a New Order Ver Failed (${order.fullOrderId})`,
-          businessTemplateId[business],
-          business
-        );
-        await sendEmailToAddress(
-          [order.client.email as string],
-          templateRender({ ...order }, businessOrderPath[business], business),
-          `Thank you for your order (${order.fullOrderId})`,
-          businessTemplateId[business],
-          business
-        );
-      }
-      return ApiError.handle(err as Error, res);
+      await handleFailedVerification(orderId, business, "paystack");
+      return new SuccessResponse("Payment is successful", true).send(res);
     }
   }
 );
