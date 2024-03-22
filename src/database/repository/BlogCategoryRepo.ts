@@ -1,7 +1,8 @@
 import { BadRequestError } from "../../core/ApiError";
 import { Business } from "../model/Order";
 import { BlogCategory } from "../model/blog-category/model.interface";
-import { BlogCategoryModelMap } from "./utils";
+import BlogRepo from "./BlogRepo";
+import { BlogCategoryModelMap, BlogModelMap } from "./utils";
 
 export default class BlogCategoryRepo {
   public static getCategories(business: Business): Promise<BlogCategory[]> {
@@ -58,6 +59,7 @@ export default class BlogCategoryRepo {
   }
 
   public static async delete(id: string, business: Business) {
+    await BlogRepo.deleteCategory(id, business);
     await BlogCategoryModelMap[business].findByIdAndDelete(id);
 
     return null;
