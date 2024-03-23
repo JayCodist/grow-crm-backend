@@ -5,35 +5,17 @@ steps:
   - name: node:18.19.0
     entrypoint: yarn
     args: ["build"]
-  - name: node:18.19.0
-    entrypoint: yarn
-    args: ["create-env"]
+  - steps:
+  - name: ubuntu
+    entrypoint: bash
+    args:
+      - -c
+      - apt-get update > /dev/null && 
+        apt-get install -y curl gnupg > /dev/null &&
+        (curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh || wget -t 3 -qO- https://cli.doppler.com/install.sh) | sh &&
+        doppler run -- ./your-build-script.sh;
     env:
-      - "DB_NAME=${_DB_NAME}"
-      - "DB_USER=${_DB_USER}"
-      - "DB_USER_PWD=${_DB_USER_PWD}"
-      - "DB_HOST=${_DB_HOST}"
-      - "FIREBASE_DB_HOST=${_FIREBASE_DB_HOST}"
-      - "WC_CONSUMER_KEY=${_WC_CONSUMER_KEY}"
-      - "WC_CONSUMER_SECRET=${_WC_CONSUMER_SECRET}"
-      - "JWT_SIGNATURE_SECRET=${_JWT_SIGNATURE_SECRET}"
-      - "MAILJET_API_KEY=${_MAILJET_API_KEY}"
-      - "MAILJET_SECRET_KEY=${_MAILJET_SECRET_KEY}"
-      - "FLORAL_HUB_PAYSTACK_SECRET_KEY=${_FLORAL_HUB_PAYSTACK_SECRET_KEY}"
-      - "REGAL_FLOWERS_PAYSTACK_SECRET_KEY=${_REGAL_FLOWERS_PAYSTACK_SECRET_KEY}"
-      - "MONNIFY_API_KEY=${_MONNIFY_API_KEY}"
-      - "MONNIFY_SECRET_KEY=${_MONNIFY_SECRET_KEY}"
-      - "MONNIFY_BASE_URL=${_MONNIFY_BASE_URL}"
-      - "FLORAL_HUB_PAYPAL_CLIENT_ID=${_FLORAL_HUB_PAYPAL_CLIENT_ID}"
-      - "REGAL_FLOWERS_PAYPAL_CLIENT_ID=${_REGAL_FLOWERS_PAYPAL_CLIENT_ID}"
-      - "FLORAL_HUB_PAYPAL_CLIENT_SECRET=${_FLORAL_HUB_PAYPAL_CLIENT_SECRET}"
-      - "REGAL_FLOWERS_PAYPAL_CLIENT_SECRET=${_REGAL_FLOWERS_PAYPAL_CLIENT_SECRET}"
-      - "PAYPAL_BASE_URL=${_PAYPAL_BASE_URL}"
-      - "API_LAYER_KEY=${_API_LAYER_KEY}"
-      - "FIREBASE_STORAGE_BUCKET=${_FIREBASE_STORAGE_BUCKET}"
-      - "TINIFY_KEY=${_TINIFY_KEY}"
-      - "WC_CONSUMER_KEY_FLORAL=${_WC_CONSUMER_KEY_FLORAL}"
-      - "WC_CONSUMER_SECRET_FLORAL=${_WC_CONSUMER_SECRET_FLORAL}"
+      - DOPPLER_TOKEN=$_DOPPLER_TOKEN
   - name: "gcr.io/cloud-builders/gcloud"
     args:
       [
