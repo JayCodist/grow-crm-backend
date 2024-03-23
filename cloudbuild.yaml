@@ -42,7 +42,7 @@ steps:
         "--quiet",
         "app.yaml",
         "--project",
-        "regal-operations-defy",
+        "regal-operations-staging",
         "--version",
         "service-default",
         "--no-promote"
