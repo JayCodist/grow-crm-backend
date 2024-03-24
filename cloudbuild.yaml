@@ -31,4 +31,3 @@ steps:
 timeout: "1600s"
 options:
   logging: CLOUD_LOGGING_ONLY
-  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
