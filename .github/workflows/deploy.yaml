@@ -1,4 +1,4 @@
-name: Deploy to Goggle App Engine (GAE)
+name: Deploy to Goggle App Engine
 
 on:
   push:
