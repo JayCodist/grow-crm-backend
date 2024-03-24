@@ -2,9 +2,6 @@ steps:
   - name: node:18.19.0
     entrypoint: yarn
     args: ["install"]
-  - name: node:18.19.0
-    entrypoint: yarn
-    args: ["build"]
   - name: ubuntu
     entrypoint: bash
     args:
@@ -12,7 +9,7 @@ steps:
       - apt-get update > /dev/null && 
         apt-get install -y curl gnupg > /dev/null &&
         (curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh || wget -t 3 -qO- https://cli.doppler.com/install.sh) | sh &&
-        doppler run -- ./your-build-script.sh;
+        doppler run -- yarn build;
     env:
       - DOPPLER_TOKEN=$_DOPPLER_TOKEN
   - name: "gcr.io/cloud-builders/gcloud"
