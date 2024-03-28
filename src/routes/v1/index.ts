@@ -23,6 +23,7 @@ import updatePaymentMethodDetails from "./firebase/order/update-payment-details"
 import categoryWPSlug from "./wordpress/category-wp/category-slug";
 import floralhubRoutes from "./floral-hub";
 import blogRoutes from "./blog";
+import blogCategoryRoutes from "./blog-category";
 
 const router = express.Router();
 
@@ -79,5 +80,7 @@ router.use("/regal", regalFlowersRoutes);
 router.use("/floralhub", floralhubRoutes);
 
 router.use("/blog", blogRoutes);
+
+router.use("/blog/category", blogCategoryRoutes);
 
 export default router;

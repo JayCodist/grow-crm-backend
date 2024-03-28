@@ -13,6 +13,9 @@ import { UserFloralModel } from "../model/user/UserFloral";
 import { BlogRegalModel } from "../model/blog/BlogRegal";
 import { Blog } from "../model/blog/model.interface";
 import { BlogFloralModel } from "../model/blog/BlogFloral";
+import { BlogCategory } from "../model/blog-category/model.interface";
+import { CategoryRegalModel } from "../model/blog-category/CategoryRegal";
+import { CategoryFloralModel } from "../model/blog-category/CategoryFloral";
 
 export const appConfigSyncProgressFieldMap: Record<Business, keyof AppConfig> =
   {
@@ -48,6 +51,11 @@ export const UserModelMap: Record<Business, Model<User>> = {
 export const BlogModelMap: Record<Business, Model<Blog>> = {
   regalFlowers: BlogRegalModel,
   floralHub: BlogFloralModel
+};
+
+export const BlogCategoryModelMap: Record<Business, Model<BlogCategory>> = {
+  regalFlowers: CategoryRegalModel,
+  floralHub: CategoryFloralModel
 };
 
 export const businessPaystackScret: Record<Business, string> = {

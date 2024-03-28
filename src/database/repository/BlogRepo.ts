@@ -28,6 +28,7 @@ export interface PaginatedFetchParams {
 }
 
 export default class BlogRepo {
+  //create a filter for category
   public static getPaginatedBlogs({
     filter: _filter,
     pageNumber = defaultPageAttr.pageNumber,
@@ -132,5 +133,18 @@ export default class BlogRepo {
 
   public static findById(id: string, business: Business): Promise<Blog | null> {
     return BlogModelMap[business].findOne({ _id: id }).lean<Blog>().exec();
+  }
+
+  public static async deleteCategory(id: string, business: Business) {
+    // filter the blog by the category id and delete it;
+    await BlogModelMap[business].updateMany(
+      {
+        category: id
+      },
+      {
+        $pull: { category: id }
+      }
+    );
+    return null;
   }
 }
