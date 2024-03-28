@@ -6,7 +6,11 @@ import { BlogCategoryModelMap, BlogModelMap } from "./utils";
 
 export default class BlogCategoryRepo {
   public static getCategories(business: Business): Promise<BlogCategory[]> {
-    return BlogCategoryModelMap[business].find().lean<BlogCategory[]>().exec();
+    return BlogCategoryModelMap[business]
+      .find()
+      .select("-__v")
+      .lean<BlogCategory[]>()
+      .exec();
   }
 
   public static async create(

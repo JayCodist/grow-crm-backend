@@ -5,9 +5,11 @@ import { handleFirebaseAuthValidation } from "../../../helpers/request-modifiers
 import blogCategoryCreate from "./create";
 import blogCategoryUpdate from "./update";
 import blogCategoryDelete from "./delete";
+import blogCategories from "./blog-all";
 
 const blogCategoryRoutes = express.Router();
 blogCategoryRoutes.use("/id", blogCategoryId);
+blogCategoryRoutes.use("/", blogCategories);
 blogCategoryRoutes.use("/name", blogCategoryName);
 
 blogCategoryRoutes.use(
