@@ -22,6 +22,20 @@ jobs:
       - name: Install dependencies
         run: yarn
 
+      - name: Get Doppler secrets (Staging)
+        uses: dopplerhq/secrets-fetch-action@v1.2.0
+        if: github.ref == 'refs/heads/staging'
+        with:
+          doppler-token: ${{ secrets.DOPPLER_STAGING_TOKEN }}
+          inject-env-vars: true
+
+      - name: Get Doppler secrets (Production)
+        uses: dopplerhq/secrets-fetch-action@v1.2.0
+        if: github.ref == 'refs/heads/main'
+        with:
+          doppler-token: ${{ secrets.DOPPLER_PRODUCTION_TOKEN }}
+          inject-env-vars: true
+
       - name: Build Node Project
         run: yarn build
 
