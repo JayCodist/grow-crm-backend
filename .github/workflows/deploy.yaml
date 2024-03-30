@@ -38,14 +38,6 @@ jobs:
 
       - name: Copy env variables to .env
         run: printenv > .env
-      
-      - name: Create service-account.json (Staging)
-        if: github.ref == 'refs/heads/staging'
-        run: echo ${{ secrets.GCP_SA_KEY_STAGING }} > service-account.json
-
-      - name: Create service-account.json (Production)
-        if: github.ref == 'refs/heads/main'
-        run: echo ${{ secrets.GCP_SA_KEY_PRODUCTION }} > service-account.json
 
       - name: Build Node Project
         run: yarn build
