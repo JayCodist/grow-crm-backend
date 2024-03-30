@@ -36,6 +36,8 @@ jobs:
           doppler-token: ${{ secrets.DOPPLER_PRODUCTION_TOKEN }}
           inject-env-vars: true
 
+      - run: printenv > .env
+
       - name: Build Node Project
         run: yarn build
 
