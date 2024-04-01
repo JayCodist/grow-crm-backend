@@ -5,8 +5,7 @@ import { applicationDefault } from "firebase-admin/app";
 
 firebaseAdmin.initializeApp({
   credential: applicationDefault(),
-  databaseURL: process.env.FIREBASE_DB_HOST,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET
+  databaseURL: process.env.FIREBASE_DB_HOST
 });
 firebaseAdmin.firestore().settings({ ignoreUndefinedProperties: true });
 

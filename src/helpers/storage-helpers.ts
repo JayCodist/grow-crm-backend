@@ -7,8 +7,8 @@ import { Business } from "../database/model/Order";
 tinify.key = process.env.TINIFY_KEY as string;
 
 const businessBucketMap: Record<Business, string> = {
-  regalFlowers: "regalflowers-cdn",
-  floralHub: "floralhub-cdn"
+  regalFlowers: process.env.FIREBASE_STORAGE_BUCKET_REGAL as string,
+  floralHub: process.env.FIREBASE_STORAGE_BUCKET_FLORAL as string
 };
 
 export const getCloudLinkForImage: (

@@ -1,0 +1,66 @@
+name: Deploy to Goggle App Engine
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js and yarn
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Get Doppler secrets (Staging)
+        uses: dopplerhq/secrets-fetch-action@v1.2.0
+        if: github.ref == 'refs/heads/staging'
+        with:
+          doppler-token: ${{ secrets.DOPPLER_STAGING_TOKEN }}
+          inject-env-vars: true
+
+      - name: Get Doppler secrets (Production)
+        uses: dopplerhq/secrets-fetch-action@v1.2.0
+        if: github.ref == 'refs/heads/main'
+        with:
+          doppler-token: ${{ secrets.DOPPLER_PRODUCTION_TOKEN }}
+          inject-env-vars: true
+
+      - name: Copy env variables to .env
+        run: printenv > .env
+
+      - name: Build Node Project
+        run: yarn build
+
+      # Production
+      - name: Google Cloud Auth Production
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY_PRODUCTION }}'
+          project_id: ${{ secrets.GCP_PROJECT_ID_PRODUCTION }}
+
+      # Staging
+      - name: Google Cloud Auth Staging
+        if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY_STAGING }}'
+          project_id: ${{ secrets.GCP_PROJECT_ID_STAGING }}
+
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: Deploy to Google App Engine
+        run: |
+          gcloud app deploy app.yaml --quiet --version service-default --no-promote --bucket gs://generic-app
