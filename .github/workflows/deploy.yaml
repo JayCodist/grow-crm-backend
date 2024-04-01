@@ -63,4 +63,4 @@ jobs:
 
       - name: Deploy to Google App Engine
         run: |
-          gcloud app deploy app.yaml --quiet --version service-default --no-promote --bucket gs://generic-app
+          gcloud app deploy app.yaml --quiet --version service-default --no-promote
