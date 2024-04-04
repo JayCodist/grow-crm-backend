@@ -8,7 +8,7 @@ logs
 coverage
 
 *.env
-
+.env.local
 service-account*.json
 
 playground.js

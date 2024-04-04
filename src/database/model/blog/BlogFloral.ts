@@ -9,7 +9,11 @@ const schema = new Schema({
   title: String,
   featuredImage: String,
   body: String,
-  category: { type: [String], index: true },
+  category: {
+    type: [Schema.Types.ObjectId],
+    index: true,
+    ref: "CategoryFloralModel"
+  },
   active: { type: Boolean, index: true },
   excerpt: String,
   createdAt: String,
