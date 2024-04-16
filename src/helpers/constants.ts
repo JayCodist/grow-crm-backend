@@ -57,7 +57,14 @@ export const currencyOptions: AppCurrency[] = [
 
 export const pickupLocations: Record<string, string> = {
   Lagos: `<span style="font-weight: 600">Lagos Pickup - </span>81b, Lafiaji Way, Dolphin Estate, Ikoyi, Lagos`,
-  Abuja: `<span style="font-weight: 600">Abuja Pickup - </span>5, Nairobi Street, off Aminu Kano Crescent, Wuse 2, Abuja`
+  Abuja: `<span style="font-weight: 600">Abuja Pickup - </span>5, Nairobi Street, off Aminu Kano Crescent, Wuse 2, Abuja`,
+  Lekki: `<span style="font-weight: 600">Lekki Pickup - </span>1, Admiralty Way, Lekki Phase 1, Lagos`
+};
+
+export const floralHubPickupLocations: Record<string, string> = {
+  Ikoyi: `<span style="font-weight: 600">Lagos Pickup - </span>15, Ikeja Way, Dolphin Estate, Ikoyi, Lagos`,
+  Abuja: `<span style="font-weight: 600">Abuja Pickup - </span>5, Nairobi Street, off Aminu Kano Crescent, Wuse 2, Abuja`,
+  lekki: `<span style="font-weight: 600">Lekki Pickup - </span>2C, Seed Education Center Road, off Kusenla Road, Ikate, Lekki`
 };
 
 export type PaymentMethod =
