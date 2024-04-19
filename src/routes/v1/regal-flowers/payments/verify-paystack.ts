@@ -221,6 +221,7 @@ verifyPaystack.post(
 
       throw new PaymentFailureError(json.data.message);
     } catch (err) {
+      console.log("Error verifying paystack payment: ", err);
       const business = req.query.business as Business;
       const orderId = (req.query.ref as string).split("-")[1];
       await handleFailedVerification(orderId, business, "paystack");

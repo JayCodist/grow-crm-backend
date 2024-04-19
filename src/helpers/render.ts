@@ -1,7 +1,11 @@
 import fs from "fs";
 import { AppCurrency } from "../database/model/AppConfig";
 import { Business, Order } from "../database/model/Order";
-import { currencyOptions, pickupLocations } from "./constants";
+import {
+  currencyOptions,
+  floralHubPickupLocations,
+  pickupLocations
+} from "./constants";
 
 export const getPriceDisplay: (price: number, currency: AppCurrency) => string =
   (price, currency) => {
@@ -108,7 +112,11 @@ export const templateRender = (
             businessColor[business]
           }">Pick Up Location</p>
               <p style="margin: 0.5rem 0; color: #737373;">
-              ${pickupLocations[order.despatchLocation as string]}
+              ${
+                business === "regalFlowers"
+                  ? pickupLocations[order.despatchLocation as string]
+                  : floralHubPickupLocations[order.despatchLocation as string]
+              }
               </p>
               `
         : ""
