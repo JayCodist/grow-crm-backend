@@ -16,6 +16,9 @@ import { BlogFloralModel } from "../model/blog/BlogFloral";
 import { BlogCategory } from "../model/blog-category/model.interface";
 import { CategoryRegalModel } from "../model/blog-category/CategoryRegal";
 import { CategoryFloralModel } from "../model/blog-category/CategoryFloral";
+import { Product } from "../model/product/model.interface";
+import { ProductRegalModel } from "../model/product/ProductRegal";
+import { ProductFloralModel } from "../model/product/ProductFloral";
 
 export const appConfigSyncProgressFieldMap: Record<Business, keyof AppConfig> =
   {
@@ -33,9 +36,14 @@ export const appConfigSyncDateFieldMap: Record<Business, keyof AppConfig> = {
   floralHub: "lastWPSyncDateFloral"
 };
 
-export const ProductModelMap: Record<Business, Model<ProductWP>> = {
+export const ProductWPModelMap: Record<Business, Model<ProductWP>> = {
   regalFlowers: ProductWPRegalModel,
   floralHub: ProductWPFloralModel
+};
+
+export const ProductModelMap: Record<Business, Model<Product>> = {
+  regalFlowers: ProductRegalModel,
+  floralHub: ProductFloralModel
 };
 
 export const CategoryModelMap: Record<Business, Model<CategoryWP>> = {

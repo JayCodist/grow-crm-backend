@@ -11,7 +11,7 @@ import {
   productWPProjection,
   productWPProjectionMinimal
 } from "../model/product-wp/model.interface";
-import { ProductModelMap } from "./utils";
+import { ProductWPModelMap } from "./utils";
 
 type SortLogic = PartialLoose<ProductWP, "asc" | "desc">;
 
@@ -41,7 +41,7 @@ export default class ProductWPRepo {
   }: PaginatedFetchParams): Promise<{ data: ProductWP[]; count: number }> {
     return new Promise((resolve, reject) => {
       wPCollectionIsReady(business).then(() =>
-        ProductModelMap[business]
+        ProductWPModelMap[business]
           .find(filter)
           .sort(sortLogic)
           .skip((pageNumber - 1) * pageSize)
@@ -52,11 +52,11 @@ export default class ProductWPRepo {
             if (err) {
               reject(new InternalError(err.message));
             } else {
-              const filterQuery = ProductModelMap[business].find(filter);
+              const filterQuery = ProductWPModelMap[business].find(filter);
               const countQuery =
                 filter === defaultFilter
                   ? filterQuery.estimatedDocumentCount()
-                  : ProductModelMap[business].countDocuments(filter);
+                  : ProductWPModelMap[business].countDocuments(filter);
               countQuery.exec((countErr, count) => {
                 if (countErr) {
                   reject(new InternalError(countErr.message));
@@ -78,7 +78,7 @@ export default class ProductWPRepo {
     business: Business,
     relatedProductsCount = 0
   ): Promise<ProductWP | null> {
-    const product = await ProductModelMap[business]
+    const product = await ProductWPModelMap[business]
       .findOne({ slug })
       .select(productWPProjection.join(" "))
       .lean<ProductWP>()
@@ -87,7 +87,7 @@ export default class ProductWPRepo {
       return null;
     }
     const relatedProducts = relatedProductsCount
-      ? await ProductModelMap[business]
+      ? await ProductWPModelMap[business]
           .find({
             categories: { $in: product.categories }
           })
@@ -114,7 +114,7 @@ export default class ProductWPRepo {
     slugs: string[],
     business: Business
   ): Promise<ProductWP[]> {
-    return ProductModelMap[business]
+    return ProductWPModelMap[business]
       .find({ slug: { $in: slugs } })
       .select(productWPProjection.join(" "))
       .lean<ProductWP[]>()
@@ -125,7 +125,7 @@ export default class ProductWPRepo {
     keys: number[],
     business: Business
   ): Promise<ProductWP[]> {
-    return ProductModelMap[business]
+    return ProductWPModelMap[business]
       .find({ key: { $in: keys } })
       .select(productWPProjection.join(" "))
       .lean<ProductWP[]>()
@@ -138,7 +138,7 @@ export default class ProductWPRepo {
   }> {
     return new Promise((resolve, reject) => {
       wPCollectionIsReady(business).then(() => {
-        ProductModelMap[business]
+        ProductWPModelMap[business]
           .find({}, productWPProjection)
           .lean()
           .exec((err, products: ProductWP[]) => {
