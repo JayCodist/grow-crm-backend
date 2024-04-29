@@ -22,7 +22,7 @@ import {
 import { Business } from "../../../database/model/Order";
 import {
   CategoryModelMap,
-  ProductModelMap,
+  ProductWPModelMap,
   appConfigSyncDateFieldMap,
   appConfigSyncProgressFieldMap,
   appConfigTotalSyncsFieldMap
@@ -269,7 +269,7 @@ doWordpressSync.post(
       });
       try {
         await Promise.all([
-          ProductModelMap[business].collection.drop(),
+          ProductWPModelMap[business].collection.drop(),
           CategoryModelMap[business].collection.drop()
         ]);
       } catch (err) {
@@ -290,7 +290,7 @@ doWordpressSync.post(
         })),
         { ordered: false }
       );
-      await ProductModelMap[business].insertMany(
+      await ProductWPModelMap[business].insertMany(
         products.filter(prod => prod.price),
         { ordered: false }
       );
@@ -353,7 +353,7 @@ doWordpressSync.post(
       ].forEach(async (product: any) => {
         const categoryKey = product.id.toString();
 
-        await ProductModelMap[business].updateOne(
+        await ProductWPModelMap[business].updateOne(
           { key: categoryKey },
           {
             $set: {
