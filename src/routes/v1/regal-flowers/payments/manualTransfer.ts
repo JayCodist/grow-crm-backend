@@ -22,7 +22,11 @@ import {
   businessNewOrderPathMap,
   businessOrderPathMap
 } from "../../../../database/repository/utils";
-import { handleFailedVerification } from "../../../../helpers/type-conversion";
+import {
+  handleFailedVerification,
+  paymentProviderStatusMap,
+  recentOrderChangesUpdate
+} from "../../../../helpers/type-conversion";
 import { performDeliveryDateNormalization } from "./payment-utils";
 
 const db = firestore();
@@ -49,7 +53,8 @@ manualTransfer.post(
           business: Business;
         };
 
-      const snap = await db.collection("orders").doc(req.params.id).get();
+      const orderId = req.params.id as string;
+      const snap = await db.collection("orders").doc(orderId).get();
       const order = snap.exists
         ? ({ id: snap.id, ...snap.data() } as Order)
         : undefined;
@@ -73,11 +78,35 @@ manualTransfer.post(
         bankMap[_currency.name]
       } ${referenceNumber}`;
 
-      await firestore().collection("orders").doc(req.params.id).update({
-        paymentStatus: "WEBSITE PAID - GO AHEAD (but not seen yet)",
+      await firestore().collection("orders").doc(orderId).update({
+        paymentStatus: paymentProviderStatusMap.manualTransfer,
         currency,
         paymentDetails
       });
+
+      await recentOrderChangesUpdate(orderId, {
+        name: "paymentStatus",
+        old: order.paymentStatus,
+        new: paymentProviderStatusMap.manualTransfer
+      });
+
+      // const recentOrderChanges = await firestore()
+      //   .collection("recentOrderChanges")
+      //   .where("orderid", "==", orderId)
+      //   .get();
+
+      // if (recentOrderChanges.docs[0].exists) {
+      //   await recentOrderChangesDb.doc(recentOrderChanges.docs[0].id).update({
+      //     type: "edit",
+      //     updates: {
+      //       name: "paymentStatus",
+      //       old: order.paymentStatus,
+      //       new: paymentStatus
+      //     },
+      //     timestamp: firestore.FieldValue.serverTimestamp(),
+      //     time: new Date().toISOString()
+      //   });
+      // }
 
       // Send email to admin and client
       await sendEmailToAddress(

@@ -24,7 +24,11 @@ import {
   businessOrderPathMap,
   businessTemplateIdMap
 } from "../../../../database/repository/utils";
-import { handleFailedVerification } from "../../../../helpers/type-conversion";
+import {
+  handleFailedVerification,
+  paymentProviderStatusMap,
+  recentOrderChangesUpdate
+} from "../../../../helpers/type-conversion";
 import { performDeliveryDateNormalization } from "./payment-utils";
 
 const db = firestore();
@@ -148,6 +152,12 @@ verifyPaypal.post(
               paymentDetails
             });
 
+            await recentOrderChangesUpdate(orderID, {
+              name: "paymentStatus",
+              old: order.paymentStatus,
+              new: "PART- PAYMENT PAID - GO AHEAD (but not seen yet)"
+            });
+
             await sendEmailToAddress(
               ["info@regalflowers.com.ng"],
               templateRender(
@@ -179,10 +189,16 @@ verifyPaypal.post(
           }
 
           await db.collection("orders").doc(orderID).update({
-            paymentStatus: "PAID - GO AHEAD (Paypal)",
+            paymentStatus: paymentProviderStatusMap.paypal,
             adminNotes,
             currency: currencyCode,
             paymentDetails
+          });
+
+          await recentOrderChangesUpdate(orderID, {
+            name: "paymentStatus",
+            old: order.paymentStatus,
+            new: paymentProviderStatusMap.paypal
           });
 
           // Send email to admin and client
