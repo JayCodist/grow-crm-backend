@@ -8,6 +8,7 @@ import { handleFormDataParsing } from "../../../../helpers/request-modifiers";
 import validator from "../../../../helpers/validator";
 import validation from "./validation";
 import { Business } from "../../../../database/model/Order";
+import { businessTemplateIdMap } from "../../../../database/repository/utils";
 
 const requestOTP = express.Router();
 
@@ -29,7 +30,9 @@ requestOTP.use(
       await sendEmailToAddress(
         [email],
         `Your one-time password from ${business} is ${code}. This password expires in 10 minutes`,
-        "One-time password"
+        "One-time password",
+        businessTemplateIdMap[business],
+        business
       );
       new SuccessResponse("OTP sent successfully", null).send(res);
     } catch (error) {

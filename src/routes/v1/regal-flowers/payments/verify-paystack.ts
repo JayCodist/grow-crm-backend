@@ -23,7 +23,11 @@ import {
   businessPaystackScret,
   businessTemplateIdMap
 } from "../../../../database/repository/utils";
-import { handleFailedVerification } from "../../../../helpers/type-conversion";
+import {
+  handleFailedVerification,
+  paymentProviderStatusMap,
+  recentOrderChangesUpdate
+} from "../../../../helpers/type-conversion";
 import { performDeliveryDateNormalization } from "./payment-utils";
 
 const db = firestore();
@@ -136,6 +140,12 @@ verifyPaystack.post(
                 )} to Paystack`
               });
 
+            await recentOrderChangesUpdate(orderId, {
+              name: "paymentStatus",
+              old: order.paymentStatus,
+              new: "PART- PAYMENT PAID - GO AHEAD (but not seen yet)"
+            });
+
             await sendEmailToAddress(
               [businessEmailMap[business]],
               templateRender(
@@ -176,6 +186,12 @@ verifyPaystack.post(
             currency: data.currency,
             paymentDetails
           });
+
+        await recentOrderChangesUpdate(orderId, {
+          name: "paymentStatus",
+          old: order.paymentStatus,
+          new: paymentProviderStatusMap.paystack
+        });
 
         // Send email to admin and client
         await sendEmailToAddress(
