@@ -26,7 +26,7 @@ import {
 import {
   handleFailedVerification,
   paymentProviderStatusMap,
-  recentOrderChangesUpdate
+  addRecentOrderChange
 } from "../../../../helpers/type-conversion";
 import { performDeliveryDateNormalization } from "./payment-utils";
 
@@ -140,11 +140,15 @@ verifyPaystack.post(
                 )} to Paystack`
               });
 
-            await recentOrderChangesUpdate(orderId, {
-              name: "paymentStatus",
-              old: order.paymentStatus,
-              new: "PART- PAYMENT PAID - GO AHEAD (but not seen yet)"
-            });
+            await addRecentOrderChange(
+              orderId,
+              {
+                name: "paymentStatus",
+                old: order.paymentStatus,
+                new: "PART- PAYMENT PAID - GO AHEAD (but not seen yet)"
+              },
+              "edit"
+            );
 
             await sendEmailToAddress(
               [businessEmailMap[business]],
@@ -177,6 +181,7 @@ verifyPaystack.post(
           }
         }
 
+        // add payment status recent order change
         await firestore()
           .collection("orders")
           .doc(orderId as string)
@@ -187,11 +192,26 @@ verifyPaystack.post(
             paymentDetails
           });
 
-        await recentOrderChangesUpdate(orderId, {
-          name: "paymentStatus",
-          old: order.paymentStatus,
-          new: paymentProviderStatusMap.paystack
-        });
+        // add payment details recent order change
+        await addRecentOrderChange(
+          orderId,
+          {
+            name: "paymentStatus",
+            old: order.paymentStatus,
+            new: paymentProviderStatusMap.paystack
+          },
+          "edit"
+        );
+
+        await addRecentOrderChange(
+          orderId,
+          {
+            name: "paymentDetails",
+            old: order.paymentDetails,
+            new: paymentDetails
+          },
+          "edit"
+        );
 
         // Send email to admin and client
         await sendEmailToAddress(

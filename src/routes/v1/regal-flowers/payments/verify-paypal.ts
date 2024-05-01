@@ -27,7 +27,7 @@ import {
 import {
   handleFailedVerification,
   paymentProviderStatusMap,
-  recentOrderChangesUpdate
+  addRecentOrderChange
 } from "../../../../helpers/type-conversion";
 import { performDeliveryDateNormalization } from "./payment-utils";
 
@@ -152,11 +152,27 @@ verifyPaypal.post(
               paymentDetails
             });
 
-            await recentOrderChangesUpdate(orderID, {
-              name: "paymentStatus",
-              old: order.paymentStatus,
-              new: "PART- PAYMENT PAID - GO AHEAD (but not seen yet)"
-            });
+            // add payment status recent order change
+            await addRecentOrderChange(
+              orderID,
+              {
+                name: "paymentStatus",
+                old: order.paymentStatus,
+                new: "PART- PAYMENT PAID - GO AHEAD (but not seen yet)"
+              },
+              "edit"
+            );
+
+            // add payment details recent order change
+            await addRecentOrderChange(
+              orderID,
+              {
+                name: "paymentDetails",
+                old: order.paymentDetails,
+                new: paymentDetails
+              },
+              "edit"
+            );
 
             await sendEmailToAddress(
               ["info@regalflowers.com.ng"],
@@ -195,11 +211,15 @@ verifyPaypal.post(
             paymentDetails
           });
 
-          await recentOrderChangesUpdate(orderID, {
-            name: "paymentStatus",
-            old: order.paymentStatus,
-            new: paymentProviderStatusMap.paypal
-          });
+          await addRecentOrderChange(
+            orderID,
+            {
+              name: "paymentStatus",
+              old: order.paymentStatus,
+              new: paymentProviderStatusMap.paypal
+            },
+            "edit"
+          );
 
           // Send email to admin and client
           await sendEmailToAddress(

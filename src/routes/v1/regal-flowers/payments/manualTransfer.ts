@@ -25,7 +25,7 @@ import {
 import {
   handleFailedVerification,
   paymentProviderStatusMap,
-  recentOrderChangesUpdate
+  addRecentOrderChange
 } from "../../../../helpers/type-conversion";
 import { performDeliveryDateNormalization } from "./payment-utils";
 
@@ -84,29 +84,27 @@ manualTransfer.post(
         paymentDetails
       });
 
-      await recentOrderChangesUpdate(orderId, {
-        name: "paymentStatus",
-        old: order.paymentStatus,
-        new: paymentProviderStatusMap.manualTransfer
-      });
+      // add payment status recent order change
+      await addRecentOrderChange(
+        orderId,
+        {
+          name: "paymentStatus",
+          old: order.paymentStatus,
+          new: paymentProviderStatusMap.manualTransfer
+        },
+        "edit"
+      );
 
-      // const recentOrderChanges = await firestore()
-      //   .collection("recentOrderChanges")
-      //   .where("orderid", "==", orderId)
-      //   .get();
-
-      // if (recentOrderChanges.docs[0].exists) {
-      //   await recentOrderChangesDb.doc(recentOrderChanges.docs[0].id).update({
-      //     type: "edit",
-      //     updates: {
-      //       name: "paymentStatus",
-      //       old: order.paymentStatus,
-      //       new: paymentStatus
-      //     },
-      //     timestamp: firestore.FieldValue.serverTimestamp(),
-      //     time: new Date().toISOString()
-      //   });
-      // }
+      // add payment details recent order change
+      await addRecentOrderChange(
+        orderId,
+        {
+          name: "paymentDetails",
+          old: order.paymentDetails,
+          new: paymentDetails
+        },
+        "edit"
+      );
 
       // Send email to admin and client
       await sendEmailToAddress(

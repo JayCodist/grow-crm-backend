@@ -10,7 +10,6 @@ import { templateRender } from "./render";
 import { PaymentType } from "../database/model/PaymentLog";
 
 const db = firestore();
-const recentOrderChangesDb = firestore().collection("recentOrderChanges");
 
 export const paymentProviderStatusMap: Record<PaymentType, PaymentStatus> = {
   paypal: "PAID - GO AHEAD (Paypal)",
@@ -19,22 +18,21 @@ export const paymentProviderStatusMap: Record<PaymentType, PaymentStatus> = {
   manualTransfer: "PAID - GO AHEAD (Bank Transfer)"
 };
 
-export const recentOrderChangesUpdate = async (
-  orderId: string,
-  updates: Record<string, any>
+export const addRecentOrderChange = async (
+  orderid: string,
+  updates: Record<string, any> | null,
+  type: "edit" | "add"
 ) => {
-  const recentOrderChanges = await firestore()
-    .collection("recentOrderChanges")
-    .where("orderid", "==", orderId)
-    .get();
-  if (recentOrderChanges.docs[0].exists) {
-    await recentOrderChangesDb.doc(recentOrderChanges.docs[0].id).update({
-      type: "edit",
-      updates,
-      timestamp: firestore.FieldValue.serverTimestamp(),
-      time: new Date().toISOString()
-    });
-  }
+  const snap = await db.collection("recentOrderChanges").add({
+    adminName: "website",
+    orderid,
+    updates,
+    type,
+    timestamp: firestore.FieldValue.serverTimestamp(),
+    time: new Date().toISOString()
+  });
+
+  console.log(`Added recent order change: ${snap.id}`);
 };
 
 export const handleFailedVerification = async (
@@ -57,11 +55,15 @@ export const handleFailedVerification = async (
         adminNotes: `${order.adminNotes} (Ver Failed)`
       });
 
-    await recentOrderChangesUpdate(orderId, {
-      name: "paymentStatus",
-      old: order.paymentStatus,
-      new: paymentProviderStatusMap[paymentType]
-    });
+    await addRecentOrderChange(
+      orderId,
+      {
+        name: "paymentStatus",
+        old: order.paymentStatus,
+        new: paymentProviderStatusMap[paymentType]
+      },
+      "edit"
+    );
 
     await sendEmailToAddress(
       [businessEmailMap[business]],
