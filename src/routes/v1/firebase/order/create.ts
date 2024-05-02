@@ -24,11 +24,11 @@ import {
 import validation from "./validation";
 import validator from "../../../../helpers/validator";
 import { getPriceDisplay } from "../../../../helpers/render";
+import { addRecentOrderChange } from "../../../../helpers/type-conversion";
 
 const createOrder = express.Router();
 const { firestore } = firebaseAdmin;
 const db = firestore().collection("orders");
-const recentOrderChangesDb = firestore().collection("recentOrderChanges");
 
 export const getFBProductDisplayName = (product: any) =>
   product.displayNameAdmin ||
@@ -263,14 +263,8 @@ createOrder.post(
         ...payload,
         timestamp: firestore.FieldValue.serverTimestamp()
       });
-      await recentOrderChangesDb.add({
-        adminName: "website",
-        orderid: response.id,
-        type: "add",
-        updates: null,
-        timestamp: firestore.FieldValue.serverTimestamp(),
-        time: new Date().toISOString()
-      });
+
+      await addRecentOrderChange(response.id, null, "add");
 
       if (!response) {
         throw new NoDataError("Order not created");
