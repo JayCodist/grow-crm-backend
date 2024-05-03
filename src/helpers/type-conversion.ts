@@ -15,7 +15,7 @@ export const paymentProviderStatusMap: Record<PaymentType, PaymentStatus> = {
   paypal: "PAID - GO AHEAD (Paypal)",
   paystack: "PAID - GO AHEAD (Website - Card)",
   monnify: "PAID - GO AHEAD (Bank Transfer)",
-  manualTransfer: "PART- PAYMENT PAID - GO AHEAD (but not seen yet)"
+  manualTransfer: "WEBSITE PAID - GO AHEAD (but not seen yet)"
 };
 
 export const addRecentOrderChange = async (
