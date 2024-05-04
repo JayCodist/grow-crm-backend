@@ -33,6 +33,7 @@
     "he": "^1.2.0",
     "html-to-text": "^9.0.5",
     "jsonwebtoken": "^8.5.1",
+    "moment": "^2.30.1",
     "mongoose": "^6.0.7",
     "node-fetch": "^2.6.7",
     "node-mailjet": "^3.3.4",
