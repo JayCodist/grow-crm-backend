@@ -1,4 +1,5 @@
 import { URLSearchParams } from "url";
+import { firestore } from "firebase-admin";
 import {
   expect,
   Contact,
@@ -27,7 +28,7 @@ const sampleContact: any = {
   state: "",
   dob: "",
   email: "",
-  timestamp: new Date().valueOf()
+  timestamp: firestore.FieldValue.serverTimestamp()
 };
 
 const endpoint = "/v1/contacts";

@@ -1,4 +1,5 @@
 import { firestore } from "firebase-admin";
+import moment from "moment";
 import { Business, Order, PaymentStatus } from "../database/model/Order";
 import { sendEmailToAddress } from "./messaging-helpers";
 import {
@@ -29,7 +30,7 @@ export const addRecentOrderChange = async (
     updates,
     type,
     timestamp: firestore.FieldValue.serverTimestamp(),
-    time: new Date().toISOString()
+    time: moment().format()
   });
 
   console.log(`Added recent order change: ${snap.id}`);
