@@ -20,8 +20,7 @@ import {
   businessEmailMap,
   businessNewOrderPathMap,
   businessOrderPathMap,
-  businessPaystackScret,
-  businessTemplateIdMap
+  businessPaystackScret
 } from "../../../../database/repository/utils";
 import {
   handleFailedVerification,
@@ -107,7 +106,7 @@ verifyPaystack.post(
                 business
               ),
               `Warning a New Order amount mismatch (${order.fullOrderId})`,
-              businessTemplateIdMap[business],
+
               business
             );
             await sendEmailToAddress(
@@ -118,7 +117,7 @@ verifyPaystack.post(
                 business
               ),
               `Thank you for your order (${order.fullOrderId})`,
-              businessTemplateIdMap[business],
+
               business
             );
           }
@@ -163,7 +162,7 @@ verifyPaystack.post(
                 business
               ),
               `Warning a New Order amount mismatch (${order.fullOrderId})`,
-              businessTemplateIdMap[business],
+
               business
             );
 
@@ -175,7 +174,7 @@ verifyPaystack.post(
                 business
               ),
               `Thank you for your order (${order.fullOrderId})`,
-              businessTemplateIdMap[business],
+
               business
             );
           }
@@ -227,7 +226,7 @@ verifyPaystack.post(
             business
           ),
           `New Order (${order.fullOrderId})`,
-          businessTemplateIdMap[business],
+
           business
         );
 
@@ -239,7 +238,7 @@ verifyPaystack.post(
             business
           ),
           `Thank you for your order (${order.fullOrderId})`,
-          businessTemplateIdMap[business],
+
           business
         );
 

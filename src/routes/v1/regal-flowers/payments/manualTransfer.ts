@@ -115,7 +115,6 @@ manualTransfer.post(
           business
         ),
         `New Order (${order.fullOrderId})`,
-        "5055243",
         business
       );
 
@@ -123,7 +122,6 @@ manualTransfer.post(
         [order.client.email as string],
         templateRender({ ...order }, businessOrderPathMap[business], business),
         `Thank you for your order (${order.fullOrderId})`,
-        "5055243",
         business
       );
 

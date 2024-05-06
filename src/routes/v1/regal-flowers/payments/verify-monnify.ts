@@ -105,14 +105,16 @@ verifyMonnify.post(
           ["info@regalflowers.com.ng"],
           templateRender({ ...order, adminNotes }, "new-order", business),
           `New Order (${order.fullOrderId})`,
-          "5055243"
+
+          business
         );
 
         await sendEmailToAddress(
           [order.client.email as string],
           templateRender({ ...order, adminNotes }, "order", business),
           `Thank you for your order (${order.fullOrderId})`,
-          "5055243"
+
+          business
         );
 
         const environment: Environment = /sandbox/i.test(

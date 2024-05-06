@@ -4,8 +4,7 @@ import { Business, Order, PaymentStatus } from "../database/model/Order";
 import { sendEmailToAddress } from "./messaging-helpers";
 import {
   businessEmailMap,
-  businessOrderPathMap,
-  businessTemplateIdMap
+  businessOrderPathMap
 } from "../database/repository/utils";
 import { templateRender } from "./render";
 import { PaymentType } from "../database/model/PaymentLog";
@@ -74,21 +73,23 @@ export const handleFailedVerification = async (
         business
       ),
       `Warning a New Order Ver Failed (${order.fullOrderId})`,
-      businessTemplateIdMap[business],
+
       business
     );
     await sendEmailToAddress(
       [order.client.email as string],
       templateRender({ ...order }, businessOrderPathMap[business], business),
       `Thank you for your order (${order.fullOrderId})`,
-      businessTemplateIdMap[business],
+
       business
     );
   } else {
     await sendEmailToAddress(
       [businessEmailMap[business]],
       "Order not found",
-      `Could not complete payment verification for order: ${orderId} for business: ${business}`
+      `Could not complete payment verification for order: ${orderId} for business: ${business}`,
+
+      business
     );
   }
 };

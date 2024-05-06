@@ -5,7 +5,6 @@ import { SuccessResponse } from "../../../core/ApiResponse";
 import validation from "./validation";
 import validator from "../../../helpers/validator";
 import { ApiError } from "../../../core/ApiError";
-import { businessTemplateIdMap } from "../../../database/repository/utils";
 
 const clientMessage = express.Router();
 
@@ -17,10 +16,9 @@ clientMessage.post(
       const { message, email, name } = req.body;
 
       await sendEmailToAddress(
-        ["info@floralhub.com.ng"],
+        ["info@floralhub.com.ng", "bellotaiwolateef1999@gmail.com"],
         clientMessageTemplateRender({ message, email, name }),
         `Client Enquiry - Contact Us`,
-        businessTemplateIdMap.floralHub,
         "floralHub"
       );
 

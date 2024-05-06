@@ -79,7 +79,9 @@ export default class UsersRepo {
             href="${businessProdUrlMap[business]}/user-upgrade?code=${code}"
           >Reset Password</a>
         </p>`,
-      "One-time password"
+      "One-time password",
+
+      business
     );
     throw new UserUpgradeRequiredError();
   }
