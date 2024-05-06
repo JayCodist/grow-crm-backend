@@ -21,8 +21,7 @@ import { getPriceDisplay, templateRender } from "../../../../helpers/render";
 import { AppCurrency } from "../../../../database/model/AppConfig";
 import {
   businessNewOrderPathMap,
-  businessOrderPathMap,
-  businessTemplateIdMap
+  businessOrderPathMap
 } from "../../../../database/repository/utils";
 import {
   handleFailedVerification,
@@ -187,7 +186,7 @@ verifyPaypal.post(
                 business
               ),
               `Warning a New Order amount mismatch (${order.fullOrderId})`,
-              businessTemplateIdMap[business],
+
               business
             );
 
@@ -199,7 +198,7 @@ verifyPaypal.post(
                 business
               ),
               `Thank you for your order (${order.fullOrderId})`,
-              businessTemplateIdMap[business],
+
               business
             );
           }
@@ -230,7 +229,7 @@ verifyPaypal.post(
               business
             ),
             `New Order (${order.fullOrderId})`,
-            businessTemplateIdMap[business],
+
             business
           );
 
@@ -242,7 +241,7 @@ verifyPaypal.post(
               business
             ),
             `Thank you for your order (${order.fullOrderId})`,
-            businessTemplateIdMap[business],
+
             business
           );
           const environment: Environment = /sandbox/i.test(

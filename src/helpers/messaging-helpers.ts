@@ -2,6 +2,7 @@ import fetch, { Headers, RequestInit } from "node-fetch";
 import { URLSearchParams } from "url";
 import { InternalError } from "../core/ApiError";
 import { Business } from "../database/model/Order";
+import { businessTemplateIdMap } from "../database/repository/utils";
 
 // const mailjet = Mailjet.connect(
 //   process.env.MAILJET_API_KEY as string,
@@ -12,13 +13,11 @@ export const sendEmailToAddress: (
   emailAddresses: string[],
   message: string,
   emailSubject: string,
-  templateID: string,
   business: Business
 ) => Promise<void> = async (
   emailAddresses,
   message,
   emailSubject,
-  templateID,
   business
 ) => {
   try {
@@ -29,7 +28,10 @@ export const sendEmailToAddress: (
     urlencoded.append("address", emailAddresses.join(","));
     urlencoded.append("message", message);
     urlencoded.append("subject", emailSubject);
-    urlencoded.append("templateID", templateID || "");
+    urlencoded.append(
+      "templateID",
+      businessTemplateIdMap[business as Business]
+    );
     urlencoded.append("business", business || "regalFlowers");
 
     const requestOptions: RequestInit = {

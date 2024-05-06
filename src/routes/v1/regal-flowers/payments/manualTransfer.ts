@@ -20,8 +20,7 @@ import { templateRender } from "../../../../helpers/render";
 import {
   businessEmailMap,
   businessNewOrderPathMap,
-  businessOrderPathMap,
-  businessTemplateIdMap
+  businessOrderPathMap
 } from "../../../../database/repository/utils";
 import {
   handleFailedVerification,
@@ -116,7 +115,6 @@ manualTransfer.post(
           business
         ),
         `New Order (${order.fullOrderId})`,
-        businessTemplateIdMap[business],
         business
       );
 
@@ -124,7 +122,6 @@ manualTransfer.post(
         [order.client.email as string],
         templateRender({ ...order }, businessOrderPathMap[business], business),
         `Thank you for your order (${order.fullOrderId})`,
-        businessTemplateIdMap[business],
         business
       );
 
