@@ -1,7 +1,10 @@
 import dayjs, { Dayjs } from "dayjs";
 import { firestore } from "firebase-admin";
 import { Business, Order } from "../../../../database/model/Order";
-import { businessEmailMap } from "../../../../database/repository/utils";
+import {
+  businessEmailMap,
+  businessTemplateIdMap
+} from "../../../../database/repository/utils";
 import { sendEmailToAddress } from "../../../../helpers/messaging-helpers";
 
 export const performDeliveryDateNormalization: (
@@ -70,7 +73,9 @@ export const performDeliveryDateNormalization: (
         "${infoMessage}"
       </p>
     `,
-        "Delivery Date Change"
+        "Delivery Date Change",
+        businessTemplateIdMap[business],
+        business
       );
     }
   }

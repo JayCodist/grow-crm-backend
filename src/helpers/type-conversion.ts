@@ -88,7 +88,9 @@ export const handleFailedVerification = async (
     await sendEmailToAddress(
       [businessEmailMap[business]],
       "Order not found",
-      `Could not complete payment verification for order: ${orderId} for business: ${business}`
+      `Could not complete payment verification for order: ${orderId} for business: ${business}`,
+      businessTemplateIdMap[business],
+      business
     );
   }
 };

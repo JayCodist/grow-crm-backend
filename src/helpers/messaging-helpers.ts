@@ -12,8 +12,8 @@ export const sendEmailToAddress: (
   emailAddresses: string[],
   message: string,
   emailSubject: string,
-  templateID?: string,
-  business?: Business
+  templateID: string,
+  business: Business
 ) => Promise<void> = async (
   emailAddresses,
   message,
