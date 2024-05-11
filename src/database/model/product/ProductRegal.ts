@@ -8,6 +8,7 @@ const COLLECTION_NAME = "productRegal";
 interface ProductRegalDocument extends ProductCreate {}
 
 const schema = new Schema({
+  key: { type: Number, index: true },
   name: String,
   _nameSearch: { type: [String], index: true },
   _categorySearch: { type: [String], index: true },

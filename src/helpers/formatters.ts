@@ -9,6 +9,10 @@ import {
   ProductWP
 } from "../database/model/product-wp/model.interface";
 import { getPriceDisplay } from "./render";
+import {
+  MinimalProduct,
+  Product
+} from "../database/model/product/model.interface";
 
 export const formatResponseRecord: (record: any) => any = record => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -58,19 +62,30 @@ export const decodeToken: <T>(token: string, ignoreExpiration: boolean) => T = (
   return payload as any;
 };
 
-export const minimizeProduct: (product: ProductWP) => MinimalProductWP =
-  product => {
-    return {
-      name: product.name,
-      sku: product.subtitle,
-      key: product.key,
-      images: product.images[0],
-      subtitle: product.subtitle,
-      slug: product.slug,
-      price: product.price,
-      variants: product.variants
-    };
+export const minimizeProduct: (
+  product: ProductWP | Product
+) => MinimalProductWP | MinimalProduct = product => {
+  return {
+    name: product.name,
+    sku: product.subtitle,
+    key: product.key,
+    images: product.images[0],
+    subtitle: product.subtitle,
+    slug: product.slug,
+    price: product.price,
+    variants: product.variants
   };
+};
+
+export const signFirebaseToken = () => {
+  return jwt.sign(
+    { firebase: true },
+    process.env.JWT_SIGNATURE_SECRET as string,
+    {
+      expiresIn: "1d"
+    }
+  );
+};
 
 export const slugify: (str: string) => string = str => {
   return str

@@ -8,6 +8,7 @@ const COLLECTION_NAME = "productFloral";
 interface ProductFloralDocument extends ProductCreate {}
 
 const schema = new Schema({
+  key: { type: Number, index: true },
   name: String,
   _nameSearch: { type: [String], index: true },
   subtitle: String,

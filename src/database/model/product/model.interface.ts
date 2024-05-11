@@ -122,6 +122,8 @@ export interface MinimalProduct {
 export interface Product {
   name: string;
   subtitle: string;
+  active: boolean;
+  key: number;
   temporaryNotes: string[];
   slug: string;
   categories: string[];
